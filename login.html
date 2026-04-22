@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA OS — Acesso ao painel de controle. Faça login para acessar seus módulos de inteligência artificial.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXIA OS — Acesso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Sora:wght@300;400;500;600;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;scroll-behavior:smooth}
+:root{
+  --acc:#00E5FF;--acc2:#00B8D4;--acclt:rgba(0,229,255,.08);--accbrd:rgba(0,229,255,.20);
+  --bg:#05070D;--bg2:#090C17;--bg3:#0E1220;--brd:rgba(255,255,255,.06);
+  --txt:#8A9DC0;--txt2:#3F5070;--white:#E8F0FF;--red:#FF3D5A;--green:#2ED080;
+  --ff:'Sora',sans-serif;--ffs:'DM Serif Display',serif;--ffm:'DM Mono',monospace;
+}
+body{
+  font-family:var(--ff);background:var(--bg);color:var(--txt);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;overflow:hidden;
+}
+body::before{
+  content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);
+  width:900px;height:700px;
+  background:radial-gradient(ellipse,var(--acclt) 0%,transparent 60%);
+  pointer-events:none;animation:orbBreath 6s ease-in-out infinite;
+}
+@keyframes orbBreath{0%,100%{opacity:.6;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.05)}}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 100%);
+  pointer-events:none;
+}
+#splash{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .6s ease;
+}
+#splash.out{opacity:0;pointer-events:none;}
+.sp-gem{
+  width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0d1117,var(--acc));
+  box-shadow:0 0 40px var(--acclt);animation:gemPulse 2s ease infinite;
+}
+@keyframes gemPulse{0%,100%{box-shadow:0 0 20px var(--acclt)}50%{box-shadow:0 0 60px var(--accbrd)}}
+.sp-name{font-family:var(--ffs);font-style:italic;font-size:2rem;color:var(--white);}
+.sp-bar{width:60px;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-top:10px;}
+.sp-fill{height:100%;width:0;background:var(--acc);animation:barFill 1s ease .1s forwards;}
+@keyframes barFill{to{width:100%}}
+.card{
+  width:100%;max-width:420px;background:rgba(9,12,23,.95);
+  border:1px solid var(--brd);border-radius:20px;
+  padding:44px 38px 36px;position:relative;z-index:1;
+  box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,229,255,.04);
+  opacity:0;transition:opacity .5s;backdrop-filter:blur(20px);
+}
+.card.visible{opacity:1;}
+.card-bar{position:absolute;top:0;left:0;right:0;height:2px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,var(--acc),var(--acc2));}
+.logo{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:32px;}
+.logo-gem{
+  width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#0d1117,#0a2a35);
+  border:1px solid var(--accbrd);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 24px rgba(0,229,255,.12);
+}
+.logo-name{font-family:var(--ffs);font-style:italic;font-size:1.4rem;color:var(--white);}
+.logo-sub{font-family:var(--ffm);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);}
+
+.tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--bg3);border-radius:10px;padding:4px;}
+.tab{
+  flex:1;padding:8px;border:none;border-radius:7px;background:transparent;
+  color:var(--txt);font-family:var(--ff);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;
+}
+.tab.active{background:var(--acclt);color:var(--acc);border:1px solid var(--accbrd);}
+
+.alert{border-radius:8px;padding:10px 14px;font-size:11.5px;margin-bottom:14px;display:none;}
+.alert.show{display:block;}
+.a-err{background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+.a-ok{background:rgba(46,208,128,.1);border:1px solid rgba(46,208,128,.3);color:var(--green);}
+
+.inp{
+  width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:10px;
+  padding:12px 14px;color:var(--white);font-family:var(--ff);font-size:13.5px;
+  outline:none;margin-bottom:12px;transition:border .2s;
+}
+.inp:focus{border-color:var(--accbrd);}
+.inp::placeholder{color:var(--txt2);}
+
+.btn{
+  width:100%;padding:13px;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(0,184,212,.08));
+  border:1px solid var(--accbrd);border-radius:10px;color:var(--acc);
+  font-family:var(--ff);font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.btn:hover{background:var(--acc);color:var(--bg);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-spinner{display:none;width:16px;height:16px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn.loading .btn-text{display:none;}
+.btn.loading .btn-spinner{display:block;}
+
+.ft{margin-top:20px;text-align:center;font-size:9px;color:var(--txt2);}
+.ft a{color:var(--acc);text-decoration:none;}
+
+/* ERR-008 FIX: Mobile overflow */
+@media(max-width:768px){
+  body{overflow-x:hidden!important}
+  .container,.wrapper,.inner,.mw,.max-w,.content,.main{max-width:100vw!important;overflow-x:hidden!important}
+  [class*="grid"]{grid-template-columns:1fr!important}
+  img,video,iframe{max-width:100%!important}
+  nav [class*="link"],[class*="nav-link"],[class*="menu-link"]{display:none!important}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  h1{font-size:clamp(24px,7vw,48px)!important}
+  h2{font-size:clamp(20px,5vw,36px)!important}
+}
+@media(max-width:600px){
+  body{overflow-x:hidden!important}
+  section,main,[class*="section"]{padding-left:16px!important;padding-right:16px!important}
+  nav,header,[class*="navbar"]{padding-left:16px!important;padding-right:16px!important}
+  [style*="width:900px"],[style*="width:800px"],[style*="width:700px"],[style*="width:600px"],[style*="width:580px"],[style*="width:560px"]{width:100%!important;max-width:100%!important}
+}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+  <script src="/core/nav-guard.js"></script>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '\u26a0 Modo offline \u2014 reconectando...';
+        document.body && document.body.appendChild(b);
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) { b.remove(); clearInterval(check); }
+        }, 2000);
+      }
+      return;
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="nexia-design-system.css">
+</head>
+<body>
+<script src="/core/nexia-splash.js"></script>
+
+<div id="splash">
+  <div class="sp-gem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="24" height="24">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  </div>
+  <div class="sp-name" style="font-style:italic">NEXIA<span style="font-family:'Sora',sans-serif;font-style:normal;font-weight:700;font-size:.72rem;letter-spacing:.2em;color:var(--acc);margin-left:6px;vertical-align:middle;">OS</span></div>
+  <div class="sp-bar"><div class="sp-fill"></div></div>
+</div>
+
+<div class="card" id="card">
+  <div class="card-bar"></div>
+  <div class="logo">
+    <div class="logo-gem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" width="24" height="24">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <div class="logo-name">NEXIA OS</div>
+    <div class="logo-sub">Plataforma de Inteligência</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-login" onclick="switchTab('login')">Entrar</button>
+    <button class="tab" id="tab-register" onclick="switchTab('register')">Criar Conta</button>
+  </div>
+
+  <div class="alert a-err" id="a-err"></div>
+  <div class="alert a-ok" id="a-ok"></div>
+
+  <!-- Formulário de Login -->
+  <div id="form-login">
+    <input class="inp" id="l-email" type="email" placeholder="E-mail de acesso" autocomplete="email">
+    <input class="inp" id="l-pass" type="password" placeholder="Senha" autocomplete="current-password">
+    <button class="btn" id="btn-login" onclick="doLogin()">
+      <span class="btn-text">Entrar na Plataforma</span>
+      <span class="btn-spinner"></span>
+    </button>
+  </div>
+
+  <!-- Formulário de Registro -->
+  <div id="form-register" style="display:none">
+    <input class="inp" id="r-name" type="text" placeholder="Nome completo">
+    <input class="inp" id="r-email" type="email" placeholder="E-mail">
+    <input class="inp" id="r-pass" type="password" placeholder="Senha (mín. 6 caracteres)">
+    <button class="btn" id="btn-register" onclick="doRegister()">
+      <span class="btn-text">Criar Conta</span>
+      <span class="btn-spinner"></span>
+    </button>
+  </div>
+
+  <div class="ft">© 2026 NEXIA OS · Powered by Firebase · <a href="mailto:suporte@nexia.app">Suporte</a></div>
+</div>
+
+<script>
+'use strict';
+
+// Splash timing
+setTimeout(() => {
+  document.getElementById('splash').classList.add('out');
+  setTimeout(() => { document.getElementById('card').classList.add('visible'); }, 300);
+}, 1200);
+
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  hideAlerts();
+}
+
+function showErr(msg) {
+  const el = document.getElementById('a-err');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('a-ok').classList.remove('show');
+}
+function showOk(msg) {
+  const el = document.getElementById('a-ok');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('a-err').classList.remove('show');
+}
+function hideAlerts() {
+  document.getElementById('a-err').classList.remove('show');
+  document.getElementById('a-ok').classList.remove('show');
+}
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.classList.toggle('loading', loading);
+  btn.disabled = loading;
+}
+
+// FIX v23: limpa chave envenenada por nexia-splash.js e event-system.js em sessões anteriores
+// Isso garante que usuários que acessaram o sistema antes do fix não fiquem presos no redirect errado.
+(function() {
+  const stale = localStorage.getItem('redirect_after_login');
+  if (stale === 'cortex') localStorage.removeItem('redirect_after_login');
+})();
+
+// Redireciona após login com base no role
+const REDIRECT_MAP = {
+  'cortex':           '/nexia/cortex-app.html',
+  'flow':             '/nexia/flow.html',
+  'strike-center':    '/nexia/strike-center.html',
+  'striker':          '/nexia/nexia-striker.html',
+  'studio':           '/nexia/studio.html',
+  'sentinel':         '/nexia/sentinel-dashboard.html',
+  'swarm':            '/nexia/swarm-control.html',
+  'pabx':             '/nexia/pabx-softphone.html',
+  'pki':              '/nexia/pki-scanner.html',
+  'osint':            '/nexia/osint-query.html',
+  'pay':              '/nexia/nexia-pay.html',
+  'store':            '/nexia/nexia-store.html',
+  'architect':        '/nexia/architect.html',
+  'social-media':     '/nexia/social-media-auto.html',
+  'my-panel':         '/nexia/my-panel.html',
+  'tenant-hub':       '/nexia/tenant-hub.html',
+  'master-admin':     '/nexia/nexia-master-admin.html',
+  'qa-test-center':   '/nexia/qa-test-center.html',
+};
+
+async function getRedirectUrl() {
+  // Support ?next=/nexia/some-page.html passed by auth.js _autoGuard
+  const _nextParam = new URLSearchParams(window.location.search).get('next');
+  if (_nextParam && _nextParam.startsWith('/')) {
+    // Store it so both branches below can use it
+    localStorage.setItem('redirect_after_login', _nextParam);
+  }
+
+  // FIX v23: role always takes priority — master/admin are never redirected to
+  // a stored page (nexia-splash.js and event-system.js used to poison this key with 'cortex').
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      const profile = NexiaAuth.getProfile();
+      const role = (profile && profile.role) || 'user';
+      if (role === 'master') { localStorage.removeItem('redirect_after_login'); resolve('/nexia/nexia-master-admin.html'); return; }
+      if (role === 'admin')  { localStorage.removeItem('redirect_after_login'); resolve('/nexia/tenant-hub.html'); return; }
+      // For regular users: respect stored redirect (e.g. they were trying to open a specific page)
+      const pending = localStorage.getItem('redirect_after_login');
+      if (pending) {
+        localStorage.removeItem('redirect_after_login');
+        const mapped = REDIRECT_MAP[pending] || (pending.startsWith('/') ? pending : '/' + pending);
+        resolve(mapped); return;
+      }
+      // FIX v41: validate homePage protocol — prevent open redirect via Firestore poisoning
+      const hp = profile && profile.homePage;
+      resolve((hp && hp.startsWith('/') && !hp.startsWith('//')) ? hp : '/nexia/my-panel.html');
+    }, 1500);
+
+    NexiaAuth.onChange((profile) => {
+      if (!profile) return;
+      clearTimeout(timer);
+      const role = profile.role || 'user';
+      if (role === 'master') { localStorage.removeItem('redirect_after_login'); resolve('/nexia/nexia-master-admin.html'); return; }
+      if (role === 'admin')  { localStorage.removeItem('redirect_after_login'); resolve('/nexia/tenant-hub.html'); return; }
+      // For regular users: respect stored redirect
+      const pending = localStorage.getItem('redirect_after_login');
+      if (pending) {
+        localStorage.removeItem('redirect_after_login');
+        const mapped = REDIRECT_MAP[pending] || (pending.startsWith('/') ? pending : '/' + pending);
+        resolve(mapped); return;
+      }
+      // FIX v41: validate homePage protocol — prevent open redirect via Firestore poisoning
+      const hp2 = profile.homePage;
+      resolve((hp2 && hp2.startsWith('/') && !hp2.startsWith('//')) ? hp2 : '/nexia/my-panel.html');
+    });
+  });
+}
+
+async function doLogin() {
+  const email = document.getElementById('l-email')?.value.trim();
+  const pass  = document.getElementById('l-pass')?.value;
+  if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
+
+  setLoading('btn-login', true);
+  hideAlerts();
+
+  const tryLogin = async () => {
+    if (!NEXIA._ready) { setTimeout(tryLogin, 150); return; }
+    try {
+      // SECURITY FIX: SESSION persistence — ao fechar aba/janela, sessão encerra
+      if (NEXIA.auth && firebase.auth) {
+        await NEXIA.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+      }
+      await NexiaAuth.login(email, pass);
+      showOk('Login realizado! Redirecionando...');
+      const url = await getRedirectUrl();
+      window.location.href = url;
+    } catch(e) {
+      showErr(e.message || 'Erro ao fazer login. Tente novamente.');
+      setLoading('btn-login', false);
+    }
+  };
+  tryLogin();
+}
+
+async function doRegister() {
+  const name  = document.getElementById('r-name')?.value.trim();
+  const email = document.getElementById('r-email')?.value.trim();
+  const pass  = document.getElementById('r-pass')?.value;
+  if (!name || !email || !pass) { showErr('Preencha todos os campos.'); return; }
+  if (pass.length < 6) { showErr('Senha deve ter pelo menos 6 caracteres.'); return; }
+
+  setLoading('btn-register', true);
+  hideAlerts();
+
+  const tryRegister = async () => {
+    if (!NEXIA._ready) { setTimeout(tryRegister, 150); return; }
+    try {
+      // FIX v50: registra com tenantSlug='nexia' por padrão para novos usuários do NEXIA OS
+      // Evita 403 no Cortex/API causado por tenantSlug='guest' incompatível com validateTenant()
+      await NexiaAuth.register(email, pass, name, 'nexia');
+      showOk('Conta criada! Redirecionando...');
+      const regUrl = await getRedirectUrl();
+      setTimeout(() => { window.location.href = regUrl; }, 1000);
+    } catch(e) {
+      showErr(e.message || 'Erro ao criar conta. Tente novamente.');
+      setLoading('btn-register', false);
+    }
+  };
+  tryRegister();
+}
+
+// Enter key: submete o formulário ativo
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const tab = document.getElementById('tab-login').classList.contains('active');
+  if (tab) doLogin(); else doRegister();
+});
+
+// SECURITY FIX: Auto-redirect removido — master/admin deve sempre fazer login manual.
+// Firebase usa SESSION persistence definida no doLogin() abaixo.
+</script>
+  <script src="/core/nexia-engine.js"></script>
+  <script src="/core/nexia-theme.js"></script>
+</body>
+</html>

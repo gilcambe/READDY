@@ -1,0 +1,2308 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\playwright.config.js",
+    "rootDir": "C:/Users/bezerra1/Downloads/NEXIA_v51_AUDITED",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/bezerra1/Downloads/NEXIA_v51_AUDITED/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/bezerra1/Downloads/NEXIA_v51_AUDITED",
+        "testIgnore": [],
+        "testMatch": [
+          "**/nexia.test.js"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "nexia.test.js",
+      "file": "nexia.test.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "1. Navegação — todas as páginas",
+          "file": "nexia.test.js",
+          "line": 25,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Login (/login) — HTTP 200, zero crash JS",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:32:53.268Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--7778e-in-—-HTTP-200-zero-crash-JS-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--7778e-in-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 7,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-22T13:32:56.028Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--7778e-in-—-HTTP-200-zero-crash-JS-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--7778e-in-—-HTTP-200-zero-crash-JS-chromium-retry1\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-45fe5aa089fe0c3f5964",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Cortex (/nexia/cortex) — HTTP 200, zero crash JS",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:32:58.422Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--089f6-ex-—-HTTP-200-zero-crash-JS-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--089f6-ex-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-22T13:33:00.900Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--089f6-ex-—-HTTP-200-zero-crash-JS-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--089f6-ex-—-HTTP-200-zero-crash-JS-chromium-retry1\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3540472b83d6df908ae0",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Sentinel (/nexia/sentinel) — HTTP 200, zero crash JS",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 9,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:33:04.187Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--bcf7d-el-—-HTTP-200-zero-crash-JS-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--bcf7d-el-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 23,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-22T13:33:09.111Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--bcf7d-el-—-HTTP-200-zero-crash-JS-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--bcf7d-el-—-HTTP-200-zero-crash-JS-chromium-retry1\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-c4a19cf46033477a0bbe",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Observability (/nexia/observability.html) — HTTP 200, zero crash JS",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:33:14.951Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--1c021-ml-—-HTTP-200-zero-crash-JS-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--1c021-ml-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-22T13:33:18.987Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--1c021-ml-—-HTTP-200-zero-crash-JS-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--1c021-ml-—-HTTP-200-zero-crash-JS-chromium-retry1\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-35c4821ea0bf06dc9ca0",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Architect (/nexia/architect) — HTTP 200, zero crash JS",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:33:22.699Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--b7d85-ct-—-HTTP-200-zero-crash-JS-chromium\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--b7d85-ct-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11,
+                      "error": {
+                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\bezerra1\\AppData\\Local\\ms-playwright\\chromium-1217\\chrome-win64\\chrome.exe\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-04-22T13:33:26.277Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--b7d85-ct-—-HTTP-200-zero-crash-JS-chromium-retry1\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--b7d85-ct-—-HTTP-200-zero-crash-JS-chromium-retry1\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-5e7a41584c4409ce9c18",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Flow (/nexia/flow) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 2,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-22T13:33:29.378Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\bezerra1\\Downloads\\NEXIA_v51_AUDITED\\test-results\\nexia-1-Navegação-—-todas--55030-ow-—-HTTP-200-zero-crash-JS-chromium\\trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-2e90a4a65f35e7c70c7e",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "My Panel (/nexia/my-panel) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3e27625327d68bf8ddb4",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Master Admin (/nexia/master-admin) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-80625dbd0687679abbcc",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Pay (/nexia/pay) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-c151c05fa816d7b6a818",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Store (/nexia/store) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-c6fc21926ecd04784d47",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Striker (/nexia/striker) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-2fbd6eaa813668617d5c",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "OSINT (/nexia/osint-query) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-89d732fcc60700db612a",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "PABX (/nexia/pabx) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-4a5645c6b95788790643",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "PKI Scanner (/nexia/pki) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-1674f17eddb4a0d77c2b",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "QA Center (/nexia/qa-test-center) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-5f45bbeda92430574d22",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Social Media (/nexia/social-media) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-c4f832388d9149f69fff",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Strike Center (/nexia/strike-center) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-1e795c561c676505a22e",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Studio (/nexia/studio) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-a17057062ffecf537ead",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Swarm Control (/nexia/swarm) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-d7f3d2e1ce182065e8f7",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Tenant Hub (/nexia/tenant-hub) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-7012d421c954947b9b0d",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "AutoDemo (/nexia/autodemo) — HTTP 200, zero crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-f3737ef65bad1d112426",
+              "file": "nexia.test.js",
+              "line": 51,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "2. Firebase Auth",
+          "file": "nexia.test.js",
+          "line": 86,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Login: sem erro Firebase No-App",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-89b1674534fd7f8b2db0",
+              "file": "nexia.test.js",
+              "line": 87,
+              "column": 3
+            },
+            {
+              "title": "Login: sem erro initializeApp duplicado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-870a34094254fca16d75",
+              "file": "nexia.test.js",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "Login: credencial inválida não redireciona para app",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-6b8e67bb51f0ed0f2af8",
+              "file": "nexia.test.js",
+              "line": 111,
+              "column": 3
+            },
+            {
+              "title": "Login: campos vazios não submetem",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-1e7b1d658987d15e9abb",
+              "file": "nexia.test.js",
+              "line": 133,
+              "column": 3
+            },
+            {
+              "title": "Páginas protegidas: redirecionam para login sem auth",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-8fd5e426bba41dd2d3e2",
+              "file": "nexia.test.js",
+              "line": 149,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "3. Layout e Design System",
+          "file": "nexia.test.js",
+          "line": 172,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Cortex: fonte Inter declarada no HTML",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-8e89dfcca8e613a9885e",
+              "file": "nexia.test.js",
+              "line": 173,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: fonte Inter declarada no HTML",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-2bc90ecb4ac41931fe3e",
+              "file": "nexia.test.js",
+              "line": 178,
+              "column": 3
+            },
+            {
+              "title": "Observability: fonte Inter declarada no HTML",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-99ff3daebe07c98e81e9",
+              "file": "nexia.test.js",
+              "line": 183,
+              "column": 3
+            },
+            {
+              "title": "Cortex: sidebar .sb presente no DOM",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-00c0ccb1a6aed670d4fb",
+              "file": "nexia.test.js",
+              "line": 188,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: sidebar .sb presente no DOM",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-9183c1600077fa834e80",
+              "file": "nexia.test.js",
+              "line": 195,
+              "column": 3
+            },
+            {
+              "title": "CSS var --bg definida e não vazia",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-55d1829af19a9560d0c5",
+              "file": "nexia.test.js",
+              "line": 202,
+              "column": 3
+            },
+            {
+              "title": "CSS var --text definida e não vazia",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-caefee1b2aeb45f53f50",
+              "file": "nexia.test.js",
+              "line": 210,
+              "column": 3
+            },
+            {
+              "title": "CSS var --c1 ou --primary definida (cor primária)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-d2e0f358777d629ccca4",
+              "file": "nexia.test.js",
+              "line": 218,
+              "column": 3
+            },
+            {
+              "title": "CSS var --brd definida e não vazia",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-499bd3ae27b04483a36c",
+              "file": "nexia.test.js",
+              "line": 227,
+              "column": 3
+            },
+            {
+              "title": "Páginas nexia: meta viewport presente",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-a147e9b50d7400ebe959",
+              "file": "nexia.test.js",
+              "line": 235,
+              "column": 3
+            },
+            {
+              "title": "Remixicon CDN referenciado no Cortex",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-a3b910a6266bbba91777",
+              "file": "nexia.test.js",
+              "line": 243,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "4. Dark Mode",
+          "file": "nexia.test.js",
+          "line": 252,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Widget #nx-theme-widget injetado no DOM",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-ef2736fba7fb558b3774",
+              "file": "nexia.test.js",
+              "line": 253,
+              "column": 3
+            },
+            {
+              "title": "Botão toggle (#nx-toggle-theme) muda data-theme",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3826397734f7bf189c9d",
+              "file": "nexia.test.js",
+              "line": 259,
+              "column": 3
+            },
+            {
+              "title": "--bg muda de valor entre light e dark",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-74691f2b243afd10c9dc",
+              "file": "nexia.test.js",
+              "line": 279,
+              "column": 3
+            },
+            {
+              "title": "Tema persiste em localStorage após setTheme",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-1bb7f1e2879520a81648",
+              "file": "nexia.test.js",
+              "line": 296,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "5. Seletor de Idioma",
+          "file": "nexia.test.js",
+          "line": 313,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Botões PT, EN, ES presentes no widget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-770c0b4eaa137942dc46",
+              "file": "nexia.test.js",
+              "line": 314,
+              "column": 3
+            },
+            {
+              "title": "Clicar EN persiste nx_lang=en",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-b67f38ef29534ceb9d5f",
+              "file": "nexia.test.js",
+              "line": 328,
+              "column": 3
+            },
+            {
+              "title": "Clicar PT persiste nx_lang=pt",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-6ec37d63f0a21bd6b991",
+              "file": "nexia.test.js",
+              "line": 339,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "6. Botões — interatividade",
+          "file": "nexia.test.js",
+          "line": 354,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Cortex: #btnSend presente e habilitado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-04fafb5ab6711a7414f6",
+              "file": "nexia.test.js",
+              "line": 355,
+              "column": 3
+            },
+            {
+              "title": "Cortex: textarea #inp aceita texto",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-43acf23fb9ea11db3f6c",
+              "file": "nexia.test.js",
+              "line": 363,
+              "column": 3
+            },
+            {
+              "title": "Cortex: seletor de modelo (#modelSel) tem > 1 opção",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-559877ea243799d97ee8",
+              "file": "nexia.test.js",
+              "line": 372,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: #btn-scan presente",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-b25a400234574a457556",
+              "file": "nexia.test.js",
+              "line": 381,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: #btn-heal disabled antes do scan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-7d1c46ef69074f515470",
+              "file": "nexia.test.js",
+              "line": 387,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: clicar Full Scan não causa crash JS",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-8a1727fdbf56e1e5a5e7",
+              "file": "nexia.test.js",
+              "line": 395,
+              "column": 3
+            },
+            {
+              "title": "Login: tab Register exibe formulário de cadastro",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-f097397b9da2d7c55da1",
+              "file": "nexia.test.js",
+              "line": 413,
+              "column": 3
+            },
+            {
+              "title": "Cortex: input vazio não dispara request /api/cortex",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-41c22ca52fdc3638e2bf",
+              "file": "nexia.test.js",
+              "line": 431,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "7. Cortex — IA real",
+          "file": "nexia.test.js",
+          "line": 454,
+          "column": 6,
+          "specs": [
+            {
+              "title": "POST /api/cortex não retorna 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-fb75d01a107f46bc346d",
+              "file": "nexia.test.js",
+              "line": 455,
+              "column": 3
+            },
+            {
+              "title": "POST /api/cortex: Content-Type é JSON, nunca HTML",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-4a85249ca7295a41ea93",
+              "file": "nexia.test.js",
+              "line": 463,
+              "column": 3
+            },
+            {
+              "title": "POST /api/cortex 200: reply é string não vazia",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-b1c3ad90567348315b65",
+              "file": "nexia.test.js",
+              "line": 474,
+              "column": 3
+            },
+            {
+              "title": "POST /api/cortex 200: resposta leva > 200ms (não é fake)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-16606faeea789091ab1c",
+              "file": "nexia.test.js",
+              "line": 488,
+              "column": 3
+            },
+            {
+              "title": "GET /api/models retorna estrutura válida",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-cef72064e9d3358ae178",
+              "file": "nexia.test.js",
+              "line": 500,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "8. Sentinel — scan real",
+          "file": "nexia.test.js",
+          "line": 517,
+          "column": 6,
+          "specs": [
+            {
+              "title": "GET /api/sentinel schema correto",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-72fc0c1f2cb05fbea847",
+              "file": "nexia.test.js",
+              "line": 518,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: HEALTHY exige ms reais (> 5ms)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-9b714f4ca85f7a86696f",
+              "file": "nexia.test.js",
+              "line": 528,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: resultados ok:false têm campo error preenchido",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3cbc3b9560d91016c6ca",
+              "file": "nexia.test.js",
+              "line": 539,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: cada resultado tem ms numérico",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3911d71fb726d11c514e",
+              "file": "nexia.test.js",
+              "line": 550,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: ms não são todos idênticos (anti-fake)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-76b9a94cb64b288f2f4f",
+              "file": "nexia.test.js",
+              "line": 559,
+              "column": 3
+            },
+            {
+              "title": "Sentinel: scan leva > 500ms (real, não cached)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-ea1fd2d4f045cd689d8a",
+              "file": "nexia.test.js",
+              "line": 570,
+              "column": 3
+            },
+            {
+              "title": "POST /api/sentinel-qa payload vazio retorna 400 ou 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-e89d1c9190a30732011b",
+              "file": "nexia.test.js",
+              "line": 579,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "9. Observability",
+          "file": "nexia.test.js",
+          "line": 591,
+          "column": 6,
+          "specs": [
+            {
+              "title": "GET /api/observability schema de métricas",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-06e84f81e9253fc89603",
+              "file": "nexia.test.js",
+              "line": 592,
+              "column": 3
+            },
+            {
+              "title": "GET /api/observe (alias) responde sem 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-7242ba8e8334e55875d9",
+              "file": "nexia.test.js",
+              "line": 603,
+              "column": 3
+            },
+            {
+              "title": "Dashboard: cards de métrica renderizados",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-12c84a26ec48eb86c6ea",
+              "file": "nexia.test.js",
+              "line": 608,
+              "column": 3
+            },
+            {
+              "title": "Dashboard: log panel presente",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-b872b3ade86642c83ef7",
+              "file": "nexia.test.js",
+              "line": 615,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "10. APIs — sem 500",
+          "file": "nexia.test.js",
+          "line": 626,
+          "column": 6,
+          "specs": [
+            {
+              "title": "GET /api/firebase-config < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-8b6d8f59d8d9d372a807",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/sentinel < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-31362f3e5f50a1f86a2e",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/observability < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-8e98aac18ac94f140222",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/models < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-dc33efb339d9e7fb27a0",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/usage < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-9b27c2bf724fc5333859",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/notifications < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-38242f902c23e9fd8e1b",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/audit < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-00795604b370df96354a",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "GET /api/sentinel-qa?action=ping < 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-64293803d52d3c67f9c6",
+              "file": "nexia.test.js",
+              "line": 639,
+              "column": 5
+            },
+            {
+              "title": "POST /api/auth retorna JSON (não HTML)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-3f1af6e9c6daef7988a3",
+              "file": "nexia.test.js",
+              "line": 655,
+              "column": 5
+            },
+            {
+              "title": "POST /api/logs retorna JSON (não HTML)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-060824613ba014fce49d",
+              "file": "nexia.test.js",
+              "line": 655,
+              "column": 5
+            },
+            {
+              "title": "POST /api/events retorna JSON (não HTML)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-005001a7c958b7808269",
+              "file": "nexia.test.js",
+              "line": 655,
+              "column": 5
+            },
+            {
+              "title": "POST /api/tenant retorna JSON (não HTML)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-b27a8fba89c7ae9d3d43",
+              "file": "nexia.test.js",
+              "line": 655,
+              "column": 5
+            },
+            {
+              "title": "/api/firebase-config retorna apiKey e projectId",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-016bc0de87954b2d4686",
+              "file": "nexia.test.js",
+              "line": 665,
+              "column": 3
+            },
+            {
+              "title": "/api/auth check sem token retorna authenticated:false",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-fa13bb5f086c73b48452",
+              "file": "nexia.test.js",
+              "line": 675,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "11. Detecção de fake",
+          "file": "nexia.test.js",
+          "line": 692,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Cortex reply não é hardcoded \"ok/true/mock\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-33ea30efaaa0943d4781",
+              "file": "nexia.test.js",
+              "line": 693,
+              "column": 3
+            },
+            {
+              "title": "Nenhuma rota GET retorna HTML quando espera JSON",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-a7f826d3e4eff512a722",
+              "file": "nexia.test.js",
+              "line": 708,
+              "column": 3
+            },
+            {
+              "title": "Sentinel ok:false tem status 0 ou >= 400",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-438ea289ba62e282f2ff",
+              "file": "nexia.test.js",
+              "line": 718,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "12. Performance",
+          "file": "nexia.test.js",
+          "line": 737,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Login carrega em < 10s",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-32127adfbfdc3ee22479",
+              "file": "nexia.test.js",
+              "line": 738,
+              "column": 3
+            },
+            {
+              "title": "Cortex carrega em < 12s",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-041f4bf1393940c823c3",
+              "file": "nexia.test.js",
+              "line": 744,
+              "column": 3
+            },
+            {
+              "title": "/api/firebase-config responde em < 3s",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-ac81325dc3ab19e79efd",
+              "file": "nexia.test.js",
+              "line": 750,
+              "column": 3
+            },
+            {
+              "title": "/api/observability responde em < 2s",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "738373f9ffa29a057f0b-77c1758bded78e115ee0",
+              "file": "nexia.test.js",
+              "line": 756,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-22T13:32:50.547Z",
+    "duration": 39043.375,
+    "expected": 0,
+    "skipped": 84,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

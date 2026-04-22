@@ -1,0 +1,204 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // Checks the user's own profile document for a field value
+    function userProfile() {
+      return get(/databases/$(database)/documents/users/$(uid())).data;
+    }
+
+    function userRole() {
+      return userProfile().role;
+    }
+
+    function userTenantSlug() {
+      return userProfile().tenantSlug;
+    }
+
+    function isMaster() {
+      return isAuthenticated() && userRole() == 'master';
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (userRole() == 'admin' || userRole() == 'master');
+    }
+
+    // User belongs to this tenant
+    function belongsToTenant(tenantSlug) {
+      return isAuthenticated() && userTenantSlug() == tenantSlug;
+    }
+
+    // User is admin/master of this tenant
+    function isAdminOfTenant(tenantSlug) {
+      return isAuthenticated() && (isMaster() || (userRole() == 'admin' && userTenantSlug() == tenantSlug));
+    }
+
+    // ── /users/{userId} ──────────────────────────────────────────
+    // Users can read/write only their own profile; master can read all
+    match /users/{userId} {
+      allow read:   if isAuthenticated() && (uid() == userId || isMaster());
+      allow create: if isAuthenticated() && uid() == userId;
+      allow update: if isAuthenticated() && (uid() == userId || isMaster());
+      allow delete: if isMaster();
+    }
+
+    // ── /tenants/{tenantSlug} ────────────────────────────────────
+    // Tenant doc itself: admins of that tenant + master can read/write
+    match /tenants/{tenantSlug} {
+      allow read:   if isAuthenticated() && (belongsToTenant(tenantSlug) || isMaster());
+      allow write:  if isAdminOfTenant(tenantSlug);
+
+      // ── /tenants/{tenantSlug}/members ────────────────────────
+      match /members/{memberId} {
+        allow read:   if isAuthenticated() && (belongsToTenant(tenantSlug) || isMaster());
+        allow write:  if isAdminOfTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/strike_campaigns ───────────────
+      match /strike_campaigns/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAuthenticated() && belongsToTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/strike_pool ────────────────────
+      match /strike_pool/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAuthenticated() && belongsToTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/pool_notifications ─────────────
+      match /pool_notifications/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow create: if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow update, delete: if isAdminOfTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/notifications ──────────────────
+      match /notifications/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow create: if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow update, delete: if isAdminOfTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/striker_prospects ──────────────
+      match /striker_prospects/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAuthenticated() && belongsToTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/cortex_memory ──────────────────
+      match /cortex_memory/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAuthenticated() && belongsToTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/kpi ─────────────────────────────
+      match /kpi/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAdminOfTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/billing ─────────────────────────
+      match /billing/{docId} {
+        allow read:   if isAdminOfTenant(tenantSlug);
+        allow write:  if isMaster();
+      }
+
+      // ── /tenants/{tenantSlug}/usage ───────────────────────────
+      match /usage/{docId} {
+        allow read:   if isAdminOfTenant(tenantSlug);
+        allow write:  if isAuthenticated() && belongsToTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/audit_log ──────────────────────
+      match /audit_log/{docId} {
+        allow read:   if isAdminOfTenant(tenantSlug);
+        allow create: if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow update, delete: if false; // audit logs are immutable
+      }
+
+      // ── /tenants/{tenantSlug}/rag_docs ───────────────────────
+      match /rag_docs/{docId} {
+        allow read:   if isAuthenticated() && belongsToTenant(tenantSlug);
+        allow write:  if isAdminOfTenant(tenantSlug);
+      }
+
+      // ── /tenants/{tenantSlug}/sentinel ───────────────────────
+      match /sentinel/{docId} {
+        allow read:   if isAdminOfTenant(tenantSlug);
+        allow write:  if isMaster();
+      }
+
+      // ── catch-all for any other tenant subcollection ──────────
+      match /{subcollection}/{docId} {
+        allow read:   if isAuthenticated() && (belongsToTenant(tenantSlug) || isMaster());
+        allow write:  if isAdminOfTenant(tenantSlug);
+      }
+    }
+
+    // ── /nexia_config/{docId} (global platform config) ──────────
+    match /nexia_config/{docId} {
+      allow read:   if isAuthenticated();
+      allow write:  if isMaster();
+    }
+
+    // ── /system/{docId} (internal health/overrides) ─────────────
+    match /system/{docId} {
+      allow read:   if isMaster();
+      allow write:  if isMaster();
+    }
+
+    // ── /system_status/{docId} (Sentinel scan results) ──────────
+    // Leitura: admins autenticados. Escrita: apenas server-side (service account bypassa rules)
+    match /system_status/{docId} {
+      allow read:   if isAdmin();
+      allow write:  if false; // escrito pelo backend via Admin SDK (service account)
+    }
+
+    // ── /sentinel_reports/{docId} ────────────────────────────────
+    match /sentinel_reports/{docId} {
+      allow read:   if isAdmin();
+      allow write:  if false; // escrito pelo backend
+    }
+
+    // ── /sentinel_heals/{docId} ──────────────────────────────────
+    match /sentinel_heals/{docId} {
+      allow read:   if isAdmin();
+      allow write:  if false; // escrito pelo backend
+    }
+
+    // ── /tenants/{tenantSlug}/modules (módulos ativos) ───────────
+    // Sub-regra explícita para evitar cair no catch-all e dar permissions error
+    match /tenants/{tenantSlug}/modules/{moduleId} {
+      allow read:   if isAuthenticated() && (belongsToTenant(tenantSlug) || isMaster());
+      allow write:  if isAdminOfTenant(tenantSlug);
+    }
+
+    // ── /tenants/{tenantSlug}/config (brand/theme) ────────────────
+    match /tenants/{tenantSlug}/config/{configId} {
+      allow read:   if isAuthenticated() && (belongsToTenant(tenantSlug) || isMaster());
+      allow write:  if isAdminOfTenant(tenantSlug);
+    }
+
+    // ── /tenants/{tenantSlug}/osint_log ──────────────────────────
+    match /tenants/{tenantSlug}/osint_log/{docId} {
+      allow read:   if isAdminOfTenant(tenantSlug);
+      allow create: if isAuthenticated() && belongsToTenant(tenantSlug);
+      allow update, delete: if false;
+    }
+
+    // ── Default: deny everything else ───────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

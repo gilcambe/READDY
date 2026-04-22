@@ -1,0 +1,30 @@
+# NEXIA OS — Render Configuration v2.0
+# Autônomo: sem Netlify, sem custos de functions externas
+
+services:
+  - type: web
+    name: nexia-os
+    runtime: node
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXIA_APP_URL
+        sync: false        # Ex: https://nexia.com.br
+      - key: FIREBASE_SERVICE_ACCOUNT_BASE64
+        sync: false        # Service account do Firebase em base64
+      - key: GROQ_API_KEY
+        sync: false        # Gratuito em console.groq.com — mínimo para Cortex funcionar
+      - key: GEMINI_API_KEY
+        sync: false        # Opcional — gratuito em aistudio.google.com
+      - key: ANTHROPIC_API_KEY
+        sync: false        # Opcional — pago, usado no Sentinel AI
+      - key: GITHUB_TOKEN
+        sync: false        # Opcional — para Sentinel abrir issues no GitHub
+      - key: GITHUB_REPO
+        sync: false        # Ex: "seu-usuario/nexia-os"
+      - key: RENDER_DEPLOY_HOOK
+        sync: false        # Opcional — Deploy Hook do Render para Sentinel Auto-Heal acionar redeploy

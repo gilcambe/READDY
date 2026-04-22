@@ -1,0 +1,59 @@
+NEXIA OS — BUILD v50
+Data: $(date +%Y-%m-%d)
+
+FIXES v50:
+─────────────────────────────────────────────────────
+[CRITICAL] middleware.js — master role bypass tenant validation
+  • guard(): se event._role === 'master' (custom claims Firebase Auth)
+    pula validateTenant() → elimina 403 no Cortex para admin@nexia.com
+
+[CRITICAL] middleware.js — auto-repair de usuários 'guest'
+  • validateTenant(): usuário com tenantSlug='guest' tentando acessar
+    tenant 'nexia' é auto-reparado no Firestore silenciosamente
+
+[BUG] sentinel.js — BASE URL errada
+  • Fallback era 'https://nexia.com.br' (não existe)
+  • Corrigido para NEXIA_APP_URL → RENDER_EXTERNAL_URL → nexia-os.onrender.com
+
+[BUG] sentinel-dashboard.html — diagnóstico fake-healthy
+  • Detecta scan suspeito (todos endpoints <5ms = URL errada)
+  • Log detalhado de cada erro com grupo, nome, status e tempo
+
+[UI] nexia-theme.js v3.0 — seletor de idioma refeito
+  • Remove PT/EN/ES empilhados verticalmente (inline, feio)
+  • Auto-injeta widget flutuante compacto: tema + PT/EN/ES lado a lado
+  • Remove elementos legados duplicados automaticamente
+
+[UI] 25 páginas limpas de seletores inline antigos
+  • Removidos nx-lang divs e nx-theme-btn standalone de todos os HTMLs
+  • nexia-theme.js agora é o único ponto de controle do widget
+
+[DX] nexia.test.js v2.0 — 20 testes reais
+  • Cortex: verifica se a IA respondeu texto real (não só HTTP 200)
+  • Sentinel 9.2/9.3: verifica tempos realistas e URL base correta
+  • Auth 4.1: verifica que token não contém mensagens de key ausente
+  • Erros 403/401: mapeados com instruções de correção
+
+[UI] cortex-app.html — mensagens de erro acionáveis
+  • 403 → instrução exata do set-master-role.js
+  • 401 → redireciona para login após 3s
+  • 500 → indica que GROQ_API_KEY/GEMINI_API_KEY pode estar faltando
+
+[BUG] login.html — novos usuários criados com tenantSlug='nexia'
+  • Anterior: tenantSlug='guest' → 403 imediato no Cortex
+  • Corrigido: tenantSlug='nexia' → acesso imediato
+
+VARIÁVEIS OBRIGATÓRIAS (Render Dashboard):
+─────────────────────────────────────────────────────
+NEXIA_APP_URL           = https://nexia-os.onrender.com
+FIREBASE_SERVICE_ACCOUNT = {... json da service account ...}
+GROQ_API_KEY            = gsk_... (cortex funciona com este)
+GEMINI_API_KEY          = AIza... (fallback do cortex)
+METRICS_SECRET          = nexia_metrics_2024_xK9pQmR7
+
+AÇÃO NECESSÁRIA (1x):
+─────────────────────────────────────────────────────
+Se admin@nexia.com ainda recebe 403 após o deploy:
+  node set-master-role.js admin@nexia.com
+  → faça logout + login novamente
+

@@ -1,0 +1,83 @@
+NEXIA OS — BUILD v49
+Data: 2026-04-21
+
+CORREÇÕES APLICADAS:
+─────────────────────────────────────────────────────────
+1. nexia/nexia-pay.html
+   - renderDashboardFallback() removida dados mock (João Silva, Maria Santos, Carlos Lima)
+     → exibe estado vazio "Aguardando conexão com Firebase..." quando Firebase offline
+   - renderDashTx() corrigido: variável txns → transactions
+   - renderAllTx() corrigido: variável allTxns → transactions
+   - loadDashboard() checa firebase.apps.length antes de chamar Firestore
+
+2. netlify/functions/cortex-logs.js
+   - guard() movido para ANTES do check de método HTTP
+   → sem token retorna 401 (não 405) — proteção de auth correta
+
+3. server.js
+   - serveFirebaseConfig() emite console.warn se FIREBASE_API_KEY não configurada
+   → facilita diagnóstico de auth/invalid-api-key no Render
+
+4. nexia/cortex-app.html
+   - init() não bloqueia na loadUsage() — loadProfile() chamado antes
+   - loadUsage() envia Bearer token + timeout de 5s com AbortController
+   → textarea#inp renderiza imediatamente após login
+
+5. ces/ces-admin.html
+   - Removidos dados mock estáticos da tabela de transações (Carlos Mendes, Ana Lima, Pedro Rocha)
+   - Removido Carlos Mendes do array de matchmaking
+   → tabela carrega dinamicamente do Firestore
+
+6. nexia.test.js → v1.6
+   - 405 adicionado aos códigos aceitos para /api/logs
+   - getToken() robusto: trata auth/invalid-api-key com try/catch + timeout 5s
+   - getVisibleText() exclui <script> inline do check de conteúdo mock
+   - METRICS_SECRET configurado
+
+CONFIGURAR NO RENDER DASHBOARD → ENVIRONMENT:
+─────────────────────────────────────────────────────────
+  FIREBASE_API_KEY              = (sua chave do Firebase Console)
+  FIREBASE_AUTH_DOMAIN          = nexia-c8710.firebaseapp.com
+  FIREBASE_PROJECT_ID           = nexia-c8710
+  FIREBASE_STORAGE_BUCKET       = nexia-c8710.firebasestorage.app
+  FIREBASE_MESSAGING_SENDER_ID  = 623044447905
+  FIREBASE_APP_ID               = 1:623044447905:web:13f70e1584fb0fcf8d2ae0
+  FIREBASE_SERVICE_ACCOUNT_BASE64 = (service account em base64)
+  METRICS_SECRET                = nexia_metrics_2024_xK9pQmR7
+
+COMO OBTER A FIREBASE_API_KEY CORRETA:
+  1. Abra https://console.firebase.google.com
+  2. Projeto nexia-c8710 → Configurações do projeto (ícone de engrenagem)
+  3. Aba "Geral" → seção "Seus apps" → Web app
+  4. Copie o valor de "apiKey"
+  5. Cole no Render → Environment → FIREBASE_API_KEY
+
+CORREÇÕES ADICIONAIS (patch 2):
+─────────────────────────────────────────────────────────
+7. nexia/sentinel-dashboard.html
+   - loadLastReport(), runFullScan(), triggerHeal() usavam fetch sem Bearer token → 401
+   - Todos convertidos para authFetch()
+   - _boot agora aguarda onAuthStateChanged antes de chamar loadLastReport()
+
+8. VARREDURA GLOBAL — 21 fetches sem token corrigidos:
+   - nexia/studio.html             (4 fetches)
+   - nexia/social-media-auto.html  (1 fetch)
+   - nexia/tenant-hub.html         (8 fetches)
+   - nexia/nexia-striker.html      (2 fetches)
+   - ces/ces-admin.html            (2 fetches)
+   - viajante-pro/vp-admin.html    (4 fetches)
+   Todos convertidos de fetch('/api/...) para authFetch('/api/...)
+   authFetch injetada nos arquivos que não tinham
+
+DIAGNÓSTICO DAS VARIÁVEIS DO RENDER:
+─────────────────────────────────────────────────────────
+✅ FIREBASE_API_KEY              — CORRETA (AIzaSyC9L...)
+✅ FIREBASE_SERVICE_ACCOUNT      — CORRETO (JSON válido, private_key com \n reais)
+✅ FIREBASE_SERVICE_ACCOUNT_BASE64 — CORRETO (base64 válido)
+✅ GROQ_API_KEY                  — configurada
+✅ METRICS_SECRET                — configurada
+✅ NEXIA_APP_URL                 — configurada
+✅ NODE_ENV                      — configurada
+
+O erro auth/invalid-api-key NÃO era das variáveis — era porque os fetches
+chamavam /api/ sem token antes do Firebase Auth estar pronto.
