@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
 <head>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="description" content="NEXIA PKI — Certificados Digitais. Gestão e validação de identidades digitais.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -833,29 +832,6 @@ input::placeholder,textarea::placeholder { color: var(--text3) !important; }
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../nexia-design-system.css">
-
-<script>
-(function() {
-  let _attempts = 0;
-  function _checkAuth() {
-    if (typeof NEXIA !== 'undefined' && NEXIA.auth) {
-      NEXIA.auth.onAuthStateChanged(u => {
-        if (!u) { window.location.href = '../login.html'; }
-      });
-    } else if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
-      firebase.auth().onAuthStateChanged(u => {
-        if (!u) { window.location.href = '../login.html'; }
-      });
-    } else if (++_attempts < 100) {
-      setTimeout(_checkAuth, 80);
-    } else {
-      window.location.href = '../login.html?error=timeout';
-    }
-  }
-  _checkAuth();
-})();
-</script>
-
 </head>
 <body>
 
