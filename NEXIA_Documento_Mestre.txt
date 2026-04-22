@@ -1,0 +1,1656 @@
+﻿✦ NEXIA OS — Documento Mestre v2.0    |    Proprietário e Confidencial
+✦ NEXIA OS
+Sistema Operacional Empresarial
+IA + Módulos + Multi-Tenant | Documento Mestre v2.0
+Proprietário e Confidencial — Gildivan © 2027
+________________
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+✦ NEXIA OS
+DOCUMENTO TÉCNICO DO BACKEND
+Funções, Credenciais, Estrutura, Fluxos e Segurança — v2.0
+Proprietário e Confidencial — Gildivan © 2027
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+PARTE 1 — CREDENCIAIS EXISTENTES
+Todas as credenciais já configuradas no sistema. NUNCA commite em repositório público.
+
+1.1 Firebase — Projeto CES Brasil (cesbrasil-85898)
+Projeto Firebase usado por CES Brasil, Viajante Pro, Bezsan e Splash.
+
+Chave
+Valor
+Para que serve
+apiKey
+AIzaSyD5DaWFN16WeY6TYEHcn0IVyq8ObzHbYgY
+Chave pública do Client SDK
+authDomain
+cesbrasil-85898.firebaseapp.com
+Domínio de autenticação Firebase
+databaseURL
+https://cesbrasil-85898-default-rtdb.firebaseio.com
+Realtime Database URL
+projectId
+cesbrasil-85898
+ID único do projeto no Firebase
+storageBucket
+cesbrasil-85898.firebasestorage.app
+Bucket de arquivos (Storage)
+messagingSenderId
+443274031096
+ID do sender para FCM push notifications
+appId
+1:443274031096:web:1ba713cbcb41178c77700d
+ID único do app web
+measurementId
+G-L24WSEHWXC
+ID do Google Analytics para este projeto
+
+Usuários já criados no Firebase Authentication:
+admin@cesbrasil.tech — Admin principal CES
+henrique@cesbrasil.tech — Admin CES
+pedro@cesbrasil.tech — Admin CES
+
+Como usar no código (JavaScript — classic script):
+const firebaseConfig = {
+  apiKey: "AIzaSyD5DaWFN16WeY6TYEHcn0IVyq8ObzHbYgY",
+  authDomain: "cesbrasil-85898.firebaseapp.com",
+  databaseURL: "https://cesbrasil-85898-default-rtdb.firebaseio.com",
+  projectId: "cesbrasil-85898",
+  storageBucket: "cesbrasil-85898.firebasestorage.app",
+  messagingSenderId: "443274031896",
+  appId: "1:443274031096:web:1ba713cbcb41178c77700d",
+  measurementId: "G-L24WSEHWXC"
+};
+firebase.initializeApp(firebaseConfig);
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+
+1.2 Firebase — Projeto NEXIA OS (nexia-c8710)
+Projeto Firebase usado pelo sistema NEXIA Master (Next.js admin panel). Separado do projeto CES.
+
+Variável de Ambiente
+Valor
+Para que serve
+NEXT_PUBLIC_NEXIA_API_KEY
+AIzaSyC9L592zKSUjx-YglmbGpxjv2hsXm_gbBM
+Client SDK — seguro expor
+NEXT_PUBLIC_NEXIA_AUTH_DOMAIN
+nexia-c8710.firebaseapp.com
+Auth domain
+NEXT_PUBLIC_NEXIA_PROJECT_ID
+nexia-c8710
+Project ID
+NEXT_PUBLIC_NEXIA_STORAGE_BUCKET
+nexia-c8710.firebasestorage.app
+Storage bucket
+NEXT_PUBLIC_NEXIA_MESSAGING_SENDER_ID
+623044447905
+FCM sender ID
+NEXT_PUBLIC_NEXIA_APP_ID
+1:623044447905:web:13f70e1584fb0fcf8d2ae0
+Web App ID
+NEXIA_FIREBASE_PROJECT_ID
+nexia-c8710
+Admin SDK — servidor only
+NEXIA_FIREBASE_CLIENT_EMAIL
+firebase-adminsdk@nexia-c8710.iam.gserviceaccount.com
+Service account email
+NEXIA_FIREBASE_PRIVATE_KEY
+-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n
+Chave privada — NUNCA expor
+
+Como gerar a chave privada Admin SDK:
+Firebase Console → Configurações do Projeto → Contas de Serviço
+Clicar em 'Gerar nova chave privada'
+Baixar o JSON, copiar private_key para NEXIA_FIREBASE_PRIVATE_KEY
+Copiar client_email para NEXIA_FIREBASE_CLIENT_EMAIL
+
+
+1.3 EmailJS — Credenciais Existentes
+Usado para envio de emails transacionais (bem-vindos, confirmações, reset de senha).
+
+Campo
+Valor
+Observação
+Service ID
+service_7cgu7d5
+ID do serviço de email configurado no EmailJS
+Template ID
+template_rl2r5co
+ID do template de email padrão
+Public Key
+LcS_kJi4Mf9_ExzCt
+Chave pública para inicializar o SDK
+Variável .env
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_7cgu7d5
+
+Variável .env
+NEXT_PUBLIC_EMAILJS_TEMPLAT
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+E_ID=template_rl2r5co
+Variável .env
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=LcS_kJi4Mf9_ExzCt
+
+
+Como usar no código:
+emailjs.send('service_7cgu7d5', 'template_rl2r5co', {
+  to_name: 'Henrique',
+  to_email: 'henrique@cesbrasil.tech',
+  subject: 'Confirmação de Inscrição CES 2027',
+  message: 'Sua inscrição foi confirmada!'
+}, 'LcS_kJi4Mf9_ExzCt');
+
+Portal de configuração: https://www.emailjs.com/account/
+Plano gratuito: 200 emails/mês
+Para mais volume: Resend.com (3.000 emails/mês grátis) como alternativa
+
+
+1.4 Mercado Pago — Credenciais
+Gateway de pagamento para módulos e mensalidades. Pix + Cartão de Crédito.
+
+Campo
+Valor/Formato
+Como obter
+MP_ACCESS_TOKEN
+APP_USR-[gerado no painel MP]
+Token de acesso à API. Gerado em mercadopago.com.br/developers
+MP_WEBHOOK_SECRET
+[gerado automaticamente]
+Usado para validar webhooks com HMAC-SHA256
+MP_COLLECTOR_ID
+[seu ID de coletor]
+ID único do recebedor nos splits de pagamento
+Variável .env (Next.js)
+MP_ACCESS_TOKEN=APP_USR-...
+Server-side only — NUNCA expor no front
+Variável .env (Next.js)
+MP_WEBHOOK_SECRET=...
+Gerado no painel MP → Configurações → Notificações
+Variável .env (Next.js)
+MP_COLLECTOR_ID=...
+Encontrado em: mercadopago.com.br/developers → Credenciais
+
+Como gerar o Access Token:
+Acesse https://www.mercadopago.com.br/developers/panel/app
+Crie um aplicativo (ou use um existente)
+Vá em Credenciais de Produção → Access Token
+Copie o token que começa com APP_USR-
+
+Como configurar o Webhook:
+MP Developers → Configurações → Notificações de pagamento
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+URL do Webhook: https://seu-dominio.com/api/webhook-mp
+Selecionar eventos: payment (pago, cancelado, devolvido)
+O MP vai gerar automaticamente um webhook.secret — copie para MP_WEBHOOK_SECRET
+
+
+1.5 Groq API — IA Contextual (CORTEX)
+Modelo llama-3.3-70b-versatile. Usado pelo CORTEX IA em todos os painéis admin.
+
+Campo
+Valor
+Observação
+GROQ_API_KEY
+gsk_[chave gerada no console Groq]
+Server-side only. NUNCA expor no front-end.
+Modelo padrão
+llama-3.3-70b-versatile
+Velocidade + qualidade. Resposta em <500ms.
+Modelo alternativo
+llama3-70b-8192
+Para contextos maiores (8192 tokens).
+Endpoint
+https://api.groq.com/openai/v1/chat/completions
+API OpenAI-compatível.
+Free tier
+14.400 requests/dia gratuitos
+Suficiente para desenvolvimento e produção inicial.
+
+Como gerar a chave Groq:
+Acesse https://console.groq.com/keys
+Crie uma conta (grátis)
+Clique em 'Create API Key'
+Copie e salve em GROQ_API_KEY no .env.local
+
+Como usar no código (Node.js / Cloud Functions):
+const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: { 'Authorization': 'Bearer ' + process.env.GROQ_API_KEY,
+             'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: 'Analise este negócio...' }],
+    max_tokens: 1000
+  })
+});
+
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+1.6 Usuários e Logins do Sistema
+Credenciais padrão criadas pelo seed. TROQUE as senhas em produção!
+
+Perfil
+Email
+Senha Padrão
+Firebase
+Painel
+NEXIA MASTER
+master@nexia.com.br
+GIL0102@
+nexia-c8710
+/master (God Mode)
+CES Admin
+admin@cesbrasil.tech
+[definida no Auth]
+cesbrasil-85898
+/tenants/ces/admin.html
+CES Admin 2
+henrique@cesbrasil.tech
+[definida no Auth]
+cesbrasil-85898
+/tenants/ces/admin.html
+CES Admin 3
+pedro@cesbrasil.tech
+[definida no Auth]
+cesbrasil-85898
+/tenants/ces/admin.html
+VP Admin
+admin@viajantepro.com.br
+GIL0102@
+nexia-c8710
+/tenants/viajante/admin.html
+Bezsan Admin
+admin@bezsan.com.br
+GIL0102@
+nexia-c8710
+/tenants/bezsan/admin.html
+Splash Admin
+admin@splashevents.com.br
+GIL0102@
+nexia-c8710
+/tenants/splash/admin.html
+
+
+1.7 Segredos de Segurança (Gerar com OpenSSL)
+Gere antes do primeiro deploy em produção:
+# No terminal Linux/Mac:
+openssl rand -hex 32  # → ORDER_INTEGRITY_SECRET
+openssl rand -hex 32  # → PAYMENT_INTENT_SECRET
+
+Variável
+Valor
+Para que serve
+ORDER_INTEGRITY_SECRET
+32 bytes hex aleatório
+Assina integridade dos pedidos de pagamento
+PAYMENT_INTENT_SECRET
+32 bytes hex aleatório
+Valida intenções de pagamento server-side
+NEXIA_ALLOWED_ORIGIN
+https://nexia.vercel.app
+CORS — domínio permitido para requisições à API
+NEXT_PUBLIC_APP_URL
+https://nexia.vercel.app
+URL pública do app (usada em emails e redirects)
+NEXT_PUBLIC_NEXIA_MASTER_EMAIL
+master@nexia.com.br
+Email do admin master para notificações
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+PARTE 2 — ESTRUTURA COMPLETA DO BACKEND
+2.1 Arquitetura do Sistema de Arquivos
+O NEXIA OS funciona em HTML puro + JavaScript ESM (sem build). O backend vive inteiramente no Firebase. Não há servidor Node.js para manter.
+
+Arquivo
+Função
+index.html
+Landing principal NEXIA com links para todos os tenants
+login.html
+Auth gate Firebase. Redireciona por role após login.
+nexia-master.html
+Painel God Mode — acesso total. Apenas role: master.
+seed.html
+Setup inicial do Firestore. Roda 1x após deploy.
+core/firebase.js
+Firebase SDK ESM. Config cesbrasil-85898. Exporta todos os helpers.
+core/bridge.js
+Firebase Compat (classic script). Usado pelo ces-landing.html.
+core/auth.js
+NexiaAuth: guard de rotas, verificação de role, redirect.
+core/cms.js
+CMS engine: subscribeContent, saveSection, uploadFile, auditLog.
+shared/styles.css
+Design system: variáveis CSS, cards, inputs, buttons, tabelas.
+tenants/ces/index.html
+CES landing (preservada exatamente do repositório original).
+tenants/ces/ces-app.js
+CES frontend: hero + about + speakers + inscrição. Classic IIFE.
+tenants/ces/admin.html
+CES admin completo. 8 seções. Firebase Auth guard.
+tenants/viajante/index.html
+Viajante Pro landing. ES module.
+tenants/viajante/viajante-app.js
+Viajante frontend: pacotes, contato. onSnapshot.
+tenants/viajante/admin.html
+VP admin: pacotes, passageiros, contatos, editor.
+tenants/bezsan/index.html
+Bezsan landing. ES module.
+tenants/bezsan/bezsan-app.js
+Bezsan frontend: leilões, pipeline. onSnapshot.
+tenants/bezsan/admin.html
+Bezsan admin: leilões CRUD, pipeline, CORTEX terminal.
+tenants/splash/index.html
+Splash landing. ES module.
+tenants/splash/splash-app.js
+Splash frontend: espaços, reserva. onSnapshot.
+tenants/splash/admin.html
+Splash admin: espaços, reservas, agenda, editor.
+firestore.rules
+Regras de segurança Zero Trust multi-tenant.
+netlify.toml
+Config de deploy: redirects, headers, Content-Type JS.
+README.md
+Documentação de setup e deploy.
+
+2.2 Estrutura Completa do Firestore
+Cada documento é JSON salvo no Google Firestore. O onSnapshot() monitora mudanças em <50ms.
+
+Coleção / Documento
+Campos e Uso
+master_users/{uid}
+Perfil do Gildivan. Campos: email, role: 'master', name, createdAt. Permite Shadow Login.
+user_index/{uid}
+Índice: uid → tenantId. Lookup O(1) para saber de qual tenant o usuário 
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+é. Nunca vem do cliente.
+tenants/{tenantId}
+Metadados do tenant: id, name, primaryColor, status (active/suspended), plan (basic/pro/enterprise), adminEmail, createdAt.
+tenants/{id}/content/hero
+Conteúdo editável do hero: badge, title, subtitle, ctaText, ctaLink, videoId, sympla, primary. Lido pelo site público via onSnapshot.
+tenants/{id}/content/about
+Seção 'Sobre': title, text, items (array de {icon, title, desc}). Editável via admin.
+tenants/{id}/content/inscricao
+Seção de formulário: title, subtitle, btnText, sympla, whatsapp. Editável via admin.
+tenants/{id}/content/footer
+Rodapé: text, email, instagram. Editável via admin.
+tenants/{id}/settings/branding
+Branding: siteName, primaryColor, secondaryColor, logoUrl, faviconUrl, domain, font, updatedAt.
+tenants/{id}/users/{uid}
+Usuário do tenant: email, name, role (ces_admin/viajante_admin/etc), status (active/suspended), avatar.
+tenants/{id}/cadastros/{docId}
+Inscrições/leads: nome, empresa, email, whatsapp, cargo, status (pendente/confirmada/cancelada), origem (site/admin), createdAt, tenantId.
+tenants/{id}/reservas/{docId}
+Reservas Splash: nome, email, tipoEvento, data, convidados, status, createdAt, tenantId.
+tenants/{id}/pacotes/{docId}
+Pacotes VP: title, desc, price, imageUrl, bookingUrl, order, createdAt, tenantId.
+tenants/{id}/leiloes/{docId}
+Lotes Bezsan: titulo, tipo, descricao, lanceMinimo, imageUrl, status (ativo/encerrado), createdAt.
+tenants/{id}/locacoes/{docId}
+Espaços Splash: nome, descricao, precoHora, capacidade, area, imageUrl, order.
+tenants/{id}/data/speakers/{docId}
+Palestrantes CES: name, topic, photoUrl, bio, instagram, linkedin, order, confirmed. Público via regra.
+tenants/{id}/notifications/{docId}
+Notificações push: title, body, type, targetUid, read (bool), broadcastedBy, createdAt.
+_audit_logs/{docId}
+Log imutável: action, tenantId, actorEmail, actor_id, severity, metadata, timestamp, iso. allow update/delete: false.
+
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+PARTE 3 — FUNÇÕES DO NEXIA MASTER (GOD MODE)
+O painel /nexia-master.html contém 9 seções. Cada uma tem funções específicas detalhadas abaixo.
+
+3.1 Seção: Empire View (Visão Global)
+Dashboard consolidado de todos os tenants. Primeira tela após o login.
+
+Função / Elemento
+O que faz
+subscribeEmpire()
+Inicializa os listeners de todos os tenants. Chama updateEmpireCard(tenant) para cada um.
+updateEmpireCard(t)
+Para cada tenant: busca contagem de cadastros no Firestore → atualiza card com nome, cor, link do site, link do admin, total de registros, status. Atualiza KPI total.
+KPI — MRR Total
+Soma de todos os planos ativos. Exibido como número em tempo real.
+KPI — Tenants Ativos
+document.getElementById('kpiTenants').textContent = TENANTS.length. Fixo — 4 tenants atuais.
+KPI — Total Inscrições
+Soma de cadastros de todos os tenants via getDocs(). Atualizado a cada mudança.
+KPI — Reservas Splash
+onSnapshot(collection(db,'tenants','splash','reservas')).size.
+KPI — Leilões Bezsan
+onSnapshot(collection(db,'tenants','bezsan','leiloes')).size.
+Cards de Tenants
+Para cada tenant: logo/cor, nome, ID, status ao vivo (online/suspenso), contagem de registros, botões 'Ver Site' e 'Admin'.
+
+3.2 Seção: Tenant Control
+Lista todos os tenants com ações de administração.
+
+Função
+O que faz
+renderTenantControl()
+Gera o HTML dos cards de cada tenant: logo, nome, ID, botões Ver Site / Admin / Shadow Login.
+openAddTenant()
+Abre modal com campos: Tenant ID, Nome, Cor primária, Email do admin. Valida campos obrigatórios.
+createTenant()
+Executa: setDoc(tenants/{id}) + setDoc(content/hero) + setDoc(settings/branding) + addDoc(_audit_logs). Cria a estrutura completa do novo tenant no Firestore em um único fluxo.
+shadowLogin(tenantId)
+Toast de confirmação + abre o admin do tenant em nova aba após 1 segundo. Simula acesso sem senha.
+
+3.3 Seção: Todas as Inscrições
+✦ NEXIA OS — Documento Técnico do Backend v2.0    |    Proprietário e Confidencial
+Agrega inscrições de TODOS os tenants em uma única tabela. Cross-tenant view.
+
+
+
+
+PARTE 1 — O QUE É A NEXIA OS
+1.1 Visão, Missão e Propósito
+A NEXIA OS não é um software comum. É um Sistema Operacional Empresarial — a camada de inteligência que conecta, orquestra e potencializa absolutamente todas as operações de uma empresa. Enquanto outros sistemas resolvem problemas isolados (um CRM aqui, um ERP ali, um chatbot acolá), a NEXIA elimina a fragmentação ao ser a espinha dorsal única de tudo.
+
+
+A filosofia central é: O mundo sangra dinheiro na fricção entre sistemas. O computador não fala com a casa, a casa não fala com a empresa, a empresa não fala com o banco. A NEXIA OS é o Tradutor Universal — a camada invisível que integra tudo via API aberta + Inteligência Artificial Contextual.
+
+
+
+
+Missão
+Ser o sistema operacional das empresas bilionárias — grande e pequenas — entregando infraestrutura de nível enterprise, IA soberana e 3.000+ módulos de operação, acessíveis como serviço mensal white-label.
+Visão
+Ser o maior ecossistema SaaS multi-tenant da América Latina até 2030, com 10.000+ tenants ativos, ARR de R$ 500M e presença em todos os ramos do mercado brasileiro e latino-americano.
+Onde quer chegar
+* Dominar o mercado B2B de plataformas operacionais no Brasil, substituindo ERPs caros e sistemas legados fragmentados
+* Ser a alternativa brasileira soberana ao SAP, Salesforce e HubSpot, com custo 10x menor e 10x mais poder de customização
+* Operar em 100% dos ramos de mercado — saúde, educação, turismo, imóveis, eventos, logística, agro, indústria, varejo, fintech e muito mais
+* Atingir 15.000 agentes IA operando simultaneamente, tornando a NEXIA a plataforma com maior densidade de inteligência artificial por cliente do mundo
+
+
+
+
+1.2 Arquitetura de Três Camadas
+A NEXIA opera em três camadas fundamentais que nunca o cliente vê — mas que garantem que tudo funcione:
+
+
+Camada
+	Descrição
+	Camada 1 — Conectividade Universal (API Gateway)
+	Conecta IoT, SaaS, Bancos (Open Finance) e ERPs legados via protocolo aberto. Fala com qualquer sistema do mundo. Nenhum sistema fica de fora.
+	Camada 2 — Inteligência Contextual (CORTEX)
+	Não executa comandos — entende intenção. Cruza a conta bancária com a agenda, com o clima, com a meta de vida do usuário e orquestra a ação sem pedir permissão.
+	Camada 3 — Identidade Digital Única (Nuvem Soberana)
+	O usuário não tem mais 50 logins. A NEXIA é o núcleo da identidade dele. Ele acessa de qualquer tela, os dados são dele e o sistema sabe quem ele é.
+	
+
+
+
+1.3 Pilha de Tecnologias — 100% Gratuitas
+Princípio fundamental: TUDO gratuito por design, não por limitação. A NEXIA usa exclusivamente tecnologias open-source ou com camadas gratuitas generosas.
+
+
+Tecnologia
+	Descrição e Custo
+	Frontend
+	Next.js 15 (React) — MIT License. Grátis para sempre.
+	Backend / Serverless
+	Firebase (Google) — Spark Plan (gratuito) cobre desenvolvimento; Blaze Plan (pay-as-you-go) para produção. Custo real: R$ 0 até 50k leituras/dia.
+	Banco de Dados
+	Firestore (Google) — NoSQL realtime. Free tier: 1GB storage, 50k reads/day, 20k writes/day.
+	Autenticação
+	Firebase Authentication — Grátis até 10.000 usuários/mês por projeto.
+	Storage de Arquivos
+	Firebase Storage — 5GB grátis. Uploads de imagens/vídeos dos clientes.
+	IA — Modelo Principal
+	Groq API (llama-3.3-70b-versatile) — Free tier: 14.400 requests/dia. Resposta em <500ms. Alternativa: Ollama local.
+	IA — Fallback
+	OpenAI GPT-4o-mini via OpenRouter — $0.00015/1K tokens. Praticamente gratuito.
+	IA — Imagens
+	Stability AI Starter — 25 imagens/mês grátis. Para geração de banners.
+	Deploy / Hosting
+	Vercel (Next.js) — Free tier: 100GB bandwidth/mês. Netlify como alternativa para sites estáticos.
+	CDN Global
+	Cloudflare Free — Cache global em 200+ cidades. Latência <14ms no Brasil.
+	Pagamentos
+	Mercado Pago — 0% taxa sobre as primeiras 100 transações/mês. Split nativo.
+	WhatsApp API
+	Evolution API (open-source) — Grátis para hospedar. Conecta ao WhatsApp Web.
+	Email Marketing
+	EmailJS — 200 emails/mês grátis. Resend.com — 3.000 emails/mês grátis.
+	SMS
+	Twilio Free Tier — US$15 de crédito grátis na abertura. Alternativa: Zenvia com plano grátis.
+	Analytics
+	Firebase Analytics + Google Analytics — Ambos completamente gratuitos.
+	Monitoramento
+	Uptime Robot — 50 monitores gratuitos. Better Stack Free — Uptime + alertas.
+	Certificados SSL
+	Let's Encrypt — Automático e gratuito via Vercel/Netlify/Cloudflare.
+	Git / CI/CD
+	GitHub Actions — 2.000 minutos/mês grátis. Deploy automático em cada commit.
+	Testes
+	Vitest + Playwright — Open-source, grátis.
+	TypeScript
+	Microsoft TypeScript — Open-source, grátis para sempre.
+	Tailwind CSS
+	MIT License — Open-source, grátis.
+	Remix Icons
+	Apache 2.0 — Open-source, grátis.
+	Mapas / GPS
+	Leaflet.js + OpenStreetMap — Open-source, grátis. Google Maps só se necessário (US$0 até 28k calls/mês).
+	Push Notifications
+	Firebase Cloud Messaging (FCM) — Completamente gratuito sem limite.
+	WebSockets (Realtime)
+	Firebase onSnapshot — Incluso no plano gratuito. Alternativa: Ably Free (3M mensagens/mês).
+	
+
+
+
+________________
+
+
+PARTE 2 — PRODUTOS NEXIA
+Os produtos são as grandes plataformas que a NEXIA vende. Os módulos são funcionalidades específicas dentro dessas plataformas. Produtos = pacotes estratégicos. Módulos = funcionalidades individuais.
+
+
+2.1 NEXIA CORE — Infraestrutura & Segurança
+A base da pirâmide. O God Mode. Todo cliente NEXIA recebe o CORE por padrão — é o alicerce sobre o qual tudo o mais é construído.
+
+
+Funcionalidade
+	O que faz
+	Multi-Tenant Data Isolator
+	Isolamento absoluto de dados por cliente. O Cliente A NUNCA acessa dados do Cliente B. Implementado via Firestore Security Rules com verificação server-side.
+	God Mode / Acesso Soberano
+	Token JWT de 15 minutos que permite ao Master (Gildivan) entrar em qualquer painel de cliente sem senha. Shadow Login sem deixar rastro no log do cliente.
+	Fail-Closed Security Gate
+	Interface travada via CSS/JS até o Firebase Auth confirmar o acesso. Anti-tela preta, anti-invasão. Se o auth falhar, o usuário vê tela de loading infinita — nunca o painel descoberto.
+	Triple White-Label CMS
+	Editor visual que muda cores e logotipos e aplica simultaneamente na Landing Page, no App do Cliente e no App do Funcionário em tempo real via Firestore onSnapshot.
+	Kill Switch Global
+	Botão de pânico que suspende o tenant inadimplente e exibe tela de bloqueio em todos os apps logados em menos de 2 segundos via atualização do campo status no Firestore.
+	Audit Log Pro (Imutável)
+	Diário de bordo inalterável que grava IP, horário e ação exata de cada clique. Armazenado na coleção _audit_logs com regra de allow write: if false após criação.
+	PKI & SSL Scanner
+	Monitor automático que verifica certificados HTTPS dos domínios dos clientes e avisa 30 dias antes do vencimento via push notification.
+	Role-Based Access Control (RBAC)
+	Matriz de permissões com dezenas de níveis: Master, Admin, Editor, Vendedor, Agente, Médico, Guia, Cliente, etc. Cada role vê apenas o que está autorizado.
+	Secondary App Auth
+	O dono cria acessos para equipe sem deslogar da conta principal. Multi-session management com controle de dispositivos simultâneos.
+	Real-Time Edge Sync
+	Atualização de telas via Firestore onSnapshot em <50ms. Qualquer escrita propagada globalmente. Zero F5, zero refresh manual.
+	LGPD & GDPR Compliance
+	Portal de consentimento de cookies, anonimização de dados sob solicitação, relatórios de conformidade e data retention policies configuráveis.
+	Backup Vault
+	Snapshots automatizados do Firestore a cada 4 horas. Restauração com 1 clique para qualquer ponto nas últimas 48 horas.
+	SLA Monitor
+	Cronômetro que monitora tempo de resposta da equipe e dispara alertas se um cliente for ignorado por mais de X minutos (configurável por tenant).
+	Bootloader Universal
+	Tela de carregamento de 1.2s com logo ✦ NEXIA OS em animação hexagonal antes de qualquer site de cliente. Crava a marca na mente dos visitantes.
+	Modo Failsafe (Demo Mode)
+	Se a internet falhar ou a API key estiver ausente, o sistema carrega dados de mock perfeitos. O cliente nunca vê erro em reunião de vendas.
+	
+
+2.2 CORTEX — Inteligência Artificial Soberana
+O cérebro neural da NEXIA. O CORTEX não é um chatbot — é um motor de inteligência operacional que cruza dados de todas as verticais e gera ações automatizadas. Fine-tuned por setor para máxima precisão.
+
+
+O CORTEX opera com LLM Router Engine: chaveamento dinâmico entre Groq (llama-3.3-70b) para velocidade, GPT-4o para raciocínio complexo e DeepSeek para código — escolhendo o melhor modelo para cada tarefa.
+
+
+As 35+ IAs Dentro do CORTEX
+
+
+Agente IA
+	O que faz
+	01 — LLM Router Engine
+	Chaveador dinâmico entre Groq, GPT-4o, Claude e DeepSeek. Escolhe o modelo ideal baseado na complexidade, custo e urgência da tarefa.
+	02 — CORTEX Co-Pilot
+	Assistente executivo no dashboard do cliente. Lê MRR, faturamento, agenda e gera conselhos estratégicos proativos. Ex: 'Seu MRR caiu 12% — 3 clientes saíram. Ação recomendada agora.'
+	03 — Sales Agent AI (Widget)
+	Chatbot flutuante na Landing Page do cliente. Foco exclusivo em fechar vendas, qualificar leads e capturar emails. Integrado ao CRM em tempo real.
+	04 — Chatbot 24/7 Omnichannel
+	Robô de atendimento integrado a WhatsApp, Telegram e Web. Responde FAQs, agenda serviços e resolve chamados. Treinado com os documentos da empresa do cliente.
+	05 — Churn Predictor
+	Analisa comportamento (dias sem login, tickets abertos, NPS baixo) e alerta 30 dias antes do cancelamento. Acurácia de 87% no modelo treinado.
+	06 — AI Copywriter / NEXIA Studio
+	Gerador de posts Instagram, roteiros de vídeo, emails de marketing, pitches de vendas e descrições de produtos no tom exato da marca do cliente.
+	07 — Smart Upsell Triggers
+	Motor de recomendação que detecta o momento ideal para oferecer produtos adicionais. Ex: cliente acabou de pagar — oferecer upgrade automático.
+	08 — Voice Analytics
+	Ouve ligações do PABX WebRTC, transcreve para texto e faz análise de sentimento (Irritado/Neutro/Satisfeito). Relatório entregue em até 30 segundos após a chamada.
+	09 — OCR / Vision AI
+	Lê CNH, RG, Passaporte e documentos físicos por foto. Extrai campos e preenche cadastros automaticamente. Reduz 80% do tempo de onboarding.
+	10 — Demand Forecast
+	Machine Learning que prevê demanda de produtos, serviços ou viagens com base em histórico + sazonalidade + tendências de mercado.
+	11 — Auto-Prompting Engine
+	Refina perguntas dos usuários em background para extrair respostas melhores das IAs. O usuário faz uma pergunta ruim — o sistema entrega uma resposta excelente.
+	12 — RAG (Memória de Sessão)
+	Vector database que faz a IA lembrar de conversas de meses atrás. O cliente menciona um projeto de junho — o CORTEX sabe exatamente o que foi discutido.
+	13 — Shadow Owner (Agente Financeiro)
+	IA que opera como um CFO virtual. Monitora contas a pagar, alertas de inadimplência, previsão de fluxo de caixa e sugere cortes de custo automaticamente.
+	14 — Guardian (Agente de Segurança)
+	Monitora acessos suspeitos, tenta de invasão e comportamentos anômalos. Bloqueia automaticamente e notifica o admin em tempo real.
+	15 — Qualificador Neural de Leads
+	Dá nota de 0-100 para cada lead novo. Avisa quem tem mais dinheiro e urgência para comprar. Integrado ao CRM com score visível no kanban.
+	16 — Negociador Autônomo B2B
+	IA que troca emails com fornecedores pedindo desconto até fechar o melhor preço. Operam dentro de parâmetros definidos pelo admin.
+	17 — Transcritor de Reuniões
+	Escuta reuniões em tempo real e entrega resumo + lista de tarefas + responsáveis em até 60 segundos após o encerramento.
+	18 — Sugestão de Próxima Melhor Ação
+	Diz para o vendedor: 'Ligue para o cliente X agora — ele visitou a página de preços 3x nas últimas 2 horas.' Timing perfeito para fechar.
+	19 — Agendador Inteligente
+	Lê a agenda de múltiplos diretores e encontra o único horário livre sem trocas de email. Integrado ao Google Calendar.
+	20 — Tráfego Neural (Social Media)
+	Cria vídeos curtos do produto e posta no TikTok/Reels automaticamente. Opera baseado em trending topics do setor do cliente.
+	21 — Neuro-Copywriter Dinâmico
+	O texto do site muda dependendo de quem está lendo. Se for jovem, a linguagem é uma. Se for CEO de 50 anos, a linguagem muda na hora via cookies.
+	22 — Previsor de Burnout de Equipe
+	Analisa emails, horas logadas e reuniões. Avisa RH: 'O funcionário X vai pedir demissão por exaustão em 1 mês.' Previne perdas de talento.
+	23 — Recrutador Sintético
+	O candidato faz entrevista em vídeo com o sistema. A IA analisa voz, coerência e perfil. Entrega apenas os 5 melhores para o RH humano.
+	24 — Tutor de IA Personalizado
+	Aluno faz pergunta às 3h da manhã. O avatar da escola explica com base no material do professor. Adaptativo ao nível de cada aluno.
+	25 — Diagnóstico Médico Auxiliar
+	Cruza sintomas, histórico e exames. Sugere hipóteses diagnósticas para o médico validar. Nunca substitui o médico — é um co-piloto.
+	26 — Previsor de Epidemias Locais
+	Analisa padrões de atendimento e busca por sintomas e projeta surtos locais com 14 dias de antecedência.
+	27 — IA de Análise de Imagens Médicas
+	Processa RX, TC e RM. Destaca anomalias para o radiologista validar. Reduz 60% do tempo de laudo.
+	28 — Previsor de Gargalos Portuários
+	Para logística: avisa 'A alfândega em Santos está com 4 dias de atraso, desvie para Paranaguá.' Opera em tempo real com dados públicos.
+	29 — IA de Detecção de Pragas (Agro)
+	Analisa foto da plantação e identifica praga ou doença. Recomenda defensivo específico e dosagem correta.
+	30 — Jurimetria Avançada
+	Analisa histórico de um juiz e prevê com 85% de precisão as chances de ganhar um processo. Para clientes do setor jurídico.
+	31 — Gerador Automático de Petições
+	O advogado digita os fatos. A IA redige a petição inicial completa em linguagem jurídica correta e formatada.
+	32 — Leitor de Contratos Obscuros
+	Escaneia contratos de 200 páginas em segundos. Destaca em vermelho cláusulas abusivas e riscos ocultos.
+	33 — Assistente Soprador (Whisper)
+	Enquanto atendente fala com cliente irritado ao telefone, a IA escuta e joga na tela os melhores argumentos para acalmar e reter o cliente.
+	34 — Decisor Automático de Reembolso
+	Se cliente pede estorno de R$50, libera na hora. Se for R$5.000, trava para análise humana. Reduz 70% do custo operacional de CS.
+	35 — A Singularidade NEXIA (Auto-Cura)
+	O módulo supremo. O CORTEX monitora o próprio código. Se erro é detectado, a IA reescreve a linha quebrada e reinicia em 2 segundos. Zero downtime humano perceptível.
+	
+
+2.3 NEXIA LAB — Laboratório de Inovação
+O ambiente de experimentação e desenvolvimento de novas capacidades. No LAB, o Gildivan e a equipe técnica testam novos módulos, novos modelos de IA e novas integrações antes de lançar para os clientes na Loja.
+
+
+* Sandbox de testes isolado por tenant — um bug no LAB nunca afeta produção
+* Fine-tuning de modelos de IA com dados reais dos clientes (anonimizados)
+* Prototipagem rápida de novos módulos em 48h via Arquiteto IA
+* A/B testing de novas features antes do lançamento global
+* Laboratório de integração com novas APIs — bancárias, governamentais, de saúde
+* Pesquisa de novos modelos de LLM open-source para reduzir custo
+* Acesso exclusivo para clientes Enterprise como beta testers
+
+
+2.4 NEXIA STUDIO — Fábrica de Conteúdo
+A plataforma de geração de conteúdo com IA. Diferente do CORTEX (que é operacional), o Studio é focado em comunicação, marketing e criação de ativos digitais para os clientes.
+
+
+Funcionalidade
+	Descrição
+	AI Copywriter
+	Gera posts para Instagram, LinkedIn, Twitter/X, Facebook no tom da marca. Calendário editorial automático de 30 dias com 1 clique.
+	Video Script Generator
+	Roteiros completos para YouTube, Reels e TikTok. Com ganchos, transições e CTAs otimizados por setor.
+	Email Marketing Pro
+	Editor de emails drag-and-drop + IA geradora de subject lines com taxa de abertura prevista. Disparos em massa com segmentação.
+	Landing Page Builder
+	Criador de landings com IA: o cliente descreve o produto, a IA gera o layout, os textos e os CTAs. Publicação em 1 clique.
+	Proposta Comercial AI
+	O vendedor digita o cliente e o produto, a IA gera uma proposta em PDF profissional com valores, benefícios e prazo de validade.
+	Gerador de Iscas Digitais
+	Cria e-books, checklists e guias completos em PDF para captura de leads. A IA escreve, formata e disponibiliza para download automático.
+	Social Proof Engine
+	Transforma depoimentos de clientes em stories, carrosséis e vídeos automaticamente. Captura reviews e recria em formato de anúncio.
+	Brand Voice Guardian
+	Garante que todo conteúdo gerado pela IA siga o tom de voz definido pelo cliente. Nunca gera conteúdo fora da identidade da marca.
+	
+
+2.5 NEXIA STORE — App Store de Módulos
+A loja de módulos da NEXIA. Funciona como a App Store da Apple — o cliente paga uma mensalidade base e pode adquirir módulos adicionais conforme a necessidade do negócio. O Arquiteto IA recomenda automaticamente os módulos certos para cada setor.
+
+
+A NEXIA STORE possui mais de 3.000 módulos catalogados divididos em 40+ macro-setores. Cada módulo tem preço individual ou pode ser adquirido em pacotes por setor.
+
+
+2.6 NEXIA SHIELD — Segurança & Compliance
+O produto de cibersegurança da NEXIA. Não é um módulo — é uma plataforma inteira dedicada à proteção dos clientes e seus dados.
+
+
+* Pentest automatizado 24h: robôs testando barreiras do site o dia todo
+* Monitor de vazamentos na Dark Web: alerta se credenciais de funcionários vazaram
+* Autenticação biométrica: acesso só via reconhecimento facial no celular
+* Backup e recuperação em 4 minutos: restauração completa com 1 clique
+* Anonimizador LGPD: mascara dados sensíveis automaticamente
+* Criptografia pós-quântica: segurança militar para trocas de mensagens
+* Shadow Logging imutável: cada ação gravada em blockchain append-only
+* Bloqueio de IPs maliciosos: threat intelligence em tempo real
+________________
+
+
+PARTE 3 — OS 15.000 AGENTES IA (QUE FICARAO EM STANDBY... SÓ ATUAM CASO NECESSÁRIO... ATREVS DE GATILHOS) 
+3.1 Arquitetura dos Agentes
+A NEXIA opera com 15.000 agentes IA trabalhando simultaneamente em 9 divisões especializadas. Cada agente é um worker assíncrono rodando em background — processando dados, tomando decisões e executando ações sem intervenção humana.
+
+
+Implementação técnica: Vercel Edge Functions + Firestore Cloud Functions + Cloud Tasks para filas de processamento. O custo é próximo de zero no free tier do Google Cloud.
+
+
+Divisão
+	Função dos Agentes
+	Divisão 1 — Vendas & CRM(2.500 agentes)
+	Qualificam leads, scoring em tempo real, suggest próxima ação, follow-up automático, análise de pipeline, previsão de fechamento, detecção de churn de oportunidade.
+	Divisão 2 — Marketing & Conteúdo(2.000 agentes)
+	Criam e agendam posts, geram emails, executam A/B tests, otimizam orçamento de ads, monitoram menções de marca, respondem comentários, agendam stories.
+	Divisão 3 — Atendimento & Suporte(2.500 agentes)
+	Respondem tickets automaticamente, triagem de prioridade, sugestão de resolução para atendentes humanos, escalação inteligente, análise de sentimento em tempo real.
+	Divisão 4 — Financeiro & Fintech(1.500 agentes)
+	Conciliação bancária automática, detecção de fraude, régua de cobrança, previsão de fluxo de caixa, emissão de nota fiscal, alerta de vencimentos.
+	Divisão 5 — Operações & Logística(1.500 agentes)
+	Roteirização de entregas, rastreamento de pedidos, alertas de estoque crítico, previsão de demanda, controle de frota, agendamento de manutenção.
+	Divisão 6 — RH & Pessoas(1.000 agentes)
+	Onboarding automático, análise de clima, detecção de burnout, sugestão de treinamento, gestão de escalas, processamento de folha.
+	Divisão 7 — Segurança & Compliance(1.500 agentes)
+	Monitoramento contínuo de ameaças, varredura de vulnerabilidades, checagem de conformidade LGPD, geração de relatórios de auditoria.
+	Divisão 8 — Dados & Analytics(1.500 agentes)
+	Processamento de dashboards em tempo real, geração de relatórios automáticos, detecção de anomalias, previsões de crescimento, benchmarking setorial.
+	Divisão 9 — Treinamento & Aprendizado(1.000 agentes)
+	Fine-tuning contínuo dos modelos, aprendizado com interações dos clientes, melhoria de prompts, validação de qualidade de resposta, retreinamento semanal.
+	
+
+3.2 Como os Agentes são Distribuídos por Cliente
+Cada tenant (cliente NEXIA) recebe uma alocação proporcional ao seu plano:
+
+
+Plano
+	Alocação de Agentes
+	Plano Basic (até R$497/mês)
+	50 agentes dedicados + pool compartilhado de 500 agentes
+	Plano Pro (até R$1.297/mês)
+	200 agentes dedicados + pool compartilhado de 2.000 agentes
+	Plano Enterprise (R$1.997+/mês)
+	500 agentes dedicados + pool compartilhado de 5.000 agentes
+	Plano Sovereign (custom)
+	2.000 agentes dedicados + acesso total ao pool de 15.000
+	________________
+
+
+PARTE 4 — O SUPER ADMIN / GOD MODE (NEXIA MASTER)
+4.1 Quem é o Admin da NEXIA
+O NEXIA Master é Gildivan — o proprietário e operador soberano de toda a plataforma. Ele tem acesso irrestrito a absolutamente tudo: todos os tenants, todos os dados, toda a infraestrutura. Nenhum cliente vê o que outro cliente tem. O Master vê tudo.
+
+
+4.2 O que o Admin Pode Fazer — Acesso Completo
+
+
+Funcionalidade Master
+	Descrição
+	Empire View (Visão Global)
+	Dashboard consolidado com MRR total, número de tenants ativos, agentes IA online, uptime do sistema, incidentes em tempo real. Tudo em uma tela.
+	Global Tenant Control
+	Matriz com todos os clientes: nome, plano, valor mensal, status (ativo/inadimplente/suspenso), módulos ativos, data de entrada. Filtros e busca avançada.
+	Kill Switch Global
+	Suspende qualquer tenant com 1 clique. A tela do cliente exibe 'Serviço suspenso' imediatamente via Firestore onSnapshot. Reversível em 1 clique.
+	Shadow Login (God Mode)
+	Entra no painel de qualquer cliente exatamente como o cliente vê, sem precisar da senha dele. Token de 15 minutos com auto-expiração.
+	MRR Global Chart
+	Gráficos de receita recorrente total, histórico de crescimento, previsão para os próximos 3 meses, ticket médio, clientes em risco de churn.
+	Monitor de Infraestrutura
+	Consumo de CPU, bandwidth e storage de cada tenant. Uptime por produto. Latência de APIs. Alertas automáticos quando algum indicador fica vermelho.
+	Broadcast System
+	Envia mensagens para todos os clientes ou um específico. Push notification, banner no painel, email — tudo de uma tela.
+	Arquiteto IA (Fechador de Vendas)
+	Digita o nicho do prospect, a IA analisa o ramo, seleciona os módulos perfeitos da Store, calcula o preço ideal e gera a proposta completa.
+	NEXIA Store Management
+	Gerencia o catálogo de módulos: preços, descrições, disponibilidade por plano, ativação/desativação global, promoções e bundles.
+	Audit Log Global
+	Vê o log de TODA ação tomada em TODA a plataforma: qual admin, de qual tenant, fez o quê, quando, de qual IP.
+	Billing & Pagamentos
+	Gestão de faturas, planos, datas de vencimento, histórico de pagamentos, emissão de NF, gestão de chargebacks.
+	Feature Flags Globais
+	Liga ou desliga funcionalidades para todos ou grupos específicos de clientes. Deploy gradual de novas features.
+	Criação de Tenants (Templates)
+	Cria novo cliente em 30 segundos usando templates pré-configurados por setor. O Firestore já vem populado com dados padrão.
+	Gerenciamento de Agentes IA
+	Painel de controle dos 15.000 agentes: quantos estão ativos, em treinamento ou idle. Alocação manual para tenants específicos.
+	Dev Code Viewer
+	Acesso ao código-fonte completo da plataforma diretamente no painel. Sem precisar de GitHub.
+	
+
+4.3 O que o Admin de Cada Tenant Pode Fazer
+O admin do tenant (ex: Henrique da CES) recebe um painel completo mas restrito ao seu próprio ambiente. Ele nunca vê dados de outros clientes.
+
+
+Funcionalidade Admin Tenant
+	Descrição
+	Site Builder Visual (WYSIWYG)
+	Edita textos, imagens, cores, seções e botões do próprio site clicando diretamente. Como o Webflow — sem código.
+	Gestor de Blocos Visuais
+	Adiciona, reordena e deleta seções do site. Drag and drop visual. Mudanças refletem no site público em tempo real.
+	CRM de Leads
+	Tabela ao vivo de todos os cadastros, com status, timestamp, origem. Exportação para CSV, Excel e PDF com 1 clique.
+	Inscrições / Cadastros
+	CRUD completo: criar manualmente, alterar status (pendente/confirmado/cancelado), adicionar notas, enviar email.
+	Upload de Mídia
+	Upload de fotos, vídeos, PDFs e planilhas direto do PC. Armazenados no Firebase Storage com URL pública no Firestore.
+	Campanhas de Marketing
+	Disparo de mensagens individuais, em grupo ou em massa via WhatsApp, Email e SMS. Com tracking de abertura.
+	Exportação de Dados
+	CSV, PDF e Excel de qualquer listagem do sistema. Relatórios automáticos semanais por email.
+	Gráficos e Analytics
+	Leads por período, vendas por canal, taxa de conversão, origem de tráfego. Dashboards customizáveis.
+	Gestão de Equipe Granular
+	Cria contas para funcionários com permissões específicas. Funcionário A só edita texto, B acessa financeiro.
+	Domínio Próprio + SSL
+	Aponta o www.empresa.com.br para o sistema. SSL automático via Let's Encrypt/Cloudflare.
+	SEO + Pixel Manager
+	Cola pixels do Facebook, Google Analytics, GTM. Configura meta tags, Open Graph e sitemap automático.
+	Central de Webhooks
+	Conecta o sistema a Sympla, Hotmart, RD Station, Zapier e sistemas externos via webhook.
+	NEXIA Store (Módulos)
+	Compra módulos adicionais para o próprio ambiente. Pagamento via Pix ou Cartão. Ativação imediata.
+	Configurações de Branding
+	Muda cores primárias, logos, fontes e aplica em todo o ecossistema simultaneamente.
+	Alterar Fontes
+	Seletor de tipografia exclusivo do ADM — muda a fonte de todo o site com 1 clique.
+	Palestrantes (CES)
+	CRUD completo de speakers: foto, bio, topic, Instagram, LinkedIn, ordem de exibição, status de confirmação.
+	Notificações Push
+	Envia notificações para todos os usuários do app. Segmentação por perfil, localização ou comportamento.
+	Audit Log do Tenant
+	Vê log de todas as ações tomadas dentro do próprio ambiente. Para compliance interno.
+	
+
+4.4 Planos e Limites de Usuários
+
+
+Plano
+	Inclusos
+	Plano BasicR$ 297–497/mês
+	3 usuários admin inclusos. R$ 47/usuário adicional. Até 10 módulos ativos. 5GB Storage. 50 agentes IA.
+	Plano ProR$ 797–1.297/mês
+	10 usuários admin inclusos. R$ 37/usuário adicional. Até 20 módulos ativos. 25GB Storage. 200 agentes IA. CORTEX IA incluído.
+	Plano EnterpriseR$ 1.997–3.997/mês
+	Usuários ilimitados. Módulos ilimitados. 100GB Storage. 500 agentes IA. CORTEX fine-tuned. SLA 99.9%.
+	Plano SovereignCustom (a partir de R$ 5.000/mês)
+	Infraestrutura dedicada. 2.000 agentes IA. Suporte técnico direto com Gildivan. Custom SLA. Onboarding presencial.
+	________________
+
+
+PARTE 5 — OS 3.000+ MÓDULOS DA NEXIA STORE
+Os módulos são funcionalidades específicas que o cliente ativa na NEXIA Store. Cada um resolve um problema de negócio real. O Arquiteto IA recomenda automaticamente os módulos certos para cada nicho.
+
+
+Abaixo estão os módulos organizados por categoria. Esta é a listagem completa — todos os 200 módulos documentados nos arquivos do repositório + os módulos adicionais por setor.
+
+
+5.1 Módulos do Núcleo (NEXIA CORE — Grátis para todos)
+
+
+Módulo
+	Função
+	M001 — Arquiteto IA (Fechador de Vendas)
+	Digita o nicho → IA seleciona módulos → gera proposta com preço. O closer automático da NEXIA.
+	M002 — Global Tenant Control
+	Matriz de todos os clientes com status, plano, MRR, inadimplência.
+	M003 — Kill Switch de Inadimplência
+	Suspende cliente com 1 clique. Tela de bloqueio instantânea.
+	M004 — MRR Global Chart
+	Dashboard de receita recorrente consolidada em tempo real.
+	M005 — Monitor de Infraestrutura
+	CPU, bandwidth, storage e uptime de cada tenant.
+	M006 — Shadow Login
+	Acessa painel de qualquer cliente sem senha. Token 15min.
+	M007 — Broadcast System
+	Mensagens globais para todos ou tenants específicos.
+	M008 — Bootloader Universal
+	Tela de loading NEXIA em todos os sites de clientes.
+	M009 — Modo Failsafe (Demo Mode)
+	Dados mock perfeitos quando internet/API falha.
+	M010 — White-Label Automático
+	Muda cores e logo automaticamente por cliente logado.
+	M011 — Construtor Visual WYSIWYG
+	Edição direta de textos e fotos no site sem código.
+	M012 — Gestor de Blocos Visuais
+	Drag-and-drop de seções do site. Sem código.
+	M013 — Gatilho de Urgência em Tempo Real
+	Barra de alerta no topo do site ('Últimas 5 vagas!').
+	M014 — Dashboard de Vendas Local
+	Gráficos de acessos e conversões do site do cliente.
+	M015 — Painel Financeiro (Payouts)
+	Dinheiro a receber + botão de saque.
+	M016 — Configuração de Domínio Próprio
+	Apontar www.empresa.com.br com SSL automático.
+	M017 — Gestor de Equipe Granular
+	Permissões por funcionário — quem vê o quê.
+	M018 — CRM de Leads Integrado
+	Tabela ao vivo de cadastros + exportação CSV.
+	M019 — SEO & Hub de Pixels
+	Facebook Pixel, Google Analytics, GTM, meta tags.
+	M020 — Central de Webhooks
+	Integração com Sympla, Hotmart, RD Station, Zapier.
+	
+
+5.2 Módulos de IA e Vendas (21–30)
+
+
+Módulo
+	Função
+	M021 — Assistente de Vendas SDR
+	IA que liga para leads via voz e agenda reuniões sozinha.
+	M022 — Ajuste Inteligente de Preços
+	Yield management: sobe/desce preço por demanda em tempo real.
+	M023 — Recuperador de Carrinho Omnichannel
+	WhatsApp/email automático para quem abandonou compra.
+	M024 — Leitor de Emoções em Vídeo
+	Análise de microexpressão na videochamada. Timing de fechamento.
+	M025 — Qualificador Neural de Leads
+	Score 0-100 para cada lead. Quem tem mais dinheiro e urgência.
+	M026 — Atendente Virtual 24h (Clone do Dono)
+	Chatbot treinado com a voz e valores do dono da empresa.
+	M027 — Negociador Autônomo B2B
+	IA que negocia com fornecedores por email. Fecha melhores preços.
+	M028 — Transcritor de Reuniões
+	Resumo + tarefas em 60s após encerrar a reunião.
+	M029 — Sugestão de Próxima Melhor Ação
+	Diz: 'Ligue para X agora, ele visitou preços 3x.'
+	M030 — Agendador Inteligente
+	Encontra o horário livre entre N executivos automaticamente.
+	
+
+5.3 Módulos de Marketing (31–42)
+
+
+Módulo
+	Função
+	M031 — Tráfego Neural (Social Media Auto)
+	Cria e posta vídeos no TikTok/Reels automaticamente.
+	M032 — Neuro-Copywriter Dinâmico
+	Texto do site muda por perfil do visitante em tempo real.
+	M033 — Retargeting Integrado
+	Persegue com anúncios quem visitou e saiu sem comprar.
+	M034 — Motor de Cupons e Descontos
+	Códigos promocionais com limite de uso e tempo (BLACK20).
+	M035 — Mapas de Calor (Heatmaps)
+	Grava a tela do visitante. Mostra onde as pessoas clicam.
+	M036 — Teste A/B Automático
+	Duas versões do site. O sistema mantém a que converte mais.
+	M037 — Disparador de Email Marketing
+	Mailchimp integrado nativamente com segmentação por perfil.
+	M038 — Otimizador de Anúncios (ROAS IA)
+	Aumenta verba onde dá lucro, corta onde dá prejuízo.
+	M039 — Construtor de UTMs Automático
+	Rastreamento de origem de vendas por canal.
+	M040 — Sistema de Afiliados Nativo
+	Links de comissão para parceiros venderem produtos.
+	M041 — Coletor de Avaliações 5 Estrelas
+	Email pós-compra pedindo review no Google. Automático.
+	M042 — Gerador de Iscas Digitais
+	Escreve e-books e checklists para captura de leads.
+	
+
+5.4 Módulos de ERP, RH e Operações (43–54)
+
+
+Módulo
+	Função
+	M043 — Gestão de Holding/Filiais
+	Controla 10 filiais em um único painel.
+	M044 — Automação If/Then (Zapier Nativo)
+	'Se pagar → emita NF → mande WhatsApp.' Sem código.
+	M045 — Gestor de Armazém (WMS)
+	Organiza logística de produtos na prateleira.
+	M046 — Integração Mágica (No-Code)
+	Conecta ao sistema velho do cliente sem programador.
+	M047 — Extrator de NF via OCR
+	Lê PDFs de NF e joga valores no financeiro automaticamente.
+	M048 — Portal de Fornecedores
+	Fornecedores enviam cotações diretamente no sistema.
+	M049 — Gestão de Ativos e Frota
+	Rastreia carros, computadores e máquinas da empresa.
+	M050 — Onboarding de RH Automático
+	Funcionário novo: email criado, treinamento enviado, contratos assinados.
+	M051 — Sincronização de Folha de Pagamento
+	Horas extras e comissões calculadas e enviadas ao financeiro.
+	M052 — Escalonador de Turnos Inteligente
+	Escala mensal de hospital/restaurante sem conflitos de horário.
+	M053 — Sistema de Chamados (Helpdesk)
+	Tickets organizados: Aberto, Em Atendimento, Resolvido.
+	M054 — BI Preditivo de Estoque
+	'A água vai acabar sexta. Compre agora.'
+	
+
+5.5 Módulos de Fintech (55–68)
+
+
+Módulo
+	Função
+	M055 — Motor de Crédito IA
+	Lê CPF/CNPJ e avisa se é seguro vender a prazo.
+	M056 — Conciliação Bancária Automática
+	Cruza extrato com vendas. 'Tudo certo' no fim do dia.
+	M057 — Split Inteligente de Pagamentos
+	R$100 pago → R$80 pro dono, R$20 pro sócio — automático.
+	M058 — Hub Open Finance
+	Saldo Itaú, Bradesco e Nubank na mesma tela.
+	M059 — Anti-Fraude em Tempo Real
+	Bloqueia compras suspeitas antes do cartão aprovar.
+	M060 — Escrow Inteligente
+	Dinheiro preso até produto ser entregue. Alta confiança.
+	M061 — Links de Pagamento Dinâmicos
+	Cria link de pagamento no WhatsApp. Pix ou Cartão.
+	M062 — Motor de Assinaturas (Recorrência)
+	Cobrança mensal automática. Igual Netflix.
+	M063 — Régua de Cobrança Automática
+	SMS dia -1, no dia e +3 dias. Automático e educado.
+	M064 — Cartões Virtuais Corporativos
+	Cartão com limite para funcionário viajar.
+	M065 — Gateway de Cripto
+	Aceita Bitcoin e USDT no site.
+	M066 — Conversor Multi-Moedas
+	O gringo vê o preço em Dólar ou Euro automaticamente.
+	M067 — DRE Dinâmico
+	Lucro líquido piscando na tela descontando impostos.
+	M068 — Contas a Pagar/Receber Unificadas
+	Avisa o que vence hoje para não ter juros.
+	
+
+5.6 Módulos de Segurança (69–81)
+
+
+Módulo
+	Função
+	M069 — Escudo Cibernético 24h
+	Pentest automatizado. Robôs testando o site o dia todo.
+	M070 — Monitor Dark Web
+	Alerta se credenciais de funcionário vazaram na internet.
+	M071 — Autenticação Biométrica
+	Acesso apenas com reconhecimento facial.
+	M072 — Backup e Recuperação 4min
+	Restaura tudo como estava ontem com 1 clique.
+	M073 — Portal de Transparência GovTech
+	Prefeituras exibem gastos públicos de forma clara.
+	M074 — Leitor de Editais com IA
+	Resume editais de 500 páginas em 30 segundos.
+	M075 — Anonimizador LGPD
+	Mascara dados sensíveis. Empresa fica livre de multas.
+	M076 — Bloqueio de IPs Maliciosos
+	Threat intelligence em tempo real. Bane IPs suspeitos.
+	M077 — Cofre Zero-Knowledge
+	Contratos guardados onde nem a NEXIA consegue ler.
+	M078 — Criptografia Pós-Quântica
+	Segurança militar nas mensagens da plataforma.
+	M079 — Shadow Logging Imutável
+	Cada ação gravada em pedra. Impossível de apagar.
+	M080 — Votação Eletrônica Auditável
+	Para assembleias de condomínio e conselhos corporativos.
+	M081 — Anti-Bots (Prova de Humanidade)
+	Elimina compras falsas por robôs cambistas.
+	
+
+5.7 Módulos Verticais Específicos por Setor (82–200+)
+Além dos módulos horizontais (que servem qualquer empresa), a NEXIA possui módulos verticais deep spec — ultra-especializados por setor. Aqui estão os principais:
+
+
+Setor
+	Módulos Incluídos
+	CONSTRUÇÃO & IMOBILIÁRIOM082–M088
+	Precificação imobiliária dinâmica, Gêmeo Digital BIM em 3D, Agendador de visitas autônomo, Assinatura digital de contratos, Portal do condômino, Simulador de financiamento Caixa, Integração de catracas faciais.
+	SAÚDE & CLÍNICASM089–M094
+	Telemedicina com triagem por IA, Prontuário eletrônico unificado, Farmácia inteligente com alerta de validade, Portal de resultados de exames, Agendador clínico de alto giro, Análise genômica para cross-sell.
+	AGRONEGÓCIO & LOGÍSTICAM095–M100
+	Sensor de colheita via satélite, Irrigação neural controlada, Roteirização logística avançada, Rastreador de cadeia de frio, Sincronização de tratores IoT, Marketplace de frete por leilão.
+	EVENTOS, HOTELARIA & MÍDIAM101–M108
+	Check-in facial, App do evento nativo, Planta interativa do pavilhão, Motor de reservas hoteleiras sem comissão, Chave digital no celular, Concierge VIP, Dublagem em tempo real, Pay-per-view protegido.
+	LEGALTECH & COMPLIANCEM136–M145
+	Jurimetria IA, Gerador de petições, Monitor de marcas/patentes, Leitor de contratos abusivos, Rastreador de pirataria, Mediação online de disputas, Compliance fiscal global, Auditoria de cadeia de fornecimento, Dashboard ESG, Crédito de carbono automático.
+	EDUTECHM146–M155
+	Tutor IA 24/7, Anti-fraude em provas, Corretor automático de redações, Paywall dinâmico de conteúdo, Sala de aula metaverso (VR/AR), DRM anti-pirataria, Diploma blockchain, Gamificação anti-evasão, Tradução simultânea, Quiz automático.
+	HRTECHM156–M163
+	Recrutador sintético IA, Previsor de burnout, Mapeador de clima organizacional, Benefícios flexíveis automáticos, Headhunter IA LinkedIn, Plano de carreira simulado, Gestão de fuso horário global, Rescisão 1 clique.
+	CUSTOMER SUCCESSM164–M170
+	Previsor de churn exato, Decisor de reembolso automático, Sentimentômetro de tickets, Onboarding guiado na tela, FAQ auto-atualizável, Assistente soprador (Whisper), Reativador de clientes inativos.
+	SMART CITIES & INDÚSTRIA 4.0M171–M180
+	Semáforos sincronizados por IA, Lixeiras IoT, Monetização de Wi-Fi, Gêmeo digital de chão de fábrica, Robôs autônomos de armazém, Provador virtual AR, Detecção de furto por visão computacional, Precificação E-Ink de gôndola, Monitor de drones, Conexão Starlink.
+	FOODTECHM181–M190
+	Menu digital QR, KDS de cozinha digital, Delivery Hub com rastreamento, Controle de inventário Chef, Gestão de comandas, Auto-checkout QR, Controle de validade, Análise de desperdício, Cardápio dinâmico por disponibilidade, Reservas de mesa online.
+	MÓDULOS EXTRASM191–M200
+	Renderização 3D automática, Simulador de stress térmico, IoT hospitalar, Som ambiente dinâmico, Cofre de senhas auto-destrutivas, Recibos NFT, Pixel streaming de games, Auditoria de smart contracts, Interface por ondas cerebrais (preparatório), Validador de deepfakes.
+	________________
+
+
+PARTE 6 — CLIENTES E ESTRATÉGIA DE MERCADO
+6.1 Quem é o Cliente NEXIA — Qualquer Tamanho, Qualquer Ramo
+A NEXIA atua em TODOS os ramos. Pequenas, médias e grandes empresas. O modelo multi-tenant permite escalar do microempresário ao conglomerado sem mudar uma linha de código.
+
+
+Perfil de Cliente
+	Descrição e Ticket
+	Pequena Empresa (1–10 funcionários)
+	Plano Basic. Site profissional, CRM simples, CORTEX básico. Ex: clínica local, agência de turismo, salão de beleza. Ticket: R$297–497/mês.
+	Média Empresa (10–100 funcionários)
+	Plano Pro. ERP leve, marketing automation, módulos setoriais. Ex: rede de clínicas, agência de eventos, imobiliária. Ticket: R$797–1.297/mês.
+	Grande Empresa (100+ funcionários)
+	Plano Enterprise. IA soberana, 15k agentes, SLA 99.9%, suporte dedicado. Ex: CES Brasil, grupos hospitalares, redes de franquias. Ticket: R$1.997–5.000+/mês.
+	Governo e Prefeituras
+	Plano Sovereign. GovTech, portal de transparência, gestão de editais, votação eletrônica auditável. Ticket: sob consulta.
+	
+
+6.2 Clientes Atuais
+
+
+Cliente
+	Descrição
+	CES Brasil 2027
+	Corporate Events Summit — Missão Empresarial Brasileira para o CES Las Vegas. Plano Enterprise. Módulos: Matchmaking IA, Credencial Digital, Palestrantes, Agenda, Delegações, Streaming, Inscrições. Admin: Henrique, Pedro.
+	Viajante Pro
+	Agência premium de turismo corporativo. Plano Pro. Módulos: Check-in Digital, Rooming List, Seat Map, GPS do grupo, Flight Monitor, SOS Panic, Baggage Tracker. Destinos: Dubai, Tóquio, Paris, Miami, Maldivas.
+	Bezsan Leilões
+	Plataforma de leilões imobiliários com IA. Plano Enterprise. Módulos: Live Bidding Engine, Auto-Bid, Anti-Sniping Timer, KYC/AML, Catálogo de Lotes, Auditório Híbrido, Post-Auction Settlement. 14+ leilões ao vivo.
+	Splash Eventos
+	Espaço de eventos premium com piscina, decoração e infraestrutura completa. Plano Pro. Módulos: Agenda Anti-Overbooking, Reservas, Precificação Dinâmica, Contratos, Serviços Adicionais. 6 espaços, 148 clientes.
+	Journey Partners (JP)
+	Agência de luxury travel corporativo. Plano Enterprise. R$5.800/mês. 10 módulos. 15.000 agentes IA na operação. 380 grupos corporativos ativos.
+	Splash Capital (inadimplente)
+	Cliente com R$2.900/mês de débito. 45 dias em atraso. Kill Switch ativável.
+	
+
+6.3 Como Integrar Novos Clientes à NEXIA
+
+
+Etapa
+	Ação
+	Passo 1 — Fechamento com Arquiteto IA
+	Gildivan digita o nicho do prospect no Arquiteto IA. O sistema seleciona os módulos certos, calcula o preço e gera a proposta PDF em segundos.
+	Passo 2 — Criação do Tenant
+	No painel Master, clicar em 'Novo Tenant'. Escolher o template do setor. O Firestore é populado automaticamente com conteúdo padrão do setor em 30 segundos.
+	Passo 3 — Configuração do Seed
+	Executar /seed.html no browser. Cria todas as coleções Firestore: tenants, content, settings, cadastros, usuários. Estrutura pronta para uso.
+	Passo 4 — Criação de Usuários
+	Firebase Console → Authentication → Criar usuário admin do cliente. Criar user_index/{uid} → tenantId. Criar tenants/{id}/users/{uid} com role e status.
+	Passo 5 — Configuração de Branding
+	Admin do cliente acessa Configurações → Branding. Define cores, logo, fonte. Reflete em tempo real via onSnapshot no site público.
+	Passo 6 — Domínio Próprio
+	Admin aponta www.empresa.com.br no painel de DNS. SSL automático via Let's Encrypt/Vercel. Ativo em 24h.
+	Passo 7 — Treinamento do Admin
+	Guided Tour automático no primeiro login. O sistema ensina cada seção com tooltips e setas. Manual interativo em accordion nas laterais.
+	Passo 8 — Ativação de Módulos
+	Admin acessa NEXIA Store. Escolhe módulos. Paga via Pix ou Cartão via Mercado Pago. Módulo ativo em menos de 5 minutos.
+	
+
+6.4 Fluxo de Pagamento
+
+
+Tipo de Cobrança
+	Como Funciona
+	Mensalidade do Plano
+	Cobrança recorrente mensal via Mercado Pago (cartão tokenizado ou Pix com QR dinâmico). Dunning automático: aviso dia -3, dia 0, bloqueio dia +5 via Kill Switch.
+	Módulos Avulsos
+	Compra pontual via Mercado Pago. Pix instantâneo ou cartão de crédito. Ativação automática após confirmação do webhook.
+	Planos Anuais (Desconto)
+	12% de desconto no plano anual. Cobrança única. NF-e emitida automaticamente.
+	Split de Receita
+	Para módulos desenvolvidos por parceiros: 70% para a NEXIA, 30% para o desenvolvedor do módulo. Processado via Split do Mercado Pago.
+	Emissão de NF-e
+	Automática após pagamento. XML e PDF enviados por email e armazenados no Storage.
+	Recuperação de Inadimplência
+	Dia 1: email educado. Dia 3: WhatsApp com link de pagamento. Dia 5: Kill Switch ativado + proposta de renegociação enviada.
+	Chargeback Protection
+	Anti-fraude pré-aprovação via análise de IP, device fingerprint e velocidade de digitação. Reduz chargebacks em 85%.
+	________________
+
+
+PARTE 7 — CLIENTE: CES BRASIL 2027
+7.1 O que é a CES Brasil
+A CES Brasil 2027 é a Missão Empresarial Brasileira para o CES (Consumer Electronics Show) em Las Vegas — o maior palco de inovação e tecnologia do planeta. A CES Brasil leva um grupo seleto de executivos, empresários e empreendedores brasileiros para 5 dias de imersão no evento.
+
+
+A empresa é operada por Henrique e Pedro (admins do sistema), com o Gildivan como suporte Master.
+
+
+7.2 Ramo de Atuação
+* Eventos empresariais B2B internacionais
+* Missões de inovação e tecnologia
+* Formação de networking entre líderes empresariais brasileiros
+* Conexão com o ecossistema global de startups, VCs e big techs
+* Geração de negócios e parcerias internacionais
+
+
+7.3 O que a NEXIA faz pela CES
+
+
+Módulo
+	Função para a CES
+	Landing Page CES 2027
+	Site completo com hero em vídeo YouTube background, seção sobre a missão, palestrantes, timeline, formulário de inscrição. 100% editável via ADM. Nada fixo.
+	Formulário 'Quero Participar'
+	Gravação em Firestore (tenants/ces/cadastros) em tempo real. Status: pendente/confirmado/cancelado. Admin recebe via onSnapshot sem refresh.
+	Gestão de Palestrantes (Speakers)
+	CRUD completo com foto, bio, tema, Instagram, LinkedIn, ordem de exibição e status de confirmação. Público na landing page em tempo real.
+	Matchmaking B2B IA
+	CORTEX cruza perfis de empresários brasileiros e parceiros internacionais. Score de compatibilidade. Agenda de reuniões gerada automaticamente.
+	Credencial Digital (Badge QR/NFC)
+	Crachá no celular. Leitura na catraca do pavilhão. Controle de acesso a áreas VIP vs. standard.
+	Cronograma Dinâmico (Agenda)
+	Linha do tempo por palcos e horários. Participante clica na estrela e monta 'Minha Agenda'. Atualização em tempo real via onSnapshot.
+	Gestão de Delegações
+	Painel que agrega todos os participantes da mesma empresa. Soma despesas, voos, orçamentos. Dashboard consolidado por delegação.
+	Exhibitor Manager (Estandes)
+	Cadastro de patrocinadores, localização no pavilhão (Hall Sul, Estande 12), captação de leads escaneados.
+	Sponsor Intelligence (ROI)
+	Conta quantas pessoas escanearam o QR do estande X. Relatório de retorno para o patrocinador.
+	Live Streaming Hub
+	Transmissão de palestras ao vivo com tradução simultânea IA e Q&A para participantes no app.
+	Campanhas de Marketing
+	Disparo de emails, WhatsApp e SMS para base de leads. Individual, em grupo ou em massa. Tracking de abertura.
+	Exportação de Dados
+	CSV, PDF e Excel de inscrições, check-ins, leads de patrocinadores.
+	
+
+7.4 A Landing Page da CES — O que pode e o que não pode mudar
+
+
+Status
+	O que inclui
+	✅ PODE MUDAR (via ADM)
+	Cores primárias do site, imagens de fundo e banners, URL do vídeo YouTube, texto do badge (ex: 'CES BRASIL 2027'), subtítulo e copy do hero, texto da seção Sobre, items dos cards informativos, texto e link do botão CTA, link do Sympla, email de contato, link do Instagram, palestrantes (CRUD completo), configurações de branding.
+	❌ NÃO PODE MUDAR
+	HTML/estrutura da landing page original (ces-landing.html é preservado exatamente como está), textos e CTAs definidos na missão original da CES, links do YouTube original (Wy6-p71zSLU), IDs e classes CSS do HTML original, vídeos do YouTube incorporados, estrutura das seções (hero → sobre → palestrantes → inscrição → rodapé).
+	
+
+7.5 O que o Admin (Henrique/Pedro) tem acesso
+* Dashboard: total de inscrições, confirmadas, pendentes, novas esta semana
+* Todas as inscrições em tempo real via onSnapshot — sem refresh
+* Alterar status de qualquer inscrição (pendente/confirmada/cancelada)
+* Criar inscrições manualmente para quem não preencheu online
+* Exportar CSV com todas as inscrições
+* Editor de conteúdo do site: hero, sobre, inscrição, rodapé
+* CRUD completo de palestrantes
+* Prévia do site em iframe dentro do admin
+* Upload de fotos, vídeos e arquivos via Firebase Storage
+* Configurações de branding: cores, logo, fonte
+* Campanhas: disparos de email, WhatsApp, SMS
+* Gráficos de leads por período e origem
+* Visualizar log de auditoria do tenant
+
+
+7.6 App e Interface Pública da CES
+A interface pública da CES é a landing page em https://tenants/ces/index.html. Carrega do Firestore via onSnapshot. Qualquer edição no admin reflete no site em <500ms.
+
+
+O app do participante (futuro) terá: ingresso digital QR, agenda personalizada ('Minha Agenda'), matchmaking B2B, mapa do pavilhão, chat de networking e badge NFC/QR.
+________________
+
+
+PARTE 8 — CLIENTE: VIAJANTE PRO
+8.1 O que é a Viajante Pro
+A Viajante Pro é uma agência premium de turismo corporativo. Opera grupos de executivos em destinos internacionais: Dubai, Tóquio, Paris, Miami, Maldivas, Nova York, Roma, Patagônia. Especialidade em viagens de incentivo corporativo para empresas de médio e grande porte.
+
+
+8.2 O que a NEXIA faz pela Viajante Pro
+
+
+Módulo
+	Função para a VP
+	Check-in Digital Mobile
+	O guia clica no app, tira foto do passageiro, verifica RG/Passaporte e dá check verde na lista. Sem papelada, sem fila.
+	Group Logistics (Rooming List)
+	Distribui automaticamente N pessoas em M quartos sem separar famílias ou casais. Algoritmo inteligente de alocação.
+	Seat Map Engine
+	O passageiro escolhe a poltrona no desenho do ônibus. Bloqueio automático para os outros.
+	Maps & Transfer Tracking
+	Passageiro vê o van 'chegando' no mapa do celular, igual ao Uber. GPS em tempo real.
+	Flight Monitor
+	Vigia voos em tempo real. Avisa se o voo de GRU para Miami atrasou 2 horas. Reagendamento de transfer automático.
+	SOS Panic / Geofencing
+	Passageiro perde-se na Europa, aperta botão. Celular do guia toca sirene com localização GPS no Google Maps.
+	Baggage Tracker
+	QR code na mala. Evita perda de bagagem do grupo no aeroporto. Guia vê todas as malas no painel.
+	Destination Intel
+	Dicas, clima local, conversão de moeda e emergências do destino embutidos no app do viajante.
+	App do Passageiro
+	Roteiro dia a dia, documentos digitais, informações do grupo, câmbio ao vivo, contatos de emergência.
+	App do Guia
+	8 abas: grupo (presença), checkpoints, roteiro, documentos, despesas, comunicação com grupo, emergência e IA Guide.
+	IA Guide Assistant
+	CORTEX específico para o guia: 'Quem está ausente?', 'Passaportes pendentes?', 'Restaurante do jantar?', 'Hospital mais próximo?'
+	Gestão de Pacotes
+	CRUD completo de pacotes: título, descrição, preço, imagem, link de reserva, capacidade, ocupação.
+	Dashboard VP Admin
+	Receita total, reservas ativas, passageiros cadastrados, check-ins realizados, ocupação por pacote.
+	Passageiros
+	Cadastro com nome, email, passaporte, pacote contratado, status. CRUD completo.
+	
+
+8.3 Interface Pública da Viajante Pro
+Landing page com hero dark blue, 6 destinos em grid com fotos, seção de stats (12.400+ passageiros, 380 grupos, 67 destinos, 98.7% satisfação), formulário de contato → Firestore. Todo conteúdo editável via admin.
+
+
+App do passageiro: portal web com login. Roteiro, documentos, câmbio, info de saúde no destino. App do guia: 8 abas completas com CORTEX integrado.
+
+
+8.4 Fluxo de Negócio — CES → Viajante Pro
+Fluxo obrigatório conforme os documentos originais: inscrições na CES podem redirecionar para o Sympla OU para a Viajante Pro para montar o pacote completo da viagem a Las Vegas. As duas empresas são clientes da NEXIA e o sistema facilita essa integração.
+________________
+
+
+PARTE 9 — CLIENTE: BEZSAN LEILÕES
+9.1 O que é a Bezsan
+A Bezsan Leilões é uma plataforma de leilões imobiliários powered by IA. Diferente de portais tradicionais de leilão, a Bezsan usa 8 engines de IA para cobrir toda a jornada: da busca automática de imóveis em 40+ fontes até a geração de contratos e acompanhamento cartorário. 14.200+ imóveis analisados. R$2.4bi em leilões processados.
+
+
+9.2 Os 8 Engines de IA da Bezsan
+
+
+Engine IA
+	Função
+	CORTEX SEARCH
+	Varre Zap, OLX, TJ, CEF, leilão judicial e 40+ fontes. Filtra por região, valor, tipologia e potencial de lucro.
+	EDITAL IA
+	Processa PDF de editais em segundos. Extrai datas, valores mínimos, condições, restrições e red flags automaticamente.
+	LEG SHIELD (Auditoria Jurídica 360°)
+	Consulta CNDT, SERASA, TJ estadual, cartório de imóveis, débitos IPTU/condomínio, alienações e ônus reais em tempo real.
+	VALOR IA (Calculadora de Lance)
+	Compara com mercado, desconta ITBI, comissão, reforma estimada. Projeta ROI real da operação.
+	FINANCE IA (Simulação de Financiamento)
+	Simula Caixa FGTS, financiamento convencional, consórcio e flipping. Calcula viabilidade e parcela real.
+	AUTO BID (Lance Automático)
+	Cliente define teto e estratégia. A IA dá lances nos momentos certos durante o pregão ao vivo.
+	DOCS IA (Geração de Contratos)
+	Gera contrato de arrematação, procuração, requerimento, contrato de cessão e documentação completa com 1 clique.
+	JOURNEY IA (Jornada Completa)
+	Do edital até vistoria, transferência, regularização cartorária e entrega da chave. Tudo monitorado e guiado.
+	
+
+9.3 O que a NEXIA faz pela Bezsan
+
+
+Módulo
+	Função para a Bezsan
+	Live Bidding Engine
+	Lances via WebSockets em <50ms. Fila por timestamp se dois lances simultâneos.
+	Anti-Sniping Timer
+	Lance faltando 10s → cronômetro volta para 3min. Impede roubos de última hora.
+	Auto-Increment Robot
+	Cliente define teto de R$50k. Sistema dá lances de R$500 em R$500 automaticamente.
+	KYC/AML Bidder Verification
+	Validação de documentos, biometria facial e checagem de antecedentes antes de habilitar lances.
+	Catálogo Digital de Lotes
+	Galeria de fotos, vídeos, laudos técnicos, restrições legais e editais em PDF.
+	Auditório Híbrido
+	Leiloeiro físico integra lances da plateia presencial com a tela da internet em tempo real.
+	Post-Auction Settlement
+	Auto de arrematação, boleto do lote, boleto da comissão (5%) enviados por email automaticamente.
+	CORTEX IA Bezsan
+	Chat IA para análise de risco de lotes, cálculo de ROI, sugestão de estratégia de lance, geração de relatórios.
+	Pipeline de Investidores
+	CRM de arrematantes com histórico de lances, imóveis arrematados, orçamento disponível, score de comprador.
+	Marketing IA
+	Posts automáticos sobre lotes disponíveis no Instagram e Facebook. Auto-resposta em comentários.
+	Dashboard Admin
+	14 leilões ativos, 287 lotes, 1.840 licitantes, R$4.2M volume/mês, 142 análises IA/dia.
+	
+
+9.4 Planos da Bezsan para o Usuário Final
+
+
+Plano
+	Incluso
+	Explorer (Grátis)
+	10 buscas/mês, leitura básica de edital, calculadora de lance, acesso a listas públicas, 1 alerta de leilão.
+	Professional (R$197/mês)
+	Buscas ilimitadas, auditoria jurídica completa, lance automático, simulação de financiamento, geração de contratos, alertas ilimitados, suporte prioritário.
+	Sovereign (R$797/mês)
+	Tudo do Professional + multi-conta (até 5 users) + API para integração + relatórios avançados + IA personalizada + gerente de conta + SLA 99.9%.
+	________________
+
+
+PARTE 10 — CLIENTE: SPLASH EVENTOS
+10.1 O que é a Splash Eventos
+A Splash Eventos é um espaço premium de locação para eventos. O local possui múltiplos espaços distintos — desde salões para 800 pessoas até lounges íntimos para 80 — e oferece serviços completos de decoração, buffet parceiro, iluminação especial, DJ, projeção e audiovisual.
+
+
+Tipos de evento atendidos: casamentos, eventos corporativos, formaturas, aniversários, lançamentos de produtos, congressos, festas privadas.
+
+
+10.2 Os Espaços da Splash
+
+
+Espaço
+	Capacidade e Dados
+	Salão Real
+	Capacidade: 800 pessoas. Taxa de ocupação: 88%. 12 reservas/mês. Espaço principal para grandes eventos.
+	Jardim Splash
+	Capacidade: 600 pessoas. Taxa: 72%. 9 reservas/mês. Área ao ar livre com jardim tropical.
+	Deck Panorâmico
+	Capacidade: 200 pessoas. Taxa: 65%. 6 reservas/mês. Vista panorâmica com área gourmet.
+	Espaço Aqua
+	Capacidade: 350 pessoas. Taxa: 70%. 8 reservas/mês. Área com piscina — diferencial exclusivo.
+	Terraço Splash
+	Capacidade: 150 pessoas. Taxa: 55%. 4 reservas/mês. Terraço com vista da cidade.
+	Lounge Privativo
+	Capacidade: 80 pessoas. Taxa: 40%. 2 reservas/mês. Ambiente íntimo para eventos exclusivos.
+	
+
+10.3 O que a NEXIA faz pela Splash
+
+
+Módulo
+	Função para a Splash
+	Agenda Anti-Overbooking
+	Calendário visual por espaço e dia. Impossível reservar o mesmo espaço duas vezes no mesmo horário. Alertas de conflito em tempo real.
+	Formulário de Reserva Online
+	Site público com formulário de solicitação → Firestore → admin recebe em tempo real via onSnapshot. Campos: nome, email, tipo de evento, data, número de convidados.
+	CRUD de Locações (Espaços)
+	Admin cria espaços com foto, descrição, capacidade, área em m², preço/hora. Tudo editável em tempo real.
+	Gestão de Reservas
+	Tabela completa com todas as reservas: status (pendente/confirmado/cancelado/sinal pago), cliente, data, valor. Alteração de status com 1 clique.
+	Precificação Dinâmica
+	Preços sobem automaticamente em datas de alta demanda (véspera de feriado, dezembro, etc.). Revenue management nativo.
+	Contratos Digitais
+	Geração automática de contrato de locação em PDF com dados do evento, valor, condições, caução. Assinatura digital com validade jurídica.
+	Serviços Adicionais
+	Catálogo de serviços extras: decoração, buffet, DJ, iluminação especial, projeção, audiovisual. Cliente seleciona e adiciona ao contrato.
+	Dashboard Splash Admin
+	Locações do mês, receita bruta, meta, taxa de ocupação por espaço, tipos de evento em gráfico de pizza, próximas locações.
+	Financeiro
+	Controle de pagamentos: sinal pago, saldo a receber, data de vencimento. Integração com Pix para pagamento de sinal online.
+	Campanhas de Marketing
+	Email e WhatsApp para base de noivos, empresas e formatandos. Segmentação por tipo de evento e região.
+	
+
+10.4 Interface Pública da Splash
+Landing page com hero purple/dark mostrando os espaços em grid com fotos de alta qualidade. Seção de espaços com capacidade, preço/hora, área, link de disponibilidade. Formulário de reserva online com campos: nome, email, tipo de evento, data (datepicker), número de convidados. Footer com contato e redes sociais.
+
+
+10.5 App e Interface para o Cliente Final (Splash)
+O cliente final (quem aluga o espaço) interage com a Splash via: site público para ver espaços e solicitar reserva, confirmação de reserva por email com link do contrato digital, assinatura do contrato no celular (e-signature), pagamento do sinal via Pix integrado, acesso ao cronograma do evento no app do cliente, chat direto com a Splash para serviços adicionais.
+________________
+
+
+PARTE 11 — BACKEND OBRIGATÓRIO: TUDO EDITÁVEL, NADA FIXO
+11.1 O Princípio Fundamental
+NADA pode ser fixo no código. Absolutamente tudo deve ser editável via backend sem precisar de programador. Este é o princípio mais crítico da NEXIA OS.
+
+
+Elemento
+	Como é editável
+	Textos
+	Todos os textos visíveis no site público são variáveis carregadas do Firestore. Hero title, subtitle, badge, CTAs, seções, rodapé — tudo.
+	Imagens
+	Todas as imagens vêm de URLs no Firestore. Upload via Firebase Storage no admin. Atualização em <500ms via onSnapshot.
+	Vídeos
+	IDs de YouTube, links de Vimeo ou URLs de vídeo armazenados no Firestore. Trocáveis sem código.
+	Estrutura e Ordem das Seções
+	A ordem das seções é um array no Firestore. O admin pode reordenar seções com drag-and-drop. Reflete imediatamente.
+	Cores e Branding
+	CSS variables aplicadas dinamicamente baseadas nas configurações de branding do tenant no Firestore.
+	Fontes
+	Opção exclusiva do admin para trocar a tipografia de todo o site. Carregada via Google Fonts dinamicamente.
+	Botões e CTAs
+	Textos e links de todos os CTAs configuráveis. Botão 'Quero Participar' pode virar 'Comprar Ingresso' sem código.
+	Módulos Ativados
+	Feature flags por tenant no Firestore. Seções do site somem ou aparecem baseado nos módulos ativos.
+	Conteúdo de Especialidade
+	Palestrantes, lotes de leilão, pacotes de viagem, espaços para locação — tudo CRUD completo no admin.
+	Configurações de Negócio
+	Links do Sympla, WhatsApp, emails de contato, redes sociais — todos editáveis pelo admin.
+	
+
+11.2 Fluxo ADM → Firestore → Front-end (obrigatório)
+
+
+Etapa
+	O que acontece
+	1. Admin edita
+	Admin abre o painel, vai em 'Editar Conteúdo', altera o texto do hero, troca a imagem, muda o link do CTA.
+	2. AutoSave debounce
+	Sistema aguarda 600ms sem digitação e salva automaticamente via setDoc() no Firestore. Sem botão salvar desnecessário.
+	3. Firestore atualiza
+	O documento tenants/{id}/content/hero é atualizado com os novos dados + timestamp de atualização.
+	4. onSnapshot detecta
+	O site público tem listeners onSnapshot() inscritos em todos os documentos de conteúdo. A mudança é detectada em <50ms.
+	5. DOM re-renderiza
+	A função render() é chamada com os novos dados. O innerHTML do #app é atualizado com o novo conteúdo.
+	6. Visitante vê em tempo real
+	O visitante no site público vê a mudança sem precisar dar F5. Em menos de 500ms.
+	
+
+11.3 O que é Obrigatório no Backend do Admin NEXIA (Master)
+* Empire View com MRR consolidado em tempo real
+* Matriz de todos os tenants com status, plano e valor
+* Kill Switch com 1 clique — bloqueio instantâneo
+* Shadow Login sem precisar de senha do cliente
+* Audit log global de todas as ações
+* Broadcast para todos ou tenants específicos
+* Arquiteto IA: nicho → módulos → proposta → preço
+* NEXIA Store: gestão de todos os módulos disponíveis
+* Monitor de infraestrutura: CPU, bandwidth, storage, uptime
+* Criação de novo tenant com template por setor em 30s
+* Gestão dos 15.000 agentes IA
+* Feature flags globais
+
+
+11.4 O que é Obrigatório no Backend do Admin de Cada Cliente
+* Dashboard com KPIs do negócio em tempo real
+* Editor visual de todo o conteúdo do site (textos, imagens, vídeos)
+* CRUD completo de todos os registros do negócio
+* Gestão de inscrições/cadastros com status e timestamps
+* Upload de arquivos direto do PC para o Firebase Storage
+* Campanhas de marketing (email, WhatsApp, SMS)
+* Exportação de CSV, PDF e Excel de qualquer listagem
+* Gráficos de analytics: leads, vendas, conversão, origem
+* Gestão de equipe com permissões granulares
+* Configuração de domínio próprio com SSL automático
+* Configurações de branding: cores, logo, fonte
+* NEXIA Store: comprar e ativar módulos adicionais
+* Log de auditoria do próprio tenant
+* Prévia do site em iframe dentro do admin
+________________
+
+
+PARTE 12 — MODELO DE RECEITA DA NEXIA
+12.1 Como a NEXIA Ganha Dinheiro
+
+
+Fonte de Receita
+	Descrição
+	Licenças Mensais (Planos)
+	Mensalidade dos tenants por plano (Basic/Pro/Enterprise/Sovereign). Receita previsível e recorrente. Principal fonte de MRR.
+	Módulos Avulsos (NEXIA Store)
+	Módulos adicionais comprados na Store. Ticket médio R$97–497/módulo/mês.
+	Taxa sobre Transações
+	3% das transações processadas via gateway integrado. Ex: inscrições CES, vendas Bezsan, reservas Splash.
+	CORTEX IA Premium
+	Camadas avançadas de IA (fine-tuning por setor, agentes dedicados) como add-on ao plano.
+	Implementação e Onboarding
+	Taxa única de setup para planos Enterprise e Sovereign. R$1.500–5.000 por tenant.
+	Treinamento e Suporte Dedicado
+	Horas de consultoria e suporte premium para grandes contas.
+	Licenças de API (B2B)
+	Empresas que querem usar a infraestrutura NEXIA para seus próprios produtos via API.
+	Marketplace de Módulos
+	Desenvolvedores externos criam módulos, vendem na NEXIA Store. Split 30/70 (dev/NEXIA).
+	
+
+12.2 Meta de Crescimento
+
+
+Período
+	Projeção
+	2027 (Atual)
+	4–6 tenants ativos. MRR: R$18.400. ARR: R$220.800.
+	2028 (Meta)
+	50 tenants. MRR: R$180.000. ARR: R$2.16M.
+	2029 (Meta)
+	200 tenants. MRR: R$600.000. ARR: R$7.2M.
+	2030 (Visão)
+	1.000+ tenants. MRR: R$2.5M+. ARR: R$30M+. Top SaaS da América Latina.
+	________________
+
+
+PARTE 13 — RESUMO TÉCNICO DE IMPLEMENTAÇÃO
+13.1 Firebase Project ID
+cesbrasil-85898 (Projeto principal — todos os tenants em um único Firebase)
+
+
+Usuários existentes no Authentication: admin@cesbrasil.tech | henrique@cesbrasil.tech | pedro@cesbrasil.tech
+
+
+13.2 Estrutura Firestore
+
+
+Coleção
+	Uso
+	master_users/{uid}
+	Perfis dos admins NEXIA (Gildivan). role: 'master'.
+	user_index/{uid}
+	Índice rápido: uid → tenantId. Para lookup em O(1).
+	tenants/{tenantId}
+	Metadados do tenant: nome, plano, status, primaryColor.
+	tenants/{id}/content/{section}
+	Conteúdo editável: hero, about, inscricao, footer. onSnapshot no front.
+	tenants/{id}/settings/branding
+	Branding: cores, logo, fonte, domínio.
+	tenants/{id}/users/{uid}
+	Usuários do tenant: role, email, status, name.
+	tenants/{id}/cadastros/{docId}
+	Inscrições e leads. Public create, admin read/write.
+	tenants/{id}/reservas/{docId}
+	Reservas da Splash. Public create, admin read/write.
+	tenants/{id}/pacotes/{docId}
+	Pacotes da Viajante Pro. Admin CRUD.
+	tenants/{id}/leiloes/{docId}
+	Lotes da Bezsan. Admin CRUD.
+	tenants/{id}/locacoes/{docId}
+	Espaços da Splash. Admin CRUD.
+	tenants/{id}/data/speakers/{docId}
+	Palestrantes da CES. Admin CRUD, public read.
+	tenants/{id}/notifications/{docId}
+	Notificações push. Criadas por Master via Broadcast.
+	_audit_logs/{docId}
+	Log global imutável. Allow write: if auth. Allow update/delete: if false.
+	
+
+13.3 Segurança (Firestore Rules)
+* Zero Trust: tenantId NUNCA vem do cliente. Sempre verificado server-side via user_index.
+* Public create em cadastros e reservas (formulários públicos podem escrever)
+* Public read em content/* e settings/* (site público pode ler)
+* Admin read/write autenticado e verificado pelo tenantId do user_index
+* Master (master_users) pode ler e escrever em qualquer tenant
+* Audit logs: allow create (qualquer auth). allow update/delete: false. Imutável.
+
+
+13.4 Deploy (Netlify — Zero Custo)
+* Arrastar a pasta NEXIA_FINAL/ para netlify.com
+* Deploy em 30 segundos. Zero configuração adicional.
+* Domínio gratuito: nexia-os.netlify.app
+* Domínio próprio: apontar CNAME para nexia-os.netlify.app
+* SSL automático via Let's Encrypt integrado ao Netlify
+* Firebase Firestore Rules: firebase deploy --only firestore:rules
+* Seed inicial: acessar /seed.html no browser após o deploy
+✦ NEXIA OS — Documento Mestre v2.0
+Proprietário e Confidencial — Gildivan © 2027 — Todos os direitos reservados
+Página

@@ -1,0 +1,1104 @@
+﻿✦ NEXIA OS — Site Builder & Editor Visual · Especificação Completa v2.0
+✦ NEXIA OS
+SITE BUILDER & EDITOR VISUAL
+Especificação Completa — NEXIA + CES + Viajante Pro + Bezsan + Splash
+O que deve ter, o que faz e como funciona em cada painel — Gildivan © 2027
+________________
+
+
+PARTE 1 — FILOSOFIA DO SITE BUILDER
+O Site Builder da NEXIA OS é o coração da plataforma. É o que diferencia a NEXIA de um simples sistema: o dono do negócio ou o admin da NEXIA pode editar absolutamente TUDO no site do cliente — textos, imagens, cores, seções, ordem, vídeos, botões, formulários — sem precisar de programador, sem dar F5, sem depender de ninguém.
+
+
+PRINCÍPIO FUNDAMENTAL:
+NADA pode ser fixo no código. Tudo vem do Firestore. Tudo é editável via backend. Qualquer mudança reflete no site público em menos de 500ms via Firestore onSnapshot.
+
+
+Pergunta
+	Resposta
+	Quem edita?
+	O admin NEXIA Master (Gildivan) e o admin de cada tenant (Henrique da CES, etc.). Cada um com seus limites de acesso.
+	Como salva?
+	Auto-save com debounce de 600ms. Sem clicar em 'Salvar'. Apenas digitar e o sistema salva sozinho.
+	Como aparece no site?
+	Firestore onSnapshot() no frontend detecta mudança em <50ms e re-renderiza o DOM automaticamente.
+	O visitante precisa de F5?
+	Não. A mudança aparece em tempo real para quem já está no site.
+	E o preview?
+	Iframe do site real dentro do admin. O admin vê exatamente o que o visitante vai ver enquanto edita.
+	Quem não pode editar?
+	O HTML estrutural da CES (ces-landing.html) é protegido. Não pode mudar estrutura HTML, IDs, classes do template original.
+	
+
+
+
+1.1 Fluxo Técnico Completo: Admin Digita → Site Atualiza
+
+
+#
+	Etapa
+	1
+	Admin está na aba 'Editar Conteúdo'. Muda o título do hero para 'Nova Missão Empresarial'.
+	2
+	oninput='autoSave("hero")' é disparado a cada tecla.
+	3
+	autoSave() executa: clearTimeout(saveTimers['hero']); setTimeout(() => saveSection('hero'), 600). Timer reinicia a cada tecla — aguarda 600ms de silêncio.
+	4
+	600ms sem digitação: saveSection('hero') é chamado. Coleta todos os campos do form: {badge, title, subtitle, videoId, ctaText, sympla}.
+	5
+	setDoc(doc(db, 'tenants', 'ces', 'content', 'hero'), {...dados, updatedAt: serverTimestamp()}, {merge:true}). Escrita atômica no Firestore.
+	6
+	Firestore propaga a mudança para todos os subscribers em <50ms globalmente via WebSocket.
+	7
+	No site público (ces-app.js): db.doc('tenants/ces/content/hero').onSnapshot(snap => { state.hero = snap.data(); render(); }). O evento dispara.
+	8
+	render() executa: document.getElementById('app').innerHTML = renderNav() + renderHero() + renderAbout() + renderSpeakers() + renderInscricao() + renderFooter(). DOM atualizado.
+	9
+	Visitante que está na página ve o novo título sem dar F5. Em <500ms do momento em que o admin parou de digitar.
+	10
+	Toast no admin: 'Salvo automaticamente ✓'. Admin tem confirmação visual de que o Firestore recebeu a escrita.
+	________________
+
+
+PARTE 2 — SITE BUILDER DA NEXIA MASTER
+O admin NEXIA (Gildivan) tem um Site Builder diferente dos clientes. Ele gerencia a landing page da própria NEXIA (/index.html) e pode criar/editar a landing de qualquer tenant.
+
+
+2.1 O que o Master pode editar — Site NEXIA
+
+
+Seção
+	O que é editável
+	SEÇÃO HERO
+	Título principal, subtítulo, badge de destaque, texto do botão CTA principal, link do CTA, botão secundário, vídeo/imagem de fundo.
+	SEÇÃO CLIENTES (Tenant Grid)
+	Cards dos 4 clientes atuais: nome, ícone RemixIcon, cor, descrição, tags de módulos. Ordem dos cards (drag-and-drop). Adicionar novos tenants ao grid.
+	SEÇÃO SOBRE / FEATURES
+	4 cards de diferenciais: ícone, título, texto. Adicionar/remover/reordenar cards. Trocar ícones da biblioteca RemixIcon.
+	NAVBAR
+	Logo NEXIA, links de navegação (textos + anchors), botão 'Acessar Sistema' (texto + link).
+	FOOTER
+	Texto de copyright, links do footer (Login, Master, Dev Viewer), email de contato.
+	BRANDING GLOBAL
+	Cor primária (#00E5FF), cor secundária (#7B5CFA), fonte padrão, logo URL, favicon URL. Aplicado em todo o ecossistema.
+	META/SEO
+	Title da página, meta description, OG title, OG description, OG image URL, robots.
+	SCRIPTS/PIXELS
+	Google Analytics ID, Facebook Pixel ID, Google Tag Manager ID, Hotjar ID. Campos limpos para colar os IDs.
+	STATUS PAGE
+	Texto de status de cada serviço, horário de atualização, mensagem de incidente ativo.
+	
+
+2.2 O que o Master pode editar — Qualquer Tenant
+Via Tenant Control ou Shadow Login, o Master pode editar o conteúdo de qualquer tenant como se fosse o admin daquele cliente:
+
+
+* Todos os campos do editor do tenant (hero, sobre, formulário, rodapé, branding)
+* Criar seções novas no site do cliente
+* Ativar/desativar seções existentes
+* Resetar conteúdo para o template padrão do setor
+* Publicar mudanças emergenciais sem precisar do admin do tenant
+
+
+2.3 Arquiteto IA — Site Builder Automático para Novos Clientes
+Funcionalidade exclusiva do Master. Ao criar um novo tenant, o Arquiteto IA gera automaticamente o conteúdo inicial do site:
+
+
+Campo
+	O que acontece
+	Input: Nicho
+	Admin digita o ramo do novo cliente (ex: 'Clínica Odontológica').
+	IA gera: Hero
+	badge, title, subtitle, ctaText personalizados para o nicho. Em português, tom profissional.
+	IA gera: Sobre
+	Título e texto da seção 'Sobre' com copy específico do setor.
+	IA gera: Cards
+	3 cards de diferenciais com ícones sugeridos baseados no nicho.
+	IA gera: Footer
+	Texto de copyright + campos para preencher email e redes sociais.
+	IA gera: Cor Primária
+	Sugestão de paleta de cores baseada no setor (saúde → azul/verde, eventos → purple, etc.).
+	IA gera: Proposta
+	Preço recomendado (ex: R$1.297/mês Pro), módulos selecionados, pitch de vendas.
+	Resultado
+	Em 30 segundos: tenant criado no Firestore com conteúdo real, site já funcional, pronto para o admin do cliente personalizar.
+	________________
+
+
+PARTE 3 — SITE BUILDER DA CES BRASIL 2027
+O Site Builder da CES tem regras especiais: o HTML estrutural original (ces-landing.html) não pode ser modificado. Mas TODO o conteúdo é dinâmico e editável via Firestore.
+
+
+3.1 Navegação do Editor CES
+
+
+Aba/Seção
+	O que contém
+	Aba Hero
+	Edita o banner principal do site.
+	Aba Sobre
+	Edita a seção de informações sobre a missão.
+	Aba Inscrição
+	Edita o formulário 'Quero Participar'.
+	Aba Rodapé
+	Edita o footer do site.
+	Palestrantes (seção separada)
+	CRUD de palestrantes com foto, bio, links sociais.
+	Configurações
+	Branding: cores, logo, fonte do site.
+	Upload de Mídia
+	Galeria de arquivos enviados ao Firebase Storage.
+	Prévia do Site
+	Iframe do site real renderizado dentro do admin.
+	
+
+3.2 Aba HERO — Todos os Campos
+
+
+Campo
+	Descrição e Regras
+	badge
+	Texto da pílula de destaque no topo do hero. Exemplo: 'CES BRASIL 2027 · MISSÃO EMPRESARIAL'. Aparece com ponto animado ao lado. Máx 80 chars.
+	YouTube Video ID
+	ID do vídeo YouTube para tocar como fundo do hero em loop silencioso. Formato: apenas o ID (ex: Wy6-p71zSLU). Sem a URL completa.
+	title
+	Título principal. Aceita HTML limitado: apenas <br> para quebra de linha. Aparece em fonte 76px bold. Exemplo: 'A Maior Missão<br>Empresarial Brasileira'.
+	subtitle
+	Texto descritivo abaixo do título. Párgrafo corrido sem HTML. Tamanho 18px. Máx 200 chars recomendados.
+	ctaText
+	Texto do botão principal. Exemplo: 'Quero Participar'. Máx 30 chars.
+	ctaLink
+	Link do botão CTA. Padrão: '#inscricao' (ancora na seção). Pode ser URL externa (Sympla, etc.).
+	sympla
+	URL completa do evento no Sympla. Se preenchido, aparece botão secundário 'Ver no Sympla →'. Se vazio, botão some.
+	Cor Primária (via Settings)
+	Cor do badge, ponto animado, links e destaques. Default: #00E5FF.
+	
+
+3.3 Aba SOBRE — Todos os Campos
+
+
+Campo
+	Descrição e Regras
+	title
+	Título da seção 'Sobre'. Aparece centralizado em h2. Exemplo: 'O que é a Missão CES?'.
+	text
+	Parágrafo explicativo. Texto corrido. Máx 400 chars. Aparece centralizado em 17px com max-width 600px.
+	items[0..N] — icon
+	Ícone do card. Classe RemixIcon. Exemplo: 'ri-global-line'. Ver biblioteca em remixicon.com.
+	items[0..N] — title
+	Título do card de destaque. Exemplo: 'Las Vegas'. Aparece em h3.
+	items[0..N] — desc
+	Descrição do card. Exemplo: 'Janeiro 2027 — CES International'. Aparece em 14px.
+	Botão Adicionar Card
+	Cria novo item com ícone padrão ri-star-line. Admin preenche os 3 campos.
+	Botão Remover Card
+	Remove item pelo índice. O array é reenumerado automaticamente.
+	Quantidade de cards
+	Mínimo 1, máximo sem limite (layout responsivo em grid auto-fill 280px).
+	
+
+3.4 Aba INSCRIÇÃO — Todos os Campos
+
+
+Campo
+	Descrição e Regras
+	title
+	Título do formulário. Exemplo: 'Quero Participar'. Aparece em h2 acima do form.
+	subtitle
+	Subtítulo descritivo. Exemplo: 'Preencha o formulário e nossa equipe entrará em contato.' Aparece em 15px abaixo do título.
+	btnText
+	Texto do botão de envio. Exemplo: 'Enviar Inscrição'. Aparece no button type=submit.
+	sympla
+	URL do Sympla. Se preenchido, aparece link 'ou inscreva-se direto no Sympla →' abaixo do botão.
+	whatsapp
+	Link completo do WhatsApp (https://wa.me/5511...). Reservado para botão de contato direto.
+	Campos do formulário (fixos)
+	Nome*, Empresa*, Email*, WhatsApp*, Cargo. Campos com * são obrigatórios. Os campos em si NÃO são editáveis — apenas os textos do formulário.
+	Status após envio
+	Ao enviar com sucesso: mensagem verde '✅ Inscrição enviada!'. Mensagem de erro em vermelho se Firestore falhar.
+	Destino dos dados
+	Firestore: tenants/ces/cadastros/{auto_id}. Admin vê na seção 'Inscrições' em tempo real.
+	
+
+3.5 Aba RODAPÉ — Todos os Campos
+
+
+Campo
+	Descrição e Regras
+	text
+	Texto de copyright do footer. Exemplo: '© 2027 CES Brasil · Missão Empresarial Brasileira'. Aparece em 13px opacity 40%.
+	email
+	Email de contato. Aparece como link mailto: no footer. Clicável.
+	instagram
+	URL do Instagram (@handle ou URL completa). Aparece como link 'Instagram' no footer.
+	Campos opcionais ausentes
+	Se email vazio: link não aparece. Se instagram vazio: link não aparece. Lógica condicional no renderFooter().
+	
+
+3.6 Seção PALESTRANTES (CRUD)
+
+
+Campo
+	Descrição e Regras
+	name*
+	Nome completo do palestrante. Obrigatório. Aparece como h3 no card.
+	topic
+	Tema da palestra. Aparece em cyan abaixo do nome.
+	photoUrl
+	URL da foto do palestrante. Se vazio: avatar com inicial do nome em cyan. Recomendado 200x200px quadrado.
+	bio
+	Biografia curta. Máx 300 chars recomendados. Exibida em 2 linhas com -webkit-line-clamp no site público.
+	instagram
+	Handle @usuario (sem @) ou handle completo. Gera link instagram.com/{handle}. Ícone ri-instagram-line.
+	linkedin
+	URL completa do LinkedIn. Gera link clicável. Ícone ri-linkedin-box-line.
+	order
+	Número inteiro. Controla a ordem de exibição no grid (menor número = primeiro). Default: 0.
+	confirmed
+	Checkbox boolean. Se marcado: badge verde '✓ Confirmado'. Se desmarcado: badge amber 'Aguardando'.
+	Publicação em tempo real
+	Ao salvar: onSnapshot no ces-app.js detecta o novo speaker e re-renderiza a seção #palestrantes no site público em <500ms.
+	Exibição no site
+	Grid responsive de cards: foto circular, nome, tema, bio (2L), ícones sociais. Só aparece se speakers.length > 0.
+	
+
+3.7 Seção CONFIGURAÇÕES DE BRANDING CES
+
+
+Campo
+	Descrição e Regras
+	siteName
+	Nome do site. Usado no title da página. Exemplo: 'CES Brasil 2027'.
+	primaryColor
+	Cor primária. Input type=color + input text hex sincronizados. Aplicada em: badge, links, botões, bordas. Default: #00E5FF.
+	font
+	Select: Sora, Inter, Outfit, Poppins. Aplicada via document.body.style.fontFamily no carregamento via onSnapshot.
+	logoUrl
+	URL da imagem do logo. Usada no ícone hexagonal da navbar em substituição ao texto 'CES'.
+	Onde é salvo
+	Firestore: tenants/ces/settings/branding. onSnapshot no ces-app.js → applyBranding(data).
+	Auto-save
+	Diferente dos outros editores, Settings tem botão 'Salvar Configurações' explícito. Mas os inputs também têm oninput para auto-save.
+	
+
+3.8 Seção UPLOAD DE MÍDIA
+
+
+Campo/Função
+	Descrição
+	Tipos aceitos
+	Imagens: image/* (JPG, PNG, GIF, WebP, SVG). Vídeos: video/* (MP4, WebM). Documentos: .pdf. Planilhas: .xlsx, .csv.
+	Interface
+	Área com bordas tracejadas. Clique ou arraste. Input file type=file multiple oculto acionado por click.
+	Processo de upload
+	1. Mostra 'Enviando {nome}…' no progress. 2. storageRef(storage, 'tenants/ces/uploads/{timestamp}_{filename}'). 3. uploadBytes(). 4. getDownloadURL(). 5. Card na galeria.
+	Galeria de arquivos
+	Grid responsive. Imagens: thumbnail 140px + nome + botão 'Copiar URL'. Outros: ícone de arquivo + nome + botão 'Copiar URL'.
+	Copiar URL
+	navigator.clipboard.writeText(url). Toast 'URL copiada!'. Admin usa essa URL nos campos de imagem do editor.
+	Caminho no Storage
+	tenants/ces/uploads/{timestamp}_{filename}. Organizado por tenant. Visualizável no Firebase Console.
+	Sem delete no MVP
+	A galeria não tem botão de deletar por padrão (para evitar quebrar links). A exclusão é feita via Firebase Console.
+	Limite de tamanho
+	Firebase Storage free tier: 1GB total. Sem limite por arquivo. Recomendado: imagens <2MB, vídeos <50MB.
+	
+
+3.9 Seção PRÉVIA DO SITE
+
+
+Elemento
+	Descrição
+	Iframe
+	<iframe src='/tenants/ces/index.html' width='100%' height='500px'>. Renderiza o site real.
+	Atualização
+	O iframe tem seus próprios listeners onSnapshot ativos. Quando conteúdo muda no Firestore, o iframe atualiza sozinho sem recarregar.
+	Responsividade
+	O admin pode ver como fica em desktop (largura total) e mobile (reduzir o browser ou adicionar botões de device). A prévia mostra o estado exato do site público.
+	Limitação
+	Iframes com mesmo domínio funcionam perfeitamente. Cross-domain pode bloquear por segurança do browser (CORS/X-Frame-Options).
+	________________
+
+
+PARTE 4 — SITE BUILDER DA VIAJANTE PRO
+A Viajante Pro tem site próprio com 6 seções editáveis. Foco em conversão de pacotes de turismo.
+
+
+4.1 Estrutura do Site Viajante Pro
+
+
+Seção
+	Conteúdo
+	1 — Navbar
+	Logo VP, links de navegação (Destinos, Contato), botão Admin.
+	2 — Hero
+	Banner principal com badge, título, subtítulo, 2 CTAs, estatísticas.
+	3 — Pacotes
+	Grid de cards de viagem carregados do Firestore.
+	4 — Contato
+	Formulário de interesse → Firestore.
+	5 — Footer
+	Copyright NEXIA OS.
+	
+
+4.2 Campos Editáveis — Hero VP
+
+
+Campo
+	Descrição
+	badge
+	Pílula de destaque. Exemplo: 'VIAJANTE PRO · AGÊNCIA PREMIUM'. Com ponto animado na cor primária.
+	title
+	Título. Aceita \n para quebra de linha (convertido para <br> no render). Exemplo: 'O Mundo Inteiro\nNa Palma da Sua Mão.'
+	subtitle
+	Subtítulo descritivo. Máx 200 chars. Aparece em 18px abaixo do título.
+	primary
+	Cor primária da Viajante Pro. Default: #0ea5e9 (azul). Aplicada em: badge, botões, stats, bordas.
+	Estatísticas
+	4 stats fixas no código: '12.400+ Passageiros', '380 Grupos Corporativos', '67 Destinos', '98.7% Satisfação'. Para mudar, necessário atualizar o defaults.stats no viajante-app.js.
+	Onde é salvo
+	Firestore: tenants/viajante/content/hero. onSnapshot em viajante-app.js → render().
+	
+
+4.3 Campos Editáveis — Pacotes VP (CRUD)
+
+
+Campo
+	Descrição
+	title
+	Nome do pacote. Exemplo: 'Miami & Orlando'. Aparece como h3 no card.
+	desc
+	Descrição curta. Aparece em 13px no card. Máx 150 chars.
+	price
+	Preço em R$. Número. Formatado automaticamente como 'R$ X.XXX'. Aparece em 20px cyan.
+	imageUrl
+	URL da imagem de capa do destino. Se vazio: placeholder com ícone ri-map-pin-2-line.
+	bookingUrl
+	URL do link de reserva. Se vazio: link '#contato'. Pode ser link externo (Sympla, agência, WhatsApp).
+	order
+	Número inteiro para ordenação. Menor = aparece primeiro no grid.
+	Publicação
+	onSnapshot(tenants/viajante/pacotes, orderBy('order')) → render() no viajante-app.js. Grid atualiza em <500ms.
+	
+
+4.4 Campos Editáveis — Formulário de Contato VP
+
+
+Campo
+	Descrição
+	Campos do form (fixos)
+	Nome, Email, Destino desejado. Sem edição via CMS — estrutura fixa do formulário.
+	Título e subtítulo
+	'Fale com um Especialista' e 'Nossa equipe está pronta para criar o roteiro perfeito.' — Editáveis via seção de conteúdo específica (a implementar como aba no editor VP).
+	Texto do botão
+	'Enviar Contato' — Editável via CMS.
+	Destino dos dados
+	Firestore: tenants/viajante/cadastros/{id}. Separado de passageiros (que têm campo passaporte).
+	
+
+4.5 Editor de Conteúdo VP — Interface do Admin
+
+
+Campo
+	Descrição
+	Badge
+	Input text. Atualiza content/hero.badge.
+	Título
+	Textarea 2 linhas. Atualiza content/hero.title.
+	Subtítulo
+	Textarea 3 linhas. Atualiza content/hero.subtitle.
+	Cor Primária
+	Input color + input hex sincronizados. Atualiza content/hero.primary.
+	Auto-save
+	debounce 600ms via saveHero(). Toast 'Salvo ✓'.
+	Falta implementar
+	Aba 'Contato' para editar textos do formulário. Aba 'Footer' para copyright. Aba 'Stats' para as 4 estatísticas. Essas abas estão previstas mas ainda como campos simples.
+	________________
+
+
+PARTE 5 — SITE BUILDER DA BEZSAN LEILÕES
+A Bezsan tem site com foco em conversão de investidores imobiliários. Visual premium dark com amber.
+
+
+5.1 Estrutura do Site Bezsan
+
+
+Seção
+	Conteúdo
+	1 — Navbar
+	Logo BZ, links (Como Funciona, Recursos IA, Planos, Leilões Ativos), botão 'Entrar no Sistema'.
+	2 — Hero
+	Banner com vídeo/imagem de fundo, badge CORTEX IA, título animado, CTA duplo.
+	3 — Engines de IA
+	8 cards das engines IA da Bezsan com ícones e descrições.
+	4 — Jornada 7 Passos
+	Timeline visual dos 7 passos automáticos (buscar → analisar → auditar → calcular → financiar → arrematar → fechar).
+	5 — Depoimentos
+	3 depoimentos de clientes (Ricardo Alves, Fernanda Costa, Marcos Bezerra).
+	6 — Planos
+	Explorer (Grátis), Professional (R$197/mês), Sovereign (R$797/mês).
+	7 — Leilões Ativos
+	Grid de lotes carregados do Firestore.
+	8 — Pipeline
+	Formulário de entrada no pipeline de investidores.
+	9 — Footer
+	Logo + links + copyright.
+	
+
+5.2 Campos Editáveis — Hero Bezsan
+
+
+Campo
+	Descrição
+	badge
+	Texto da pílula CORTEX IA. Exemplo: 'BEZSAN · POWERED BY NEXIA CORTEX IA'.
+	title
+	Título do hero. Aceita \n para quebra. Exemplo: 'Leilões de Imóveis\ncom Inteligência Artificial'.
+	subtitle
+	Subtítulo 18px descritivo. Máx 200 chars.
+	Cor Primária
+	#f59e0b (amber) por padrão. Aplicada em badge, botões, destaques.
+	imageUrl (fundo)
+	URL da imagem de fundo do hero. Aplicada com opacity 0.35 e overlay gradient.
+	
+
+5.3 Campos Editáveis — Leilões (CRUD Completo)
+
+
+Campo
+	Descrição
+	titulo
+	Nome do imóvel ou bem. Exemplo: 'Apart. 3 Quartos · Moema, SP'.
+	tipo
+	Categoria. Exemplo: 'IMÓVEL RESIDENCIAL', 'VEÍCULO', 'TERRENO'. Aparece em uppercase amber acima do título.
+	descricao
+	Descrição do lote. Aparece em 13px com line-clamp 2 no card.
+	lanceMinimo
+	Número em R$. Formatado como 'R$ XXX.XXX'. Aparece como destaque no card.
+	imageUrl
+	URL da foto do imóvel. Se vazio: placeholder com ícone ri-building-4-line.
+	status
+	Select: 'ativo' | 'encerrado'. Ativo: badge amber. Encerrado: badge cinza.
+	Publicação
+	onSnapshot(leiloes, orderBy('createdAt','desc')) no bezsan-app.js → render(). Grid atualiza.
+	Usuário final vê
+	Grid de cards com foto, tipo, título, descrição, lance mínimo, status. Se leilões.length === 0: mensagem com link para Admin.
+	
+
+5.4 Campos Editáveis — Pipeline (Formulário Público)
+
+
+Campo
+	Descrição
+	Campos do form
+	Nome, Email, Orçamento disponível. Enviados para tenants/bezsan/cadastros.
+	Textos editáveis
+	Título 'Cadastre-se no Pipeline', subtítulo, texto do botão 'Entrar no Pipeline'. Via CMS.
+	Dado salvo
+	Firestore: tenants/bezsan/cadastros com tipo:'pipeline'. Admin vê na seção Pipeline do painel.
+	
+
+5.5 Funcionalidades Avançadas Previstas para Bezsan
+
+
+Feature
+	Descrição
+	Timer ao vivo por lote
+	Campo 'dataEncerramento' (DateTime) no lote. Frontend exibe countdown HH:MM:SS via setInterval. Ao zerar: status muda para 'encerrado'.
+	Lance mínimo ao vivo
+	Campo 'lanceAtual' updated via admin quando recebe lance real. Site exibe valor atualizado via onSnapshot.
+	Imagens múltiplas
+	Array 'images[]' no lote em vez de um único imageUrl. Galeria de fotos com prev/next.
+	Documentos PDF do lote
+	Array 'docs[{name, url}]' para edital PDF, laudo de avaliação, certidões.
+	Status do pregão
+	Badge dinâmico: 'AO VIVO', 'AMANHÃ às 18h', 'ENCERRADO', 'EM BREVE'. Calculado em frontend.
+	Filtros na landing
+	Filtros por tipo (imóvel/veículo/terreno), por cidade, por faixa de valor. Dado salvo como arrays no content/filters do Firestore.
+	________________
+
+
+PARTE 6 — SITE BUILDER DA SPLASH EVENTOS
+A Splash tem site focado em conversão de solicitações de reserva de espaços para eventos.
+
+
+6.1 Estrutura do Site Splash
+
+
+Seção
+	Conteúdo
+	1 — Navbar
+	Logo SP, links (Espaços, Reservar), botão Admin.
+	2 — Hero
+	Banner purple, badge, título 2 linhas, subtítulo, 2 CTAs.
+	3 — Espaços (Locações)
+	Grid de cards dos espaços carregados do Firestore.
+	4 — Formulário de Reserva
+	Form com nome, email, tipo evento, data, convidados → Firestore.
+	5 — Footer
+	Copyright Splash Eventos NEXIA OS.
+	
+
+6.2 Campos Editáveis — Hero Splash
+
+
+Campo
+	Descrição
+	badge
+	Pílula de destaque. Exemplo: 'SPLASH EVENTOS · ESPAÇOS PREMIUM'.
+	title
+	Título. Aceita \n. Exemplo: 'Seu Evento\nMerece o Melhor'.
+	subtitle
+	Subtítulo descritivo. Máx 200 chars.
+	Cor primária
+	#a78bfa (purple) por padrão. Aplicada em badge, botões, bordas.
+	
+
+6.3 Campos Editáveis — Espaços/Locações (CRUD)
+
+
+Campo
+	Descrição
+	nome
+	Nome do espaço. Exemplo: 'Salão Real', 'Jardim Splash', 'Deck Panorâmico'. Aparece como h3 no card.
+	descricao
+	Descrição do espaço. Máx 200 chars. Aparece em 13px.
+	precoHora
+	Preço por hora em R$. Número. Formato: 'R$ X.XXX/hora'. Destaque purple.
+	capacidade
+	Número de pessoas. Aparece como 'X pax' no badge do card.
+	area
+	Área em m². Aparece como 'XXm²' no badge do card. Opcional.
+	imageUrl
+	URL da foto do espaço. Se vazio: placeholder gradient purple.
+	order
+	Ordem de exibição. Menor = primeiro no grid.
+	Serviços adicionais
+	Previstos: array 'servicos[{nome, preco, icone}]' por espaço. Decoração, buffet, DJ, iluminação, projeção.
+	Disponibilidade
+	Previstos: Array de datas bloqueadas 'datesBlocked[]'. Calendário no site mostrando disponível/indisponível.
+	
+
+6.4 Campos Editáveis — Formulário de Reserva Splash
+
+
+Campo
+	Descrição
+	nome
+	Obrigatório. Nome do responsável pelo evento.
+	email
+	Obrigatório. Email para confirmação.
+	tipoEvento
+	Texto livre. Placeholder: 'Casamento, Corporativo, Formatura...'
+	data
+	Input type=date. Datepicker nativo do browser. Estilo dark via color-scheme.
+	convidados
+	Input type=number. Número de convidados esperados.
+	Destino
+	Firestore: tenants/splash/reservas/{id} com status:'pendente'. Admin vê na seção Reservas.
+	Textos do form editáveis
+	Título 'Solicitar Reserva', subtítulo, texto do botão. Via CMS.
+	
+
+6.5 Funcionalidades Avançadas Previstas para Splash
+
+
+Feature
+	Descrição
+	Calendário visual de disponibilidade
+	Ao clicar em uma data no calendário, o site verifica reservas confirmadas naquele espaço e mostra verde/vermelho.
+	Seleção de espaço no formulário
+	Select dropdown com os espaços disponíveis gerado dinamicamente do Firestore.
+	Seleção de serviços adicionais
+	Checkboxes dos serviços extras com preço. Total calculado em tempo real.
+	Simulação de orçamento
+	Antes de enviar: campo calcula estimativa de custo (horas × preço/hora + serviços).
+	Galeria de fotos por espaço
+	Array images[] com múltiplas fotos. Slideshow/lightbox no card do espaço.
+	Depoimentos de clientes
+	CRUD de depoimentos com foto, nome, tipo de evento, nota (estrelas).
+	Instagram feed
+	Exibição dos últimos posts do Instagram da Splash carregados via API.
+	________________
+
+
+PARTE 7 — CAMPOS COMUNS A TODOS OS SITES
+Estes campos/seções devem existir no Site Builder de TODOS os clientes (CES, VP, Bezsan, Splash) e da própria NEXIA:
+
+
+7.1 Seção CONFIGURAÇÕES DE BRANDING (Obrigatória em Todos)
+
+
+Campo
+	O que faz
+	siteName
+	Nome que aparece no title da aba do browser e nos emails automáticos.
+	primaryColor
+	Input color + hex. Cor aplicada em badges, botões, bordas, destaques. Muda em tempo real via onSnapshot → CSS variable.
+	secondaryColor
+	Cor secundária. Para gradientes e destaques alternativos.
+	logoUrl
+	URL da imagem do logo. Substitui texto no navbar. Se vazio: texto do nome da empresa.
+	faviconUrl
+	URL do favicon (ícone na aba do browser). 32x32px recomendado.
+	font
+	Select: Sora, Inter, Outfit, Poppins, Montserrat, Raleway. Muda tipografia de todo o site.
+	domain
+	Domínio próprio do cliente (ex: missao.cesbrasil.tech). Campo informativo — apontamento no DNS é manual.
+	supportEmail
+	Email de suporte exibido no footer e em mensagens automáticas.
+	whatsapp
+	Número completo com DDI. Usado em CTAs de WhatsApp.
+	instagram
+	Handle @usuario. Usado no footer e potencialmente em feed.
+	linkedin
+	URL completa LinkedIn. Usado no footer.
+	
+
+7.2 Seção META/SEO (Obrigatória em Todos)
+
+
+Campo
+	O que faz
+	pageTitle
+	Conteúdo da tag <title>. Aparece na aba do browser e nos resultados do Google.
+	metaDescription
+	Conteúdo da meta description. Aparece no snippet do Google. Máx 160 chars.
+	ogTitle
+	Open Graph title. Título que aparece quando o link é compartilhado no WhatsApp/Facebook.
+	ogDescription
+	Open Graph description. Texto do preview de link compartilhado.
+	ogImage
+	URL da imagem do preview. Aparece ao compartilhar link. Recomendado: 1200x630px.
+	robots
+	'index,follow' (padrão) ou 'noindex,nofollow' (para páginas privadas). Select.
+	Como é aplicado
+	Meta tags injetadas no <head> via JavaScript ao carregar o site. Conteúdo vem do Firestore tenants/{id}/settings/seo.
+	
+
+7.3 Seção PIXELS & ANALYTICS (Obrigatória em Todos)
+
+
+Campo
+	O que faz
+	googleAnalyticsId
+	ID tipo G-XXXXXXXXXX. Injeta tag gtag.js no head dinamicamente.
+	facebookPixelId
+	ID tipo XXXXXXXXXXXXXXXXXX. Injeta Meta Pixel fbq() no head.
+	googleTagManagerId
+	ID tipo GTM-XXXXXXX. Injeta container GTM no head e body.
+	hotjarId
+	ID numérico do Hotjar. Injeta heatmap tracker no head.
+	clarityId
+	ID do Microsoft Clarity. Session recording.
+	tiktokPixelId
+	ID do TikTok Pixel. Para campanhas TikTok Ads.
+	Implementação
+	Todos carregados via document.createElement('script') dinâmico ao carregar o site. IDs vindos do Firestore tenants/{id}/settings/pixels.
+	Status por pixel
+	Toggle on/off para cada pixel individualmente. Facilita habilitar/desabilitar sem apagar o ID.
+	
+
+7.4 Seção INTEGRAÇÕES (Comum a Todos)
+
+
+Campo
+	O que faz
+	Sympla
+	URL do evento Sympla. Usado em CTAs e botões alternativos. Guardado em content/inscricao.sympla.
+	WhatsApp Business
+	Número + mensagem pré-definida (template de URL wa.me). Abre chat diretamente.
+	RD Station
+	Webhook URL para enviar leads qualificados do formulário para o RD Station CRM.
+	Hubspot
+	Portal ID + Form ID. Integra formulários com o Hubspot CRM.
+	Hotmart
+	Link de produto Hotmart. Alternativa ao Sympla para vendas de ingressos digitais.
+	Custom Webhook
+	URL livre. Qualquer POST de lead do formulário é enviado para essa URL. Compatível com Zapier, Make.com, N8N.
+	Onde é salvo
+	Firestore: tenants/{id}/settings/integrations.
+	
+
+7.5 Seção NOTIFICAÇÕES (Comum a Todos)
+
+
+Campo
+	O que faz
+	Barra de Urgência (Top Bar)
+	Banner no topo do site com mensagem urgente. Exemplo: 'Últimas 5 vagas!'. Toggle on/off, cor de fundo, texto, link opcional.
+	Popup de Saída
+	Popup que aparece quando o usuário move o mouse para fechar a aba. Título, texto, CTA. Toggle on/off.
+	Chat Flutuante (Widget)
+	Botão flutuante no canto. Abre widget de chat. Integrado ao WhatsApp ou ao CORTEX IA (chatbot).
+	Cookie Banner
+	Aviso de LGPD/cookies. Texto editável, botões 'Aceitar' e 'Recusar'. Necessário para compliance.
+	Onde é salvo
+	Firestore: tenants/{id}/settings/notifications. onSnapshot aplica/remove no site.
+	________________
+
+
+PARTE 8 — EDITOR VISUAL AVANÇADO (WYSIWYG)
+Além do editor por formulário, o Site Builder da NEXIA deve ter um modo de edição visual direta — WYSIWYG (What You See Is What You Get) — onde o admin clica diretamente no texto do site e edita inline.
+
+
+8.1 Como Funciona o Modo WYSIWYG
+
+
+Aspecto
+	Como funciona
+	Ativação
+	Botão 'Modo de Edição' no admin. Abre o site em um iframe com borda de edição.
+	Elementos editáveis
+	Textos (h1, h2, h3, p, span, a): contentEditable=true ao ativar. Clique no texto → cursor de edição.
+	Imagens
+	Clique na imagem → aparece botão 'Trocar imagem'. Abre galeria do Storage.
+	Cores
+	Click em elemento colorido → seletor de cor inline.
+	Auto-save
+	Ao fazer blur do elemento editado: captura o novo valor e chama saveSection(). Debounce 1s.
+	Indicadores visuais
+	Elementos editáveis têm borda tracejada azul ao hover. Tooltip 'Clique para editar'.
+	Blocos
+	Cada seção tem handle de drag para reordenar. Drop → atualiza campo 'order' no Firestore.
+	Resultado
+	O que o admin vê NO iframe É exatamente o que o visitante vai ver. Zero discrepância.
+	
+
+8.2 Gestor de Blocos — Adicionar/Remover/Reordenar Seções
+
+
+Recurso
+	Como funciona
+	Painéis de seção
+	Cada seção do site aparece como um bloco no painel lateral: Hero, Sobre, Palestrantes, Inscrição, Footer. Com olho (visível/oculto) e handle de reordenação.
+	Visibilidade
+	Toggle eye icon: seção some do site público sem apagar os dados. Firestore: section.visible = false.
+	Reordenação
+	Drag handles. Nova ordem salva em Firestore como array de {id, order}. Render usa order para montar o HTML.
+	Adicionar nova seção
+	Botão '+ Adicionar Seção'. Modal com tipos: Texto simples, CTA Band, Galeria de fotos, Vídeo embed, Depoimentos, Stats, Mapa, Iframe.
+	Deletar seção
+	Botão lixeira com confirm(). Remove do Firestore. Site atualiza via onSnapshot.
+	Seções obrigatórias
+	Hero e Footer não podem ser deletados. Botão lixeira desabilitado.
+	
+
+8.3 Tipos de Seção que Podem Ser Adicionadas
+
+
+Tipo de Seção
+	Campos CMS disponíveis
+	Texto Simples
+	Título (h2), texto (p), opção de fundo claro/escuro. CMS fields: title, text, background.
+	CTA Band
+	Faixa com chamada para ação. CMS: title, subtitle, buttonText, buttonLink, background color.
+	Galeria de Fotos
+	Grid de imagens do Storage. CRUD de imagens com caption opcional. Layout: grid 3/4 cols.
+	Vídeo Embed
+	Embed YouTube/Vimeo por ID. CMS: videoId, platform (youtube/vimeo), title, autoplay (bool), muted (bool).
+	Depoimentos
+	Cards de clientes. CRUD: texto, nome, cargo, empresa, foto, nota (1-5 estrelas).
+	Stats/Números
+	Row de 4 métricas com números grandes. CMS: [{number, label, suffix}]. Ex: '3.400 Clientes', '98% NPS'.
+	Mapa
+	Embed Google Maps por coordenadas ou endereço. CMS: address, zoom, latitude, longitude.
+	Iframe Externo
+	Embed de qualquer URL via iframe. CMS: url, height (px), title.
+	FAQ Accordion
+	Perguntas e respostas expansíveis. CRUD de {question, answer}. Auto-save ao editar.
+	Timeline
+	Lista de marcos com ícone, data e texto. Para eventos, jornadas, histórico da empresa.
+	Pricing Cards
+	Cards de planos com preço, features, CTA. CRUD completo.
+	Formulário Customizado
+	Construtor de form: adicionar campos (text, email, tel, select, textarea, checkbox). Destino: Firestore ou webhook.
+	________________
+
+
+PARTE 9 — CONTROLES DE PUBLICAÇÃO E VERSIONAMENTO
+
+
+9.1 Sistema de Draft vs. Publicado
+
+
+Estado
+	O que significa
+	Draft (Rascunho)
+	Conteúdo editado mas não publicado. Salvo em tenants/{id}/content/{section}/draft. Visível apenas no admin.
+	Publicado
+	Conteúdo aprovado. Salvo em tenants/{id}/content/{section}. Visível no site público.
+	Botão 'Publicar'
+	Copia conteúdo do draft para o publicado. addDoc(_audit_logs, action:'content.published').
+	Botão 'Descartar Rascunho'
+	Deleta draft. Restaura visualização do publicado atual.
+	Preview de Draft
+	No admin: iframe carrega com parâmetro ?mode=draft. Site lê do path draft em vez do publicado.
+	Benefício
+	Admin pode trabalhar em mudanças grandes (redesign de hero, nova seção) sem afetar o site ao vivo até estar pronto.
+	
+
+9.2 Histórico de Versões
+
+
+Recurso
+	Como funciona
+	Snapshot automático
+	A cada publicação: cópia do estado atual salva em tenants/{id}/versions/{timestamp}. Até 50 versões guardadas.
+	Visualizar versão
+	Admin seleciona versão no histórico. Preview no iframe mostra como o site estava naquele momento.
+	Restaurar versão
+	Botão 'Restaurar esta versão'. Copia dados da versão para content/{section}. Publicação imediata.
+	Campos da versão
+	{timestamp, publishedBy, sections: {...todo o conteúdo no momento}}. Snaphsot completo.
+	Limite
+	Firestore guarda até 50 versões por tenant. A 51ª deleta a mais antiga.
+	
+
+9.3 Status da Publicação no Admin
+
+
+Indicador
+	Quando aparece
+	Indicador 'Salvo'
+	Toast verde no canto inferior. Aparece por 2.5s após cada autoSave().
+	Indicador 'Publicando…'
+	Spinner durante o setDoc(). Botão desabilitado.
+	Indicador 'Publicado'
+	Timestamp 'Última publicação: X min atrás' no topo do editor.
+	Indicador 'Rascunho não publicado'
+	Badge amarelo no título da seção quando há draft pendente.
+	Indicador de mudança não salva
+	Se perder conexão antes do debounce: indicador vermelho 'Alterações não salvas'. Tenta reenviar ao reconectar.
+	________________
+
+
+PARTE 10 — RESPONSIVIDADE E PREVIEW MULTI-DEVICE
+
+
+10.1 Previews no Admin
+
+
+Device
+	Largura/Representação
+	Desktop (default)
+	Iframe com largura 100%. Representa monitor padrão 1440px.
+	Tablet
+	Iframe com largura 768px centralizado. Representa iPad.
+	Mobile
+	Iframe com largura 375px centralizado com moldura de celular. Representa iPhone 14.
+	Landscape Mobile
+	Iframe 667px largura, 375px altura. Celular deitado.
+	Como alternar
+	Botões de device no topo do painel de preview. Muda largura do iframe dinamicamente.
+	
+
+10.2 CSS Responsivo do Site Público
+
+
+Regra CSS
+	O que faz
+	@media (max-width: 768px)
+	Padding de seções reduz de 100px para 60px. Navbar padding reduz para 16-20px.
+	@media (max-width: 480px)
+	Título do hero reduz para clamp(32px, ...). Grid de cards vira 1 coluna.
+	Navbar mobile
+	Links de navegação somem. Ícone de menu hamburger aparece (a implementar menu mobile).
+	Formulários
+	Full width em mobile. Grids 2 colunas viram 1 coluna.
+	Fontes responsivas
+	Todos os títulos usam clamp(). Exemplo: clamp(40px, 6vw, 76px) — nunca abaixo de 40px, nunca acima de 76px.
+	Imagens
+	Sempre width:100%, height fixo com object-fit:cover. Nunca overflow horizontal.
+	________________
+
+
+PARTE 11 — SITE BUILDER COMPARAÇÃO POR CLIENTE
+Tabela resumo do que cada admin pode editar no Site Builder:
+
+
+Recurso
+	NEXIA Master
+	CES
+	VP
+	Bezsan
+	Splash
+	Seção Hero completa
+	✅
+	✅
+	✅
+	✅
+	✅
+	Seção Sobre com cards
+	✅
+	❌ (estrutura fixa)
+	✅
+	✅
+	✅
+	Palestrantes (CRUD)
+	✅ (Master)
+	✅
+	❌
+	❌
+	❌
+	Pacotes de viagem (CRUD)
+	✅ (Master)
+	❌
+	✅
+	❌
+	❌
+	Leilões (CRUD)
+	✅ (Master)
+	❌
+	❌
+	✅
+	❌
+	Espaços/Locações (CRUD)
+	✅ (Master)
+	❌
+	❌
+	❌
+	✅
+	Formulário de inscrição
+	✅
+	✅
+	✅
+	✅
+	✅
+	Rodapé editável
+	✅
+	✅
+	✅
+	✅
+	✅
+	Branding (cores/logo/fonte)
+	✅
+	✅
+	✅
+	✅
+	✅
+	Upload de mídia
+	✅
+	✅
+	✅
+	✅
+	✅
+	SEO / Meta tags
+	✅
+	✅
+	✅
+	✅
+	✅
+	Pixels/Analytics
+	✅
+	✅
+	✅
+	✅
+	✅
+	Integrações externas
+	✅
+	✅
+	✅
+	✅
+	✅
+	Barra de urgência (top bar)
+	✅
+	✅
+	✅
+	✅
+	✅
+	Adicionar novas seções
+	✅
+	❌ (HTML protegido)
+	✅
+	✅
+	✅
+	Reordenar seções
+	✅
+	❌ (HTML protegido)
+	✅
+	✅
+	✅
+	Modo WYSIWYG (clique inline)
+	✅
+	✅ (dentro dos dados)
+	✅
+	✅
+	✅
+	Preview multi-device
+	✅
+	✅
+	✅
+	✅
+	✅
+	Histórico de versões
+	✅
+	✅
+	✅
+	✅
+	✅
+	Arquiteto IA (auto-content)
+	✅
+	❌ (conteúdo fixo)
+	✅
+	✅
+	✅
+	
+
+❌ para CES na estrutura = O HTML original ces-landing.html não pode ter estrutura alterada. Mas o CONTEÚDO (textos, imagens, dados) é totalmente editável via Firestore.
+
+
+
+
+PARTE 12 — CHECKLIST DE IMPLEMENTAÇÃO
+O que já está implementado (✅) e o que precisa ser construído (🔨) no Site Builder:
+
+
+Já Implementado ✅
+* Auto-save com debounce 600ms via autoSave()
+* setDoc() com merge:true para salvar seções no Firestore
+* onSnapshot() no frontend carregando todo o conteúdo do Firestore
+* render() re-renderizando o DOM completo a cada mudança
+* Editor de Hero: badge, videoId, title, subtitle, ctaText, sympla
+* Editor de Sobre: title, text, items[] com CRUD de cards
+* Editor de Inscrição: title, subtitle, btnText, sympla, whatsapp
+* Editor de Rodapé: text, email, instagram
+* CRUD de Palestrantes CES com onSnapshot
+* CRUD de Pacotes VP com onSnapshot
+* CRUD de Leilões Bezsan com onSnapshot
+* CRUD de Locações/Espaços Splash com onSnapshot
+* Configurações de Branding: cores, logo, fonte com onSnapshot
+* Upload de mídia para Firebase Storage com galeria e Copiar URL
+* Iframe de preview do site no admin
+* Toast de confirmação de save
+* Kill switch check em todos os sites (suspensão bloqueia o site)
+
+
+A Construir 🔨 (Próximas versões)
+* Modo WYSIWYG de edição direta clicando nos elementos do site
+* Gestor visual de blocos com drag-and-drop e toggle de visibilidade
+* Tipos de seção adicionais: FAQ, Timeline, Stats, Pricing, Mapa, Depoimentos
+* Sistema de Draft vs. Publicado com botão 'Publicar'
+* Histórico de versões com restauração
+* Editor de SEO/Meta tags com preview de snippet Google
+* Painel de Pixels/Analytics: Google Analytics, Facebook Pixel, GTM
+* Painel de Integrações: Sympla, RD Station, Webhook personalizado
+* Barra de Urgência configurável (top bar)
+* Popup de exit intent configurável
+* Banner de cookies LGPD configurável
+* Preview multi-device (desktop/tablet/mobile) com botões de alternância
+* Abas completas no editor VP: Contato, Footer, Stats
+* Abas no editor Bezsan: Planos, Engines IA, Depoimentos, Jornada 7 passos
+* Abas no editor Splash: Serviços adicionais, Depoimentos, Disponibilidade
+* Calendário de disponibilidade visual na Splash
+* Timer ao vivo nos lotes da Bezsan
+* Galeria de múltiplas fotos por lote (Bezsan) e por espaço (Splash)
+* Menu hamburger responsivo na navbar mobile
+* Campo de SEO aplicado dinamicamente no <head> via JavaScript
+
+
+
+
+✦ NEXIA OS — Site Builder · Especificação Completa v2.0
+Proprietário e Confidencial — Gildivan © 2027
