@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observability — NEXIA OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<script src="/core/nexia-theme.js"></script>
+<link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{font-family:'Inter',system-ui,sans-serif}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text)}
+.shell{display:flex;height:100vh;width:100vw;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:240px;background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0}
+.sb-brand{padding:16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
+.brand-orb{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--cyanlt),var(--purplt));border:1px solid var(--cyanbrd);display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:16px}
+.brand-name{font-size:14px;font-weight:800;letter-spacing:-.3px}
+.brand-name span{color:var(--cyan)}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--cyanlt);color:var(--cyan);border:1px solid var(--cyanbrd)}
+.nav-item i{font-size:15px;width:18px}
+.nav-section{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:10px 10px 4px}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.hdr{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--brd);background:var(--bg2);flex-shrink:0}
+.hdr-title{font-size:15px;font-weight:700;flex:1}
+.hdr-sub{font-size:11px;color:var(--text3)}
+.btn{padding:7px 14px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+.btn:hover{border-color:var(--cyanbrd);color:var(--cyan)}
+.btn.primary{background:var(--cyan);border-color:var(--cyan);color:#000}
+.btn.primary:hover{opacity:.9}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
+
+/* METRIC CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.card-icon.cyan{background:var(--cyanlt);color:var(--cyan);border:1px solid var(--cyanbrd)}
+.card-icon.green{background:var(--greenlt);color:var(--green);border:1px solid var(--greenbrd)}
+.card-icon.amber{background:var(--amberlt);color:var(--amber)}
+.card-icon.red{background:var(--redlt);color:var(--red)}
+.card-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.card-val{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.card-val.ok{color:var(--green)}
+.card-val.warn{color:var(--amber)}
+.card-val.err{color:var(--red)}
+.card-sub{font-size:10px;color:var(--text3)}
+
+/* CHARTS AREA */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.charts{grid-template-columns:1fr}}
+.panel{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;overflow:hidden}
+.panel-hdr{padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:13px;font-weight:600}
+.panel-body{padding:16px}
+
+/* LATENCY CHART */
+.lat-chart{height:80px;display:flex;align-items:flex-end;gap:2px;overflow:hidden}
+.lat-bar{flex:1;min-width:4px;border-radius:2px 2px 0 0;background:var(--cyanbrd);transition:height .3s}
+.lat-bar.high{background:rgba(239,68,68,.6)}
+.lat-bar.med{background:rgba(245,158,11,.6)}
+
+/* PATH TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 10px;text-align:left;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--brd)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--brd);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+.tag{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
+.tag-ok{background:var(--greenlt);color:var(--green);border:1px solid var(--greenbrd)}
+.tag-warn{background:var(--amberlt);color:var(--amber)}
+.tag-err{background:var(--redlt);color:var(--red)}
+
+/* LOG PANEL */
+.log-panel{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;overflow:hidden}
+.log-body{height:200px;overflow-y:auto;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;background:#020617}
+.log-body::-webkit-scrollbar{width:3px}.log-body::-webkit-scrollbar-thumb{background:var(--brd2)}
+.log-line{padding:2px 0;line-height:1.6}
+.log-ts{color:#475569;margin-right:8px}
+.log-INFO{color:#60A5FA}
+.log-WARN{color:#F59E0B}
+.log-ERROR{color:#EF4444}
+.log-OK{color:#34D399}
+
+/* STATUS BAR */
+.status-bar{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text3);padding:8px 20px;border-top:1px solid var(--brd);background:var(--bg2);flex-shrink:0}
+.status-bar span{display:flex;align-items:center;gap:5px}
+
+/* ALERT BADGE */
+.alert-banner{display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--red);align-items:center;gap:8px}
+.alert-banner.show{display:flex}
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="brand-orb"><i class="ri-radar-line"></i></div>
+      <div class="brand-name">NEXIA <span>OS</span></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-section">Sistema</div>
+      <a class="nav-item" href="/nexia/sentinel-dashboard.html"><i class="ri-shield-check-line"></i> Sentinel</a>
+      <a class="nav-item active" href="/nexia/observability.html"><i class="ri-line-chart-line"></i> Observability</a>
+      <a class="nav-item" href="/nexia/cortex-app.html"><i class="ri-brain-line"></i> Cortex</a>
+      <div class="nav-section">Plataforma</div>
+      <a class="nav-item" href="/nexia/nexia-master-admin.html"><i class="ri-settings-line"></i> Admin</a>
+      <a class="nav-item" href="/nexia/my-panel.html"><i class="ri-user-line"></i> Meu Painel</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="hdr">
+      <div class="live-dot" id="liveDot"></div>
+      <div>
+        <div class="hdr-title">Observability Dashboard</div>
+        <div class="hdr-sub" id="lastUpdate">Aguardando dados...</div>
+      </div>
+      <button class="btn primary" onclick="refresh()"><i class="ri-refresh-line"></i> Refresh</button>
+      <button class="btn" id="autoBtn" onclick="toggleAuto()"><i class="ri-pause-line"></i> Pause</button>
+    </header>
+
+    <div class="content">
+      <!-- ALERTS -->
+      <div class="alert-banner" id="alertBanner">
+        <i class="ri-error-warning-line"></i>
+        <span id="alertMsg"></span>
+      </div>
+
+      <!-- METRIC CARDS -->
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon cyan"><i class="ri-arrow-up-down-line"></i></div>
+          <div class="card-label">Total Requests</div>
+          <div class="card-val" id="mReqs">—</div>
+          <div class="card-sub">desde o boot</div>
+        </div>
+        <div class="card">
+          <div class="card-icon green"><i class="ri-timer-line"></i></div>
+          <div class="card-label">Avg Latency</div>
+          <div class="card-val" id="mAvg">—</div>
+          <div class="card-sub">P95: <span id="mP95">—</span> | P99: <span id="mP99">—</span></div>
+        </div>
+        <div class="card">
+          <div class="card-icon red"><i class="ri-bug-line"></i></div>
+          <div class="card-label">Error Rate</div>
+          <div class="card-val" id="mErr">—</div>
+          <div class="card-sub">Total erros: <span id="mErrCount">—</span></div>
+        </div>
+        <div class="card">
+          <div class="card-icon amber"><i class="ri-time-line"></i></div>
+          <div class="card-label">Uptime</div>
+          <div class="card-val ok" id="mUptime">—</div>
+          <div class="card-sub">desde último restart</div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts">
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title"><i class="ri-bar-chart-2-line"></i> Latência (últimas amostras)</span>
+          </div>
+          <div class="panel-body">
+            <div class="lat-chart" id="latChart"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title"><i class="ri-route-line"></i> Top Endpoints</span>
+            <span style="font-size:10px;color:var(--text3)">por volume</span>
+          </div>
+          <div class="panel-body" style="padding:0;overflow:auto;max-height:150px">
+            <table class="tbl">
+              <thead><tr><th>Rota</th><th>Reqs</th><th>Erros</th><th>Avg ms</th></tr></thead>
+              <tbody id="pathTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOG -->
+      <div class="log-panel">
+        <div class="panel-hdr">
+          <span class="panel-title"><i class="ri-terminal-line"></i> Live Logs</span>
+          <button class="btn" onclick="clearLog()" style="padding:3px 8px;font-size:10px">Limpar</button>
+        </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span><div class="live-dot" style="width:5px;height:5px"></div> Auto-refresh: <span id="autoStatus">ON</span></span>
+      <span>|</span>
+      <span>Endpoint: <code>/api/observability</code></span>
+      <span>|</span>
+      <span id="connStatus">Conectando...</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_URL = window.location.origin;
+let autoRefresh = true;
+let interval = null;
+const latHistory = [];
+
+function formatMs(ms) {
+  if (ms === undefined || ms === null) return '—';
+  return ms < 1000 ? ms + 'ms' : (ms/1000).toFixed(1) + 's';
+}
+
+function formatUptime(ms) {
+  if (!ms) return '—';
+  const s = Math.floor(ms/1000), m = Math.floor(s/60), h = Math.floor(m/60), d = Math.floor(h/24);
+  if (d > 0) return `${d}d ${h%24}h`;
+  if (h > 0) return `${h}h ${m%60}m`;
+  if (m > 0) return `${m}m ${s%60}s`;
+  return `${s}s`;
+}
+
+function addLog(level, msg) {
+  const body = document.getElementById('logBody');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  const ts = new Date().toLocaleTimeString('pt-BR');
+  line.innerHTML = `<span class="log-ts">[${ts}]</span><span class="log-${level}">[${level}] ${msg}</span>`;
+  body.appendChild(line);
+  if (body.children.length > 200) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+}
+
+function clearLog() { document.getElementById('logBody').innerHTML = ''; }
+
+function renderLatChart(paths) {
+  // Sample latencies from path data
+  const samples = paths.map(p => p.avgMs).filter(Boolean).slice(0,20);
+  if (!samples.length) return;
+  const max = Math.max(...samples, 1);
+  const chart = document.getElementById('latChart');
+  chart.innerHTML = samples.map(v => {
+    const h = Math.round((v/max)*100);
+    const cls = v > 1000 ? 'high' : v > 500 ? 'med' : '';
+    return `<div class="lat-bar ${cls}" style="height:${h}%" title="${v}ms"></div>`;
+  }).join('');
+}
+
+function renderPaths(paths) {
+  const tbody = document.getElementById('pathTable');
+  if (!paths || !paths.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text3);text-align:center;padding:16px">Sem dados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = paths.slice(0,15).map(p => {
+    const hasErr = p.errors > 0;
+    const errClass = hasErr ? 'tag-err' : 'tag-ok';
+    return `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);max-width:200px;overflow:hidden;text-overflow:ellipsis">${p.path}</td>
+      <td>${p.count}</td>
+      <td><span class="tag ${errClass}">${p.errors}</span></td>
+      <td>${formatMs(p.avgMs)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function checkAlerts(m) {
+  const alerts = [];
+  if (m.avgLatency > 1500) alerts.push(`⚠️ Latência avg alta: ${formatMs(m.avgLatency)}`);
+  if (m.errRate   > 5)     alerts.push(`🚨 Taxa de erro alta: ${m.errRate}%`);
+  if (m.p99       > 3000)  alerts.push(`⚠️ P99 crítico: ${formatMs(m.p99)}`);
+  const banner = document.getElementById('alertBanner');
+  if (alerts.length) {
+    banner.classList.add('show');
+    document.getElementById('alertMsg').textContent = alerts.join(' | ');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+async function refresh() {
+  try {
+    const t0 = Date.now();
+    const res = await fetch(`${BASE_URL}/api/observability`);
+    const ms = Date.now() - t0;
+
+    if (!res.ok) {
+      addLog('ERROR', `API retornou ${res.status} — ${res.statusText}`);
+      document.getElementById('connStatus').textContent = `Erro ${res.status}`;
+      return;
+    }
+
+    const m = await res.json();
+    document.getElementById('connStatus').textContent = `OK (${ms}ms)`;
+    document.getElementById('lastUpdate').textContent = `Atualizado: ${new Date().toLocaleTimeString('pt-BR')}`;
+
+    // Cards
+    document.getElementById('mReqs').textContent   = m.requests ?? '—';
+    const avgEl = document.getElementById('mAvg');
+    avgEl.textContent = formatMs(m.avgLatency);
+    avgEl.className   = 'card-val ' + (m.avgLatency > 1500 ? 'err' : m.avgLatency > 800 ? 'warn' : 'ok');
+
+    document.getElementById('mP95').textContent = formatMs(m.p95);
+    document.getElementById('mP99').textContent = formatMs(m.p99);
+
+    const errEl = document.getElementById('mErr');
+    errEl.textContent = (m.errRate ?? 0) + '%';
+    errEl.className   = 'card-val ' + (m.errRate > 5 ? 'err' : m.errRate > 1 ? 'warn' : 'ok');
+    document.getElementById('mErrCount').textContent = m.errors ?? 0;
+    document.getElementById('mUptime').textContent   = formatUptime(m.uptimeMs);
+
+    renderPaths(m.paths || []);
+    renderLatChart(m.paths || []);
+    checkAlerts(m);
+
+    addLog('INFO', `Metrics ok — reqs:${m.requests} avg:${formatMs(m.avgLatency)} err:${m.errRate}%`);
+  } catch (e) {
+    addLog('ERROR', `Falha ao buscar métricas: ${e.message}`);
+    document.getElementById('connStatus').textContent = 'Falha de conexão';
+  }
+}
+
+function toggleAuto() {
+  autoRefresh = !autoRefresh;
+  const btn = document.getElementById('autoBtn');
+  const status = document.getElementById('autoStatus');
+  if (autoRefresh) {
+    btn.innerHTML = '<i class="ri-pause-line"></i> Pause';
+    status.textContent = 'ON';
+    startInterval();
+  } else {
+    btn.innerHTML = '<i class="ri-play-line"></i> Resume';
+    status.textContent = 'OFF';
+    clearInterval(interval);
+  }
+}
+
+function startInterval() {
+  clearInterval(interval);
+  interval = setInterval(refresh, 5000);
+}
+
+// Boot
+(function boot() {
+  let attempts = 0;
+  function check() {
+    if (typeof NEXIA !== 'undefined' && NEXIA.auth) {
+      NEXIA.auth.onAuthStateChanged(u => {
+        if (!u) { window.location.href = '../login.html'; return; }
+        addLog('INFO', 'Autenticado — iniciando observabilidade...');
+        refresh();
+        startInterval();
+      });
+    } else if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+      firebase.auth().onAuthStateChanged(u => {
+        if (!u) { window.location.href = '../login.html'; return; }
+        addLog('INFO', 'Autenticado via Firebase — iniciando...');
+        refresh();
+        startInterval();
+      });
+    } else if (++attempts < 100) {
+      setTimeout(check, 80);
+    } else {
+      addLog('WARN', 'Firebase não disponível — modo sem auth');
+      refresh();
+      startInterval();
+    }
+  }
+  check();
+})();
+</script>
+</body>
+</html>

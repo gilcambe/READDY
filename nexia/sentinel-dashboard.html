@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXIA SENTINEL — Auto-Healing Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060910;--bg2:#0a0e1a;--bg3:#0f1425;--bg4:#151c2e;
+  --brd:rgba(255,255,255,.06);--brd2:rgba(0,229,255,.15);
+  --c1:#00E5FF;--c2:#7C3AED;--c3:#00D68F;--c4:#FF3D71;--c5:#FFAA00;
+  --text:#E8F0FF;--text2:rgba(232,240,255,.55);--text3:rgba(232,240,255,.28);
+  --ff:'DM Sans',system-ui,sans-serif;--ffm:'JetBrains Mono',monospace;--ffd:'Syne',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ff);overflow-x:hidden;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(124,58,237,.07),transparent 60%),radial-gradient(ellipse 50% 35% at 90% 100%,rgba(0,229,255,.05),transparent 60%);pointer-events:none;z-index:0}
+
+/* ── HEADER ────────────────────────────────────────────────────────────── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(6,9,16,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--brd);padding:14px 28px;display:flex;align-items:center;gap:16px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-orb{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#0d1a3a,#1a0d3a);border:1px solid var(--brd2);display:grid;place-items:center}
+.hdr-orb i{color:var(--c1);font-size:16px}
+.hdr-title{font-family:var(--ffd);font-size:15px;font-weight:800;letter-spacing:.04em}
+.hdr-title span{color:var(--c1)}
+.hdr-badge{padding:3px 10px;border-radius:20px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);font-family:var(--ffm);font-size:10px;color:var(--c1);letter-spacing:.06em}
+.hdr-health{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);padding:6px 14px;border-radius:8px;border:1px solid var(--brd)}
+.health-dot{width:8px;height:8px;border-radius:50%;animation:pulse 2s infinite}
+.hdot-healthy{background:var(--c3);box-shadow:0 0 0 0 rgba(0,214,143,.3)}
+.hdot-degraded{background:var(--c5);box-shadow:0 0 0 0 rgba(255,170,0,.3)}
+.hdot-down{background:var(--c4);box-shadow:0 0 0 0 rgba(255,61,113,.3)}
+.hdot-unknown{background:var(--text3)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3);box-shadow:0 0 0 5px rgba(0,214,143,.0)}}
+.hdr-actions{margin-left:auto;display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;border:0;font-weight:600;font-size:12px;cursor:pointer;transition:all .2s;font-family:var(--ff)}
+.btn-scan{background:linear-gradient(135deg,var(--c1),#0099bb);color:#000}
+.btn-scan:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,.3)}
+.btn-heal{background:linear-gradient(135deg,var(--c2),#6d28d9);color:#fff}
+.btn-heal:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.4)}
+.btn-ghost{background:var(--bg4);color:var(--text2);border:1px solid var(--brd)}
+.btn-ghost:hover{border-color:var(--c1);color:var(--c1)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-sm{padding:5px 12px;font-size:11px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────────────── */
+.layout{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 57px);position:relative;z-index:1}
+.sidebar{background:var(--bg2);border-right:1px solid var(--brd);overflow-y:auto;display:flex;flex-direction:column}
+.main{overflow-y:auto;padding:24px 28px}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────────── */
+.sb-section{padding:16px 16px 8px}
+.sb-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:2px;border:1px solid transparent}
+.sb-item:hover{background:var(--bg4)}
+.sb-item.active{background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.15)}
+.sb-item i{font-size:15px;color:var(--text3);flex-shrink:0}
+.sb-item.active i{color:var(--c1)}
+.sb-item-text{flex:1}
+.sb-item-name{font-size:12.5px;font-weight:500;color:var(--text2)}
+.sb-item.active .sb-item-name{color:var(--text)}
+.sb-item-sub{font-size:10.5px;color:var(--text3);margin-top:1px}
+.sb-count{font-family:var(--ffm);font-size:10px;padding:2px 7px;border-radius:10px}
+.sc-ok{background:rgba(0,214,143,.12);color:var(--c3)}
+.sc-fail{background:rgba(255,61,113,.12);color:var(--c4)}
+.sc-warn{background:rgba(255,170,0,.12);color:var(--c5)}
+.sb-divider{height:1px;background:var(--brd);margin:8px 16px}
+
+/* ── KPI CARDS ─────────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px}
+.kpi{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px 16px}
+.kpi-val{font-family:var(--ffd);font-size:28px;font-weight:800;line-height:1}
+.kpi-label{font-size:10px;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+.kv-healthy{color:var(--c3)}
+.kv-degraded{color:var(--c5)}
+.kv-down{color:var(--c4)}
+.kv-blue{color:var(--c1)}
+.kv-purple{color:var(--c2)}
+
+/* ── TABS ────────────────────────────────────────────────────────────────── */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--brd);padding-bottom:0}
+.tab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid transparent;border-bottom:none;color:var(--text3);transition:all .15s;margin-bottom:-1px}
+.tab:hover{color:var(--text2)}
+.tab.active{background:var(--bg2);border-color:var(--brd);border-bottom-color:var(--bg2);color:var(--c1)}
+
+/* ── TABLE ───────────────────────────────────────────────────────────────── */
+.tbl-wrap{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.tbl-head{display:grid;padding:9px 16px;border-bottom:1px solid var(--brd);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)}
+.tbl-row{display:grid;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.03);align-items:center;transition:background .1s}
+.tbl-row:last-child{border-bottom:none}
+.tbl-row:hover{background:rgba(255,255,255,.02)}
+.grid-routes{grid-template-columns:40px 1fr 80px 80px 60px 90px}
+.grid-fns{grid-template-columns:1fr 80px 60px 80px 120px}
+.grid-issues{grid-template-columns:100px 1fr 80px 90px}
+.grid-fixes{grid-template-columns:80px 1fr 100px 100px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:600;font-family:var(--ffm)}
+.t-ok{background:rgba(0,214,143,.1);color:var(--c3);border:1px solid rgba(0,214,143,.2)}
+.t-fail{background:rgba(255,61,113,.1);color:var(--c4);border:1px solid rgba(255,61,113,.2)}
+.t-warn{background:rgba(255,170,0,.1);color:var(--c5);border:1px solid rgba(255,170,0,.2)}
+.t-crit{background:rgba(255,61,113,.18);color:var(--c4);border:1px solid rgba(255,61,113,.3);animation:flicker .8s ease-in-out infinite}
+.t-blue{background:rgba(0,229,255,.08);color:var(--c1);border:1px solid rgba(0,229,255,.2)}
+.t-purple{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.25)}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:.65}}
+.mono{font-family:var(--ffm);font-size:11.5px}
+.text-muted{color:var(--text3)}
+.text-sm{font-size:12px}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── LOG / TERMINAL ─────────────────────────────────────────────────────── */
+.terminal{background:#020408;border:1px solid var(--brd);border-radius:10px;padding:16px;font-family:var(--ffm);font-size:11.5px;line-height:1.7;max-height:320px;overflow-y:auto;margin-bottom:20px}
+.log-line{display:flex;gap:10px;margin-bottom:2px}
+.log-ts{color:var(--text3);flex-shrink:0}
+.log-ok{color:var(--c3)}
+.log-err{color:var(--c4)}
+.log-warn{color:var(--c5)}
+.log-info{color:var(--c1)}
+.log-ai{color:#a78bfa}
+.cursor{display:inline-block;width:8px;height:13px;background:var(--c1);animation:blink 1s step-end infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+
+/* ── PROGRESS ───────────────────────────────────────────────────────────── */
+.progress-wrap{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:18px 20px;margin-bottom:20px}
+.progress-title{font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease;background:linear-gradient(90deg,var(--c1),var(--c2))}
+.progress-steps{display:flex;gap:6px;flex-wrap:wrap}
+.step-tag{padding:3px 9px;border-radius:5px;font-size:10.5px;font-family:var(--ffm);transition:all .3s}
+.step-pending{background:var(--bg4);color:var(--text3);border:1px solid var(--brd)}
+.step-active{background:rgba(0,229,255,.1);color:var(--c1);border:1px solid rgba(0,229,255,.25)}
+.step-done{background:rgba(0,214,143,.1);color:var(--c3);border:1px solid rgba(0,214,143,.2)}
+.step-fail{background:rgba(255,61,113,.1);color:var(--c4);border:1px solid rgba(255,61,113,.2)}
+
+/* ── FIX CARD ───────────────────────────────────────────────────────────── */
+.fix-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:16px;margin-bottom:12px}
+.fix-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.fix-title{font-size:13px;font-weight:600;color:var(--text)}
+.fix-file{font-family:var(--ffm);font-size:10.5px;color:var(--text3);margin-top:3px}
+.fix-body{font-size:12px;color:var(--text2);line-height:1.6}
+.fix-code{background:#020408;border:1px solid var(--brd);border-radius:7px;padding:10px 12px;font-family:var(--ffm);font-size:11px;color:#a78bfa;margin-top:8px;overflow-x:auto;white-space:pre}
+.fix-verify{font-size:11px;color:var(--c3);margin-top:8px;font-family:var(--ffm)}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────────────────── */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty i{font-size:40px;margin-bottom:12px;display:block}
+.empty p{font-size:13px}
+
+/* ── ALERT BANNER ─────────────────────────────────────────────────────────── */
+.alert-banner{background:rgba(255,61,113,.08);border:1px solid rgba(255,61,113,.2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:12.5px}
+.alert-banner i{color:var(--c4);font-size:16px;flex-shrink:0}
+.alert-banner.info{background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.15)}
+.alert-banner.info i{color:var(--c1)}
+.alert-banner.ok{background:rgba(0,214,143,.06);border-color:rgba(0,214,143,.15)}
+.alert-banner.ok i{color:var(--c3)}
+
+/* ── SCORE RING ─────────────────────────────────────────────────────────── */
+.score-ring{width:80px;height:80px;flex-shrink:0}
+.score-ring circle{fill:none;stroke-width:6;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring-bg{stroke:rgba(255,255,255,.06)}
+.ring-fill{stroke:var(--c1);transition:stroke-dashoffset .8s ease;stroke-dasharray:220}
+
+/* ── SUMMARY CARD ─────────────────────────────────────────────────────────── */
+.summary-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.summary-text{flex:1}
+.summary-text h3{font-family:var(--ffd);font-size:15px;font-weight:700;margin-bottom:4px}
+.summary-text p{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+  <script src="/core/nav-guard.js"></script>
+  <link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+/* NEXIA Theme Bridge — mapeia vars antigas para o Design System v2 */
+:root,[data-theme] {
+  --text:var(--text);--text2:var(--text2);--text3:var(--text3);
+  --brd:var(--brd);--brd2:var(--brd2);
+  --blue:var(--blue);--cyan:var(--cyan);--green:var(--green);
+  --red:var(--red);--amber:var(--amber);--gold:var(--gold);
+}
+/* Force body bg and text to use theme vars */
+body { background: var(--bg) !important; color: var(--text) !important; }
+/* Fix hardcoded dark backgrounds on cards/panels */
+[class*="card"],[class*="panel"],[class*="box"],[class*="modal-"],[class*="-modal"],
+[class*="drawer"],[class*="sidebar"],[class*="-hdr"],[class*="header"],
+.sb,.main-content,.content-area,.page-wrap,.inner {
+  background: var(--bg2) !important;
+  border-color: var(--brd) !important;
+}
+/* Fix text readability */
+[class*="label"],[class*="title"],[class*="heading"],h1,h2,h3,h4,h5,h6 {
+  color: var(--text) !important;
+}
+p,span,div { color: inherit; }
+/* Fix inputs */
+input,select,textarea {
+  background: var(--bg3) !important;
+  border-color: var(--brd) !important;
+  color: var(--text) !important;
+}
+input::placeholder,textarea::placeholder { color: var(--text3) !important; }
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '\u26a0 Modo offline \u2014 reconectando...';
+        document.body && document.body.appendChild(b);
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) { b.remove(); clearInterval(check); }
+        }, 2000);
+      }
+      return;
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+
+<!-- ── HEADER ────────────────────────────────────────────────────────────── -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-orb"><i class="ri-shield-flash-line"></i></div>
+    <div>
+      <div class="hdr-title">NEXIA <span>SENTINEL</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:1px">Auto-Healing System v1.0</div>
+    </div>
+  </div>
+  <span class="hdr-badge">PROD</span>
+
+  <div class="hdr-health" id="hdr-health">
+    <span class="health-dot hdot-unknown" id="hdr-dot"></span>
+    <span id="hdr-health-text">AGUARDANDO</span>
+  </div>
+
+  <div style="font-size:11px;color:var(--text3);padding:0 8px" id="last-scan-ts">—</div>
+
+  <div class="hdr-actions">
+    <button class="btn btn-ghost btn-sm" onclick="loadLastReport()"><i class="ri-refresh-line"></i> Reload</button>
+    <button class="btn btn-heal btn-sm" id="btn-heal" onclick="triggerHeal()" disabled title="Execute Full Scan primeiro"><i class="ri-magic-line"></i> Auto-Heal</button>
+    <button class="btn btn-scan btn-sm" id="btn-scan" onclick="triggerScan()"><i class="ri-radar-line"></i> Full Scan</button>
+  </div>
+</header>
+
+<!-- ── LAYOUT ─────────────────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Navegação</div>
+      <div class="sb-item active" onclick="showTab('dashboard')">
+        <i class="ri-dashboard-2-line"></i>
+        <div class="sb-item-text"><div class="sb-item-name">Dashboard</div><div class="sb-item-sub">Visão geral do sistema</div></div>
+      </div>
+      <div class="sb-item" onclick="showTab('routes')">
+        <i class="ri-map-2-line"></i>
+        <div class="sb-item-text"><div class="sb-item-name">Rotas</div><div class="sb-item-sub" id="sb-routes-sub">—</div></div>
+        <span class="sb-count sc-ok" id="sb-routes-ok">—</span>
+      </div>
+      <div class="sb-item" onclick="showTab('functions')">
+        <i class="ri-functions-line"></i>
+        <div class="sb-item-text"><div class="sb-item-name">Netlify Functions</div><div class="sb-item-sub" id="sb-fns-sub">—</div></div>
+        <span class="sb-count sc-ok" id="sb-fns-ok">—</span>
+      </div>
+      <div class="sb-item" onclick="showTab('issues')">
+        <i class="ri-bug-line"></i>
+        <div class="sb-item-text"><div class="sb-item-name">Issues</div><div class="sb-item-sub" id="sb-issues-sub">—</div></div>
+        <span class="sb-count sc-fail" id="sb-issues-count">—</span>
+      </div>
+      <div class="sb-item" onclick="showTab('fixes')">
+        <i class="ri-tools-line"></i>
+        <div class="sb-item-text"><div class="sb-item-name">Auto-Fixes (IA)</div><div class="sb-item-sub" id="sb-fixes-sub">—</div></div>
+        <span class="sb-count sc-warn" id="sb-fixes-count">—</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Grupos</div>
+      <div id="groups-list"></div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Histórico de Alertas</div>
+      <div id="alerts-list" style="max-height:200px;overflow-y:auto"></div>
+    </div>
+
+    <div class="sb-section" style="margin-top:auto;padding-top:12px">
+      <a href="https://nexia.com.br" target="_blank" style="color:var(--text3);font-size:11px;text-decoration:none;display:flex;align-items:center;gap:6px">
+        <i class="ri-external-link-line"></i> nexia.com.br
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content">
+
+    <!-- ── TAB: DASHBOARD ─────────────────────────────────────────────────── -->
+    <div id="tab-dashboard">
+
+      <div id="alert-banner-wrap"></div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-val" id="kpi-health">—</div><div class="kpi-label">Health</div></div>
+        <div class="kpi"><div class="kpi-val kv-blue" id="kpi-routes">—</div><div class="kpi-label">Rotas OK</div></div>
+        <div class="kpi"><div class="kpi-val kv-blue" id="kpi-fns">—</div><div class="kpi-label">Functions OK</div></div>
+        <div class="kpi"><div class="kpi-val kv-down" id="kpi-critical">—</div><div class="kpi-label">Críticos</div></div>
+        <div class="kpi"><div class="kpi-val kv-purple" id="kpi-issues">—</div><div class="kpi-label">Total Issues</div></div>
+      </div>
+
+      <!-- Summary IA -->
+      <div class="summary-card" id="summary-card" style="display:none">
+        <svg class="score-ring" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="35"/>
+          <circle class="ring-fill" cx="40" cy="40" r="35" id="ring-fill" style="stroke-dashoffset:220"/>
+        </svg>
+        <div class="summary-text">
+          <h3 id="summary-title">Analisando...</h3>
+          <p id="summary-body">O Sentinel está processando o último relatório.</p>
+        </div>
+      </div>
+
+      <!-- Scan progress -->
+      <div class="progress-wrap" id="progress-wrap" style="display:none">
+        <div class="progress-title">
+          <span id="progress-label">Escaneando sistema...</span>
+          <span id="progress-pct" class="mono" style="color:var(--c1)">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="progress-steps" id="progress-steps"></div>
+      </div>
+
+      <!-- Log terminal -->
+      <div class="terminal" id="terminal">
+        <div class="log-line"><span class="log-ts">[SENTINEL]</span><span class="log-info">Sistema inicializado. Clique em "Full Scan" para escanear.</span></div>
+        <div class="log-line"><span class="log-ts">▶</span><span class="log-info">Monitorando: <strong>nexia.com.br</strong></span></div>
+        <div class="log-line"><span class="log-ts">▶</span><span class="log-info">Firebase realtime ativo — aguardando alertas...</span></div>
+        <div><span class="cursor"></span></div>
+      </div>
+
+      <!-- Grupos overview -->
+      <div id="groups-overview"></div>
+    </div>
+
+    <!-- ── TAB: ROUTES ──────────────────────────────────────────────────────── -->
+    <div id="tab-routes" style="display:none">
+      <div class="tabs">
+        <div class="tab active" onclick="filterRoutes('all',this)">Todas</div>
+        <div class="tab" onclick="filterRoutes('fail',this)">❌ Falhas</div>
+        <div class="tab" onclick="filterRoutes('ok',this)">✅ OK</div>
+        <div class="tab" onclick="filterRoutes('critical',this)">🔴 Críticas</div>
+      </div>
+      <div id="routes-content"></div>
+    </div>
+
+    <!-- ── TAB: FUNCTIONS ───────────────────────────────────────────────────── -->
+    <div id="tab-functions" style="display:none">
+      <div id="functions-content"></div>
+    </div>
+
+    <!-- ── TAB: ISSUES ──────────────────────────────────────────────────────── -->
+    <div id="tab-issues" style="display:none">
+      <div id="issues-content"></div>
+    </div>
+
+    <!-- ── TAB: FIXES ───────────────────────────────────────────────────────── -->
+    <div id="tab-fixes" style="display:none">
+      <div id="fixes-content"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let state = {
+  report: null,
+  heal: null,
+  scanning: false,
+  healing: false,
+  routeFilter: 'all',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREBASE REALTIME
+// ═══════════════════════════════════════════════════════════════════════════
+function initRealtimeListeners() {
+  if (!window.firebase) return;
+  // NEXIA FIX: aguardar autenticação antes de abrir onSnapshot (evita permission-denied)
+  const startListeners = () => {
+    try {
+      const db = firebase.firestore();
+      // Ouve status do sistema
+      db.collection('system_status').doc('sentinel').onSnapshot(snap => {
+        if (!snap.exists) return;
+        const data = snap.data();
+        updateHealthBadge(data.health, data.lastScan);
+        log('info', `[Firebase] Health atualizado: ${data.health} — ${data.totalIssues} issues`);
+      }, err => log('warn', `[Firebase] status: ${err.message}`));
+
+      // Ouve alertas
+      db.collection('sentinel_alerts')
+        .orderBy('ts', 'desc').limit(10)
+        .onSnapshot(snap => {
+          const items = [];
+          snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+          renderAlerts(items);
+        }, err => log('warn', `[Firebase] alerts: ${err.message}`));
+    } catch (e) {
+      log('warn', `Firebase listeners: ${e.message}`);
+    }
+  };
+
+  // Aguarda auth antes de abrir listeners Firestore
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        log('ok', `[Auth] Autenticado: ${user.email}`);
+        startListeners();
+      } else {
+        log('warn', '[Auth] Sem usuário — listeners Firestore não iniciados');
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCAN
+// ═══════════════════════════════════════════════════════════════════════════
+async function triggerScan() {
+  if (state.scanning) return;
+  state.scanning = true;
+  setBtn('btn-scan', true, '<i class="ri-loader-4-line spin"></i> Escaneando...');
+  showProgress(true);
+
+  const steps = ['auth','cortex','rotas-core','ces','vp','bezsan','nexia','admin','functions'];
+  let stepIdx = 0;
+
+  const stepInterval = setInterval(() => {
+    if (stepIdx < steps.length) {
+      updateProgressStep(steps, stepIdx++);
+      updateProgressPct(Math.round((stepIdx / steps.length) * 85));
+    }
+  }, 900);
+
+  log('info', '⚡ Full Scan iniciado — verificando ' + (/* rotas */ 32) + ' rotas + 36 functions...');
+
+  try {
+    const res = await authFetch('/api/sentinel-qa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'scan' }) });
+    const data = await res.json();
+    clearInterval(stepInterval);
+    steps.forEach((_, i) => markStepDone(i));
+    updateProgressPct(100);
+
+    state.report = data;
+    renderReport(data);
+    showProgress(false, 800);
+    log('ok', `✅ Scan completo: ${data.health} — ${data.routeOK || 0} rotas OK, ${data.fnOK || 0} functions OK, ${data.critical || 0} críticos`);
+
+    // Log detalhado de cada erro encontrado
+    if (data.errors && data.errors.length > 0) {
+      data.errors.forEach(e => {
+        const lvl = (e.status >= 500 || e.status === 0) ? 'err' : 'warn';
+        log(lvl, `  ↳ [${e.group || e.name}] ${e.name}: ${e.error || 'HTTP '+e.status} — ${e.ms}ms`);
+      });
+    }
+
+    // Detecta scan suspeito (todos <5ms = URL errada ou NEXIA_APP_URL não configurado)
+    const allInstant = data.results && data.results.length > 0 && data.results.every(r => r.ms < 5);
+    if (allInstant) {
+      log('warn', '⚠️  ATENÇÃO: todas respostas <5ms — NEXIA_APP_URL pode estar errado no Render');
+      showAlertBanner('⚠️ Scan suspeito: verifique NEXIA_APP_URL no Render Dashboard', 'warn');
+    } else if (data.critical > 0) {
+      showAlertBanner(`🔴 ${data.critical} issue(s) CRÍTICO(S) — clique em Auto-Heal`, 'error');
+    } else if (data.errorCount > 0) {
+      showAlertBanner(`🟡 ${data.errorCount} rota(s) degradada(s) — verifique a aba Issues`, 'warn');
+    } else {
+      showAlertBanner('✅ Sistema saudável — todas rotas e funções operacionais', 'ok');
+    }
+    log('info', `📊 Tempo médio: ${data.avgMs || 0}ms | ${data.totalEndpoints || 0} endpoints | Duração total: ${data.durationMs || 0}ms`);
+  } catch (e) {
+    clearInterval(stepInterval);
+    log('err', `❌ Scan falhou: ${e.message}`);
+    if (e.message && (e.message.includes('503') || e.message.includes('usage'))) {
+      showAlertBanner('⚠️ Render: verifique os logs em dashboard.render.com → Logs.', 'error');
+    } else {
+      showAlertBanner('Sentinel offline — verifique se o deploy foi feito e FIREBASE_SERVICE_ACCOUNT está configurada.', 'error');
+    }
+    showProgress(false, 500);
+  } finally {
+    state.scanning = false;
+    setBtn('btn-scan', false, '<i class="ri-radar-line"></i> Full Scan');
+    const healBtn = document.getElementById('btn-heal');
+    if (healBtn) { healBtn.disabled = false; healBtn.title = ''; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HEAL
+// ═══════════════════════════════════════════════════════════════════════════
+async function triggerHeal() {
+  if (!state.report || !state.report.issues || !state.report.issues.length) {
+    log('warn', '⚠️ Execute Full Scan primeiro para identificar issues antes do Auto-Heal.');
+    return;
+  }
+  if (state.healing) return;
+  state.healing = true;
+  setBtn('btn-heal', true, '<i class="ri-loader-4-line spin"></i> Analisando...');
+  log('ai', '🤖 Auto-Heal iniciado — enviando issues para IA...');
+
+  try {
+    const issues = state.report?.issues || [];
+    const res = await authFetch('/api/sentinel-qa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'heal', issues }),
+    });
+    const data = await res.json();
+    state.heal = data;
+
+    const fixCount = data.fixes?.fixes?.length || 0;
+    log('ai', `🤖 Heal completo via ${data.aiEngine || 'rule-based'} — ${fixCount} fix(es) gerado(s)`);
+    if (data.fixes?.summary) log('ai', `📋 ${data.fixes.summary}`);
+
+    renderFixes(data);
+    showTab('fixes');
+    showAlertBanner(`${fixCount} fix(es) gerado(s) pela IA. Verifique a aba Auto-Fixes.`, 'info');
+  } catch (e) {
+    log('err', `❌ Heal falhou: ${e.message}`);
+  } finally {
+    state.healing = false;
+    setBtn('btn-heal', false, '<i class="ri-magic-line"></i> Auto-Heal');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOAD LAST REPORT
+// ═══════════════════════════════════════════════════════════════════════════
+async function loadLastReport() {
+  log('info', '🔄 Carregando último relatório...');
+  try {
+    const res = await authFetch('/api/sentinel-qa', { method: 'POST', body: JSON.stringify({ mode: 'scan' }), headers: { 'Content-Type': 'application/json' } });
+    const data = await res.json();
+    if (data.error) { log('warn', `Sem relatório: ${data.error}`); return; }
+    state.report = data;
+    renderReport(data);
+    log('ok', `Relatório carregado: ${data.scannedAt || 'data desconhecida'}`);
+  } catch (e) {
+    log('warn', `Relatório indisponível: ${e.message}`);
+    log('warn', 'Nenhum relatório salvo ainda. Execute um scan.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER REPORT
+// ═══════════════════════════════════════════════════════════════════════════
+function renderReport(r) {
+  // KPIs
+  const healthColor = r.health === 'HEALTHY' ? 'kv-healthy' : r.health === 'DEGRADED' ? 'kv-degraded' : 'kv-down';
+  setKpi('kpi-health', r.health || '?', healthColor);
+  setKpi('kpi-routes', `${r.routeOK||0}/${(r.routeOK||0)+(r.routeFail||0)}`, 'kv-blue');
+  setKpi('kpi-fns',    `${r.fnOK||0}/${(r.fnOK||0)+(r.fnFail||0)}`, 'kv-blue');
+  setKpi('kpi-critical', r.critical || 0, r.critical > 0 ? 'kv-down' : 'kv-healthy');
+  setKpi('kpi-issues', r.totalIssues || 0, r.totalIssues > 0 ? 'kv-purple' : 'kv-healthy');
+
+  // Header badge
+  updateHealthBadge(r.health, r.scannedAt);
+
+  // Sidebar
+  el('sb-routes-sub').textContent = `${r.routeOK||0} ok, ${r.routeFail||0} falha`;
+  el('sb-routes-ok').textContent  = `${r.routeOK||0}/${(r.routeOK||0)+(r.routeFail||0)}`;
+  el('sb-fns-sub').textContent    = `${r.fnOK||0} ok, ${r.fnFail||0} falha`;
+  el('sb-fns-ok').textContent     = `${r.fnOK||0}/${(r.fnOK||0)+(r.fnFail||0)}`;
+  el('sb-issues-sub').textContent = `${r.critical||0} críticos`;
+  el('sb-issues-count').textContent = r.totalIssues || 0;
+
+  // Score ring
+  const score = r.routeOK && (r.routeOK + r.routeFail) > 0
+    ? Math.round((r.routeOK / (r.routeOK + r.routeFail)) * 100) : 0;
+  const offset = 220 - (220 * score / 100);
+  el('ring-fill').style.strokeDashoffset = offset;
+  el('ring-fill').style.stroke = score >= 80 ? 'var(--c3)' : score >= 50 ? 'var(--c5)' : 'var(--c4)';
+  el('summary-title').textContent = `Score: ${score}% — ${r.health}`;
+  el('summary-body').textContent  = `${r.routeOK||0} rotas OK, ${r.fnOK||0} functions OK. ${r.critical||0} crítico(s), ${r.totalIssues||0} issue(s) total. Tempo: ${r.durationMs ? Math.round(r.durationMs/1000)+'s' : '?'}`;
+  el('summary-card').style.display = 'flex';
+
+  // Groups sidebar
+  renderGroupsSidebar(r.routeResults || []);
+
+  // Groups overview
+  renderGroupsOverview(r.routeResults || []);
+
+  // Routes tab
+  state._routes = r.routeResults || [];
+  renderRoutes(state._routes);
+
+  // Functions tab
+  renderFunctions(r.fnResults || []);
+
+  // Issues tab
+  renderIssues(r.issues || []);
+
+  el('sb-fixes-sub').textContent = 'Execute Auto-Heal';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER ROUTES
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRoutes(routes) {
+  const filtered = routes.filter(r => {
+    if (state.routeFilter === 'fail') return !r.ok;
+    if (state.routeFilter === 'ok')   return r.ok;
+    if (state.routeFilter === 'critical') return r.critical;
+    return true;
+  });
+
+  if (!filtered.length) {
+    el('routes-content').innerHTML = `<div class="empty"><i class="ri-check-double-line"></i><p>Nenhuma rota nesta categoria</p></div>`;
+    return;
+  }
+
+  el('routes-content').innerHTML = `
+    <div class="tbl-wrap">
+      <div class="tbl-head grid-routes"><span>Status</span><span>Rota</span><span>Grupo</span><span>HTTP</span><span>Checks</span><span>Tempo</span></div>
+      ${filtered.map(r => `
+        <div class="tbl-row grid-routes">
+          <span><span class="tag ${r.ok ? 't-ok' : 't-fail'}">${r.ok ? '✓ OK' : '✗ FAIL'}</span>${r.critical ? '<span class="tag t-crit" style="margin-left:4px">CRIT</span>' : ''}</span>
+          <span class="mono truncate" style="font-size:11.5px">${r.url||r.path||'—'}<br><span class="text-muted" style="font-size:10px">${r.error || ''}</span></span>
+          <span><span class="tag t-blue">${r.group||'—'}</span></span>
+          <span class="mono ${r.status >= 400 ? 'log-err' : r.status > 0 ? 'log-ok' : 'log-warn'}">${r.status || 'ERR'}</span>
+          <span>
+            ${r.ok ? '<span class="tag t-ok">✓</span>' : '<span class="tag t-fail">✗</span>'}
+          </span>
+          <span class="mono text-muted">${r.ms || 0}ms</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderFunctions(fns) {
+  if (!fns.length) { el('functions-content').innerHTML = `<div class="empty"><i class="ri-functions-line"></i><p>Nenhum dado de functions</p></div>`; return; }
+
+  el('functions-content').innerHTML = `
+    <div class="tbl-wrap">
+      <div class="tbl-head grid-fns"><span>Function</span><span>Status</span><span>HTTP</span><span>Tempo</span><span>Resposta</span></div>
+      ${fns.map(f => `
+        <div class="tbl-row grid-fns">
+          <span class="mono" style="font-size:11.5px">${f.name||f.fn||'—'}${f.critical ? ' <span class="tag t-crit" style="font-size:9px">CRIT</span>' : ''}</span>
+          <span><span class="tag ${f.ok ? 't-ok' : 't-fail'}">${f.ok ? '✓ OK' : '✗ FAIL'}</span></span>
+          <span class="mono ${f.status >= 500 ? 'log-err' : f.status === 0 ? 'log-warn' : 'log-ok'}">${f.status || 'ERR'}</span>
+          <span class="mono text-muted">${f.ms || 0}ms</span>
+          <span class="mono truncate text-muted" style="font-size:10px">${(f.body || f.error || '—').slice(0,80)}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER ISSUES
+// ═══════════════════════════════════════════════════════════════════════════
+function renderIssues(issues) {
+  el('sb-fixes-count').textContent = issues.length;
+  if (!issues.length) {
+    el('issues-content').innerHTML = `<div class="empty"><i class="ri-checkbox-circle-line"></i><p>Nenhum issue detectado!</p></div>`;
+    return;
+  }
+  el('issues-content').innerHTML = `
+    <div class="tbl-wrap">
+      <div class="tbl-head grid-issues"><span>Severidade</span><span>Issue</span><span>Tipo</span><span>Localização</span></div>
+      ${issues.map(i => `
+        <div class="tbl-row grid-issues">
+          <span><span class="tag ${i.severity === 'CRITICAL' ? 't-crit' : i.severity === 'MEDIUM' ? 't-warn' : 't-blue'}">${i.severity}</span></span>
+          <span class="text-sm">${i.detail || i.check || '?'}<br><span class="text-muted mono" style="font-size:10px">${i.type}</span></span>
+          <span><span class="tag t-purple">${i.check || i.fn || '?'}</span></span>
+          <span class="mono truncate text-muted" style="font-size:11px">${i.route || i.fn || '?'}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER FIXES
+// ═══════════════════════════════════════════════════════════════════════════
+function renderFixes(healData) {
+  const fixes  = healData.fixes?.fixes || [];
+  const engine = healData.aiEngine || 'rule-based';
+  const summary = healData.fixes?.summary || '';
+  const rootCause = healData.fixes?.rootCause || '';
+
+  el('sb-fixes-count').textContent = fixes.length;
+  el('sb-fixes-sub').textContent   = `via ${engine}`;
+
+  if (!fixes.length) {
+    el('fixes-content').innerHTML = `<div class="empty"><i class="ri-magic-line"></i><p>Nenhum fix necessário ou IA indisponível</p></div>`;
+    return;
+  }
+
+  const prioColor = p => p === 'CRITICAL' ? 't-crit' : p === 'HIGH' ? 't-fail' : p === 'MEDIUM' ? 't-warn' : 't-blue';
+
+  el('fixes-content').innerHTML = `
+    <div class="alert-banner info" style="margin-bottom:18px">
+      <i class="ri-robot-line"></i>
+      <div><strong>IA: ${engine}</strong> — ${summary || 'Análise concluída'}<br><span style="color:var(--text3);font-size:11px">${rootCause ? '🔍 ' + rootCause : ''}</span></div>
+    </div>
+    ${fixes.map(f => `
+      <div class="fix-card">
+        <div class="fix-header">
+          <div>
+            <div class="fix-title">${f.issue || '?'}</div>
+            <div class="fix-file"><i class="ri-file-code-line"></i> ${f.file || '?'}</div>
+          </div>
+          <span class="tag ${prioColor(f.priority)}">${f.priority}</span>
+        </div>
+        <div class="fix-body">${f.fix || ''}</div>
+        ${f.code ? `<div class="fix-code">${escHtml(f.code)}</div>` : ''}
+        ${f.verify ? `<div class="fix-verify">✓ Verificar: <code>${escHtml(f.verify)}</code></div>` : ''}
+      </div>`).join('')}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER GROUPS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderGroupsSidebar(routes) {
+  const groups = {};
+  routes.forEach(r => {
+    if (!groups[r.group]) groups[r.group] = { ok: 0, fail: 0 };
+    r.ok ? groups[r.group].ok++ : groups[r.group].fail++;
+  });
+
+  el('groups-list').innerHTML = Object.entries(groups).map(([g, s]) => `
+    <div class="sb-item" onclick="filterByGroup('${g}')">
+      <i class="ri-folder-line"></i>
+      <div class="sb-item-text"><div class="sb-item-name">${g}</div><div class="sb-item-sub">${s.ok} ok, ${s.fail} falha</div></div>
+      <span class="sb-count ${s.fail > 0 ? 'sc-fail' : 'sc-ok'}">${s.ok + s.fail}</span>
+    </div>`).join('');
+}
+
+function renderGroupsOverview(routes) {
+  const groups = {};
+  routes.forEach(r => {
+    if (!groups[r.group]) groups[r.group] = { ok: 0, fail: 0, routes: [] };
+    r.ok ? groups[r.group].ok++ : groups[r.group].fail++;
+    groups[r.group].routes.push(r);
+  });
+
+  el('groups-overview').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+      ${Object.entries(groups).map(([g, s]) => {
+        const total = s.ok + s.fail;
+        const pct   = total > 0 ? Math.round(s.ok / total * 100) : 0;
+        return `<div class="kpi" style="cursor:pointer" onclick="filterByGroup('${g}')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-family:var(--ffd);font-size:13px;font-weight:700;text-transform:uppercase">${g}</span>
+            <span class="tag ${s.fail > 0 ? 't-fail' : 't-ok'}">${pct}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct >= 80 ? 'var(--c3)' : pct >= 50 ? 'var(--c5)' : 'var(--c4)'}"></div></div>
+          <div style="font-size:10.5px;color:var(--text3);margin-top:6px">${s.ok} ok · ${s.fail} falha · ${total} total</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderAlerts(alerts) {
+  el('alerts-list').innerHTML = alerts.slice(0,5).map(a => `
+    <div style="padding:7px 12px;border-radius:7px;background:var(--bg3);margin-bottom:4px;font-size:11px">
+      <span class="tag ${a.health === 'HEALTHY' ? 't-ok' : a.health === 'DEGRADED' ? 't-warn' : 't-fail'}" style="margin-right:5px">${a.health}</span>
+      <span style="color:var(--text3)">${(a.ts?.toDate ? a.ts.toDate().toLocaleTimeString('pt-BR') : '')}</span>
+    </div>`).join('') || '<div style="font-size:11px;color:var(--text3);padding:8px 12px">Nenhum alerta recente</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function el(id) { return document.getElementById(id); }
+function setBtn(id, disabled, html) {
+  const b = el(id);
+  b.disabled = disabled;
+  b.innerHTML = html;
+}
+function setKpi(id, val, cls) {
+  const e = el(id);
+  e.textContent = val;
+  e.className = `kpi-val ${cls}`;
+}
+function log(type, msg) {
+  const t = el('terminal');
+  const ts = new Date().toLocaleTimeString('pt-BR');
+  const cls = { ok:'log-ok', err:'log-err', warn:'log-warn', info:'log-info', ai:'log-ai' }[type] || 'log-info';
+  const cursor = t.querySelector('.cursor');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-ts">[${ts}]</span><span class="${cls}">${msg}</span>`;
+  if (cursor) cursor.before(line);
+  else t.appendChild(line);
+  t.scrollTop = t.scrollHeight;
+}
+function showTab(name) {
+  ['dashboard','routes','functions','issues','fixes'].forEach(t => {
+    el(`tab-${t}`).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => {
+    if (i.getAttribute('onclick')?.includes(name)) i.classList.add('active');
+  });
+}
+function filterRoutes(f, btn) {
+  state.routeFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderRoutes(state._routes || []);
+}
+function filterByGroup(g) {
+  state.routeFilter = 'all';
+  const filtered = (state._routes || []).filter(r => r.group === g);
+  showTab('routes');
+  el('routes-content').innerHTML = '';
+  renderRoutes(filtered);
+}
+function showAlertBanner(msg, type) {
+  const icon = type === 'error' ? 'ri-error-warning-line' : type === 'ok' ? 'ri-checkbox-circle-line' : 'ri-information-line';
+  const cls  = type === 'ok' ? 'ok' : type === 'error' ? '' : 'info';
+  el('alert-banner-wrap').innerHTML = `<div class="alert-banner ${cls}"><i class="${icon}"></i><span>${msg}</span></div>`;
+  setTimeout(() => el('alert-banner-wrap').innerHTML = '', 8000);
+}
+function updateHealthBadge(health, ts) {
+  const dot  = el('hdr-dot');
+  const text = el('hdr-health-text');
+  const tsEl = el('last-scan-ts');
+  dot.className = `health-dot ${health === 'HEALTHY' ? 'hdot-healthy' : health === 'DEGRADED' ? 'hdot-degraded' : health === 'DOWN' ? 'hdot-down' : 'hdot-unknown'}`;
+  text.textContent = health || 'DESCONHECIDO';
+  if (ts) tsEl.textContent = `Último scan: ${new Date(ts).toLocaleTimeString('pt-BR')}`;
+}
+function showProgress(show, delay = 0) {
+  setTimeout(() => {
+    el('progress-wrap').style.display = show ? 'block' : 'none';
+    if (show) {
+      el('progress-fill').style.width = '0%';
+      el('progress-steps').innerHTML = '';
+      el('progress-pct').textContent = '0%';
+    }
+  }, delay);
+}
+function updateProgressPct(pct) {
+  el('progress-fill').style.width = pct + '%';
+  el('progress-pct').textContent  = pct + '%';
+}
+function updateProgressStep(steps, idx) {
+  const container = el('progress-steps');
+  if (container.children.length === 0) {
+    steps.forEach((s, i) => {
+      const span = document.createElement('span');
+      span.className = 'step-tag step-pending';
+      span.id = `step-${i}`;
+      span.textContent = s;
+      container.appendChild(span);
+    });
+  }
+  if (idx > 0) el(`step-${idx-1}`).className = 'step-tag step-done';
+  el(`step-${idx}`).className = 'step-tag step-active';
+}
+function markStepDone(i) {
+  const s = el(`step-${i}`);
+  if (s) s.className = 'step-tag step-done';
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function loadDemoData() {
+  log('warn', 'Modo demo — dados simulados (Sentinel function não deployada ainda)');
+  const demo = {
+    health: 'DEGRADED', critical: 3, routeOK: 24, routeFail: 6, fnOK: 28, fnFail: 8, totalIssues: 11,
+    scannedAt: new Date().toISOString(), durationMs: 14200,
+    issues: [
+      { type: 'CHECK_FAIL', severity: 'CRITICAL', route: '/', check: 'ai_dynamic', detail: '_getAIResponse ausente' },
+      { type: 'CHECK_FAIL', severity: 'CRITICAL', route: '/ces/landing', check: 'no_double_catch', detail: '2 blocos try/firebase' },
+      { type: 'CHECK_FAIL', severity: 'CRITICAL', route: '/vp/landing', check: 'no_cdn_cgi', detail: 'cdn-cgi detectado' },
+      { type: 'CHECK_FAIL', severity: 'MEDIUM', route: '/ces/executivo', check: 'wa_test_num', detail: 'Número de teste ausente' },
+      { type: 'FN_ERROR', severity: 'MEDIUM', fn: 'cortex-chat', detail: 'HTTP 500' },
+    ],
+    routeResults: [
+      { path:'/', group:'core', critical:true, status:200, ok:true, checks:[{name:'firebase',passed:true},{name:'ai_dynamic',passed:false,detail:'ausente'},{name:'wa_meta',passed:true}], ms:1240 },
+      { path:'/login', group:'core', critical:true, status:200, ok:true, checks:[{name:'form_present',passed:true}], ms:890 },
+      { path:'/ces/landing', group:'ces', critical:true, status:200, ok:false, checks:[{name:'firebase',passed:true},{name:'no_double_catch',passed:false,detail:'duplo'}], ms:1100 },
+      { path:'/vp/landing', group:'vp', critical:true, status:200, ok:false, checks:[{name:'no_cdn_cgi',passed:false},{name:'wa_test_num',passed:true}], ms:980 },
+      { path:'/nexia/store', group:'nexia', critical:true, status:200, ok:true, checks:[{name:'firebase',passed:true},{name:'no_empty_buttons',passed:true}], ms:1350 },
+      { path:'/nexia/pay', group:'nexia', critical:true, status:200, ok:true, checks:[{name:'no_double_catch',passed:true},{name:'no_syntax_error',passed:true}], ms:1120 },
+    ],
+    fnResults: [
+      { fn:'auth', critical:true, status:401, ok:true, ms:342 },
+      { fn:'cortex-chat', critical:true, status:500, ok:false, ms:2100 },
+      { fn:'agents', critical:true, status:401, ok:true, ms:287 },
+      { fn:'billing', critical:true, status:401, ok:true, ms:310 },
+      { fn:'kpi-engine', critical:false, status:401, ok:true, ms:290 },
+      { fn:'metrics-aggregator', critical:false, status:401, ok:true, ms:265 },
+    ]
+  };
+  state.report = demo;
+  renderReport(demo);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof NexiaAuth !== 'undefined') {
+    NexiaAuth.requireAuth('../login.html?next=/nexia/sentinel-dashboard.html');
+  }
+  // FIX: aguarda Firebase inicializar antes de abrir listeners (evita "No Firebase App")
+  const _boot = () => {
+    initRealtimeListeners();
+    // FIX v49: aguarda onAuthStateChanged para garantir token disponível antes de loadLastReport
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) loadLastReport();
+      });
+    }
+  };
+  if (window.NEXIA && NEXIA.onReady) { NEXIA.onReady(_boot); }
+  else { const t = setInterval(() => { if (window.NEXIA && NEXIA.onReady) { clearInterval(t); NEXIA.onReady(_boot); } }, 80); }
+});
+</script>
+  <script src="/core/nexia-theme.js"></script>
+
+  <script>
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token;
+  try { token = await user.getIdToken(); }
+  catch(e) { console.error('[authFetch] getIdToken failed:', e.message); return null; }
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+</script>
+</body>
+</html>

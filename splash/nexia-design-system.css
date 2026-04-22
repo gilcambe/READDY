@@ -1,0 +1,550 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEXIA OS — DESIGN SYSTEM v2.0
+   Enterprise-grade · Legível · Escalável · Sem neon · Sem baixo contraste
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  /* Background layers */
+  --n-bg:        #0B1120;
+  --n-surface:   #111827;
+  --n-card:      #1A2235;
+  --n-card-hover:#1F2940;
+  --n-border:    rgba(255,255,255,0.08);
+  --n-border-mid:rgba(255,255,255,0.12);
+
+  /* Text */
+  --n-text:      #F1F5F9;
+  --n-text-2:    #94A3B8;
+  --n-text-3:    #4B5563;
+
+  /* Brand accent */
+  --n-accent:    #3B82F6;
+  --n-accent-2:  #2563EB;
+  --n-accent-glow: rgba(59,130,246,0.15);
+
+  /* Status */
+  --n-success:   #10B981;
+  --n-success-bg:rgba(16,185,129,0.10);
+  --n-warning:   #F59E0B;
+  --n-warning-bg:rgba(245,158,11,0.10);
+  --n-error:     #EF4444;
+  --n-error-bg:  rgba(239,68,68,0.10);
+  --n-info:      #38BDF8;
+  --n-info-bg:   rgba(56,189,248,0.10);
+
+  /* Shape */
+  --n-radius:    10px;
+  --n-radius-lg: 14px;
+  --n-radius-xl: 18px;
+
+  /* Shadow */
+  --n-shadow:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --n-shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+
+  /* Sidebar */
+  --n-sidebar-w: 240px;
+
+  /* Typography */
+  --n-font:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --n-mono:      'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --n-tr: 0.15s ease;
+}
+
+/* ── RESET & BASE ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0 !important;
+  font-family: var(--n-font) !important;
+  background: var(--n-bg) !important;
+  color: var(--n-text) !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* ── TYPOGRAPHY ────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--n-font) !important;
+  color: var(--n-text) !important;
+  letter-spacing: -0.01em;
+}
+h1 { font-size: 24px !important; font-weight: 700 !important; }
+h2 { font-size: 18px !important; font-weight: 600 !important; }
+h3 { font-size: 15px !important; font-weight: 600 !important; }
+h4 { font-size: 13px !important; font-weight: 600 !important; }
+
+p { color: var(--n-text-2) !important; font-size: 14px !important; }
+
+a { color: var(--n-accent) !important; text-decoration: none !important; }
+a:hover { color: #60A5FA !important; }
+
+label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--n-text-2) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+code, pre, .mono, [class*="mono"], [class*="log"], [class*="terminal"] {
+  font-family: var(--n-mono) !important;
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--n-bg); }
+::-webkit-scrollbar-thumb { background: var(--n-border-mid); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── BUTTONS — override ALL variants ──────────────────────────────────── */
+button,
+[role="button"],
+.btn, .button,
+[class*="btn-"],
+[class*="button-"],
+input[type="submit"],
+input[type="button"] {
+  font-family: var(--n-font) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: var(--n-radius) !important;
+  padding: 9px 16px !important;
+  cursor: pointer !important;
+  transition: all var(--n-tr) !important;
+  border: 1px solid transparent !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+/* Primary button: blue */
+.btn-primary, .btn-scan, .btn-heal, .btn-run,
+button[class*="primary"], button[class*="submit"],
+[class*="btn-blue"], [class*="btn-action"],
+[class*="btn-save"], [class*="btn-send"] {
+  background: var(--n-accent) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+.btn-primary:hover, .btn-scan:hover, .btn-heal:hover,
+button[class*="primary"]:hover, [class*="btn-action"]:hover {
+  background: var(--n-accent-2) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.3) !important;
+}
+
+/* Secondary / ghost */
+.btn-secondary, .btn-ghost, .btn-outline,
+button[class*="secondary"], button[class*="ghost"],
+[class*="btn-cancel"], [class*="btn-back"] {
+  background: var(--n-card) !important;
+  color: var(--n-text-2) !important;
+  border-color: var(--n-border-mid) !important;
+}
+.btn-secondary:hover, .btn-ghost:hover, .btn-outline:hover {
+  background: var(--n-card-hover) !important;
+  color: var(--n-text) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+}
+
+/* Danger */
+.btn-danger, .btn-delete, [class*="btn-danger"], [class*="btn-delete"] {
+  background: var(--n-error-bg) !important;
+  color: var(--n-error) !important;
+  border-color: rgba(239,68,68,0.25) !important;
+}
+
+/* Success */
+.btn-success, [class*="btn-success"] {
+  background: var(--n-success-bg) !important;
+  color: var(--n-success) !important;
+  border-color: rgba(16,185,129,0.25) !important;
+}
+
+button:disabled, [disabled] {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* ── INPUTS & FORMS ────────────────────────────────────────────────────── */
+input, textarea, select {
+  font-family: var(--n-font) !important;
+  font-size: 14px !important;
+  background: var(--n-surface) !important;
+  color: var(--n-text) !important;
+  border: 1px solid var(--n-border-mid) !important;
+  border-radius: var(--n-radius) !important;
+  padding: 9px 12px !important;
+  transition: border-color var(--n-tr) !important;
+  outline: none !important;
+  width: 100% !important;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--n-accent) !important;
+  box-shadow: 0 0 0 3px var(--n-accent-glow) !important;
+}
+select option {
+  background: var(--n-surface) !important;
+  color: var(--n-text) !important;
+}
+::placeholder { color: var(--n-text-3) !important; }
+
+/* ── CARDS ─────────────────────────────────────────────────────────────── */
+.card, [class*="card"], [class*="-card"],
+[class*="panel"], [class*="-panel"],
+[class*="box"], [class*="-box"],
+[class*="widget"], [class*="-widget"],
+[class*="module"], [class*="-module"],
+.tile, [class*="tile"] {
+  background: var(--n-card) !important;
+  border: 1px solid var(--n-border) !important;
+  border-radius: var(--n-radius-lg) !important;
+  box-shadow: var(--n-shadow) !important;
+  color: var(--n-text) !important;
+}
+.card:hover, [class*="card"]:hover { border-color: var(--n-border-mid) !important; }
+
+/* ── TABLES ────────────────────────────────────────────────────────────── */
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 13px !important;
+}
+th {
+  background: var(--n-surface) !important;
+  color: var(--n-text-3) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid var(--n-border) !important;
+  text-align: left !important;
+}
+td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid var(--n-border) !important;
+  color: var(--n-text) !important;
+  vertical-align: middle !important;
+}
+tr:last-child td { border-bottom: none !important; }
+tr:hover td { background: rgba(255,255,255,0.02) !important; }
+
+/* Table wrapper */
+[class*="tbl-wrap"], [class*="table-wrap"], [class*="table-container"] {
+  background: var(--n-card) !important;
+  border: 1px solid var(--n-border) !important;
+  border-radius: var(--n-radius-lg) !important;
+  overflow: hidden !important;
+}
+
+/* ── BADGES & STATUS ───────────────────────────────────────────────────── */
+.badge, [class*="badge"], [class*="-tag"],
+[class*="status"], [class*="chip"],
+[class*="pill"], [class*="label-"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 3px 10px !important;
+  border-radius: 99px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* Status badges by content */
+[class*="success"], [class*="healthy"], [class*="active"], [class*="online"],
+[class*="ok"], [class*="running"], [class*="approved"] {
+  background: var(--n-success-bg) !important;
+  color: var(--n-success) !important;
+  border: 1px solid rgba(16,185,129,0.2) !important;
+}
+[class*="error"], [class*="fail"], [class*="down"], [class*="danger"],
+[class*="critical"], [class*="rejected"] {
+  background: var(--n-error-bg) !important;
+  color: var(--n-error) !important;
+  border: 1px solid rgba(239,68,68,0.2) !important;
+}
+[class*="warn"], [class*="degraded"], [class*="pending"],
+[class*="maintenance"] {
+  background: var(--n-warning-bg) !important;
+  color: var(--n-warning) !important;
+  border: 1px solid rgba(245,158,11,0.2) !important;
+}
+[class*="info"], [class*="inactive"] {
+  background: var(--n-info-bg) !important;
+  color: var(--n-info) !important;
+  border: 1px solid rgba(56,189,248,0.2) !important;
+}
+
+/* ── SIDEBAR ───────────────────────────────────────────────────────────── */
+.sidebar, [class*="sidebar"], nav[class*="side"],
+aside { 
+  background: var(--n-surface) !important;
+  border-right: 1px solid var(--n-border) !important;
+  width: var(--n-sidebar-w) !important;
+}
+
+[class*="menu-item"], [class*="nav-item"], [class*="sidebar-item"],
+[class*="sb-item"] {
+  border-radius: 8px !important;
+  transition: all var(--n-tr) !important;
+  color: var(--n-text-2) !important;
+  padding: 9px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+[class*="menu-item"]:hover, [class*="nav-item"]:hover,
+[class*="sb-item"]:hover {
+  background: rgba(255,255,255,0.05) !important;
+  color: var(--n-text) !important;
+}
+[class*="menu-item"].active, [class*="nav-item"].active,
+[class*="sb-item"].active {
+  background: var(--n-accent-glow) !important;
+  color: var(--n-accent) !important;
+  border-left: 2px solid var(--n-accent) !important;
+}
+
+/* ── HEADER ────────────────────────────────────────────────────────────── */
+header, .header, .hdr, [class*="header"],
+[class*="topbar"], [class*="navbar"] {
+  background: var(--n-surface) !important;
+  border-bottom: 1px solid var(--n-border) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* ── LOG / TERMINAL AREAS ──────────────────────────────────────────────── */
+[class*="log"], [class*="terminal"], [class*="console"],
+[class*="monitor"], pre {
+  background: #060E1A !important;
+  border: 1px solid var(--n-border) !important;
+  border-radius: var(--n-radius) !important;
+  font-family: var(--n-mono) !important;
+  font-size: 12px !important;
+  color: #94A3B8 !important;
+  padding: 14px !important;
+}
+[class*="log-entry"], [class*="log-line"] { font-size: 12px !important; }
+[class*="info"] { color: var(--n-info) !important; }
+[class*="success"] { color: var(--n-success) !important; }
+[class*="error"] { color: var(--n-error) !important; }
+[class*="warn"] { color: var(--n-warning) !important; }
+
+/* ── MODALS ────────────────────────────────────────────────────────────── */
+[class*="modal"], [class*="dialog"], [class*="overlay"],
+[class*="popup"] {
+  background: var(--n-card) !important;
+  border: 1px solid var(--n-border-mid) !important;
+  border-radius: var(--n-radius-xl) !important;
+  box-shadow: var(--n-shadow-lg) !important;
+}
+[class*="modal-backdrop"], [class*="overlay-bg"] {
+  background: rgba(0,0,0,0.7) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ── TABS ──────────────────────────────────────────────────────────────── */
+[class*="tabs"], [class*="tab-bar"], [role="tablist"] {
+  border-bottom: 1px solid var(--n-border) !important;
+  display: flex !important;
+  gap: 4px !important;
+}
+[class*="tab"], [role="tab"] {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--n-text-3) !important;
+  cursor: pointer !important;
+  border-radius: 8px 8px 0 0 !important;
+  transition: all var(--n-tr) !important;
+  border: 1px solid transparent !important;
+  border-bottom: none !important;
+}
+[class*="tab"]:hover { color: var(--n-text-2) !important; }
+[class*="tab"].active, [role="tab"][aria-selected="true"] {
+  background: var(--n-card) !important;
+  border-color: var(--n-border) !important;
+  border-bottom-color: var(--n-card) !important;
+  color: var(--n-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* ── KPI / METRIC CARDS ────────────────────────────────────────────────── */
+[class*="kpi"], [class*="metric"], [class*="stat"] {
+  background: var(--n-card) !important;
+  border: 1px solid var(--n-border) !important;
+  border-radius: var(--n-radius-lg) !important;
+  padding: 16px !important;
+  box-shadow: var(--n-shadow) !important;
+}
+[class*="kpi-val"], [class*="metric-val"], [class*="stat-val"] {
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: var(--n-text) !important;
+}
+[class*="kpi-label"], [class*="metric-label"], [class*="stat-label"] {
+  font-size: 11px !important;
+  color: var(--n-text-3) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* ── PROGRESS BARS ─────────────────────────────────────────────────────── */
+[class*="progress"], progress {
+  background: var(--n-surface) !important;
+  border-radius: 99px !important;
+  height: 6px !important;
+  border: none !important;
+  overflow: hidden !important;
+}
+[class*="progress-bar"], [class*="progress-fill"] {
+  background: var(--n-accent) !important;
+  border-radius: 99px !important;
+  transition: width 0.4s ease !important;
+}
+
+/* ── ALERTS / NOTIFICATIONS ────────────────────────────────────────────── */
+[class*="alert"], [class*="notification"], [class*="toast"] {
+  border-radius: var(--n-radius) !important;
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  border: 1px solid var(--n-border) !important;
+}
+
+/* ── SECTION / PANEL HEADERS ───────────────────────────────────────────── */
+[class*="section-title"], [class*="panel-title"],
+[class*="section-header"], [class*="block-title"] {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--n-text-3) !important;
+  margin-bottom: 12px !important;
+}
+
+/* ── DIVIDERS ──────────────────────────────────────────────────────────── */
+hr, [class*="divider"], [class*="separator"] {
+  border: none !important;
+  border-top: 1px solid var(--n-border) !important;
+  margin: 12px 0 !important;
+}
+
+/* ── TOOLTIPS ──────────────────────────────────────────────────────────── */
+[class*="tooltip"] {
+  background: var(--n-surface) !important;
+  border: 1px solid var(--n-border-mid) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  padding: 6px 10px !important;
+  color: var(--n-text) !important;
+  box-shadow: var(--n-shadow-lg) !important;
+}
+
+/* ── CHARTS / GRAPH CONTAINERS ─────────────────────────────────────────── */
+[class*="chart"], [class*="graph"], canvas {
+  background: transparent !important;
+  border-radius: var(--n-radius) !important;
+}
+
+/* ── GLOBAL NEON KILLERS ────────────────────────────────────────────────── */
+/* Remove harsh neon glows and replace with subtle versions */
+[style*="text-shadow"], [style*="box-shadow"] {
+  text-shadow: none !important;
+}
+/* Override inline neon glows on specific elements */
+[class*="glow"], [class*="neon"] {
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* ── SPINNER / LOADING ─────────────────────────────────────────────────── */
+[class*="spinner"], [class*="loader"], [class*="loading"] {
+  border-color: var(--n-border) !important;
+  border-top-color: var(--n-accent) !important;
+}
+
+/* ── AVATAR / ICON WRAPPERS ────────────────────────────────────────────── */
+[class*="avatar"], [class*="icon-wrap"] {
+  background: var(--n-card) !important;
+  border: 1px solid var(--n-border) !important;
+  border-radius: var(--n-radius) !important;
+}
+
+/* ── LIST ITEMS ────────────────────────────────────────────────────────── */
+li { color: var(--n-text-2) !important; font-size: 14px !important; }
+ul, ol { padding-left: 20px !important; }
+
+/* ── MISC CLEANUP ──────────────────────────────────────────────────────── */
+small { color: var(--n-text-3) !important; font-size: 11px !important; }
+strong, b { color: var(--n-text) !important; font-weight: 700 !important; }
+em { color: var(--n-text-2) !important; }
+
+/* Remove borders from neon-style elements */
+[class*="orb"], [class*="pulse"] {
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* ── LAYOUT PATCHES ────────────────────────────────────────────────────── */
+.app, [class*="app-wrapper"], [class*="app-layout"] {
+  display: flex !important;
+  min-height: 100vh !important;
+}
+
+.main, [class*="main-content"], [class*="page-content"] {
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow-y: auto !important;
+  background: var(--n-bg) !important;
+}
+
+.content, [class*="content-area"], [class*="page-body"],
+[class*="main-body"] {
+  padding: 24px !important;
+}
+
+/* ── NEXIA-SPECIFIC OVERRIDES ───────────────────────────────────────────── */
+/* Preserve status health dots but make them non-animated */
+.health-dot, [class*="health-dot"] {
+  animation: healthPulse 3s ease-in-out infinite !important;
+  box-shadow: none !important;
+}
+@keyframes healthPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.15); }
+}
+
+/* Logo brand */
+[class*="brand"], [class*="logo"] {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--n-text) !important;
+}
+[class*="brand"] span, [class*="logo"] span {
+  color: var(--n-accent) !important;
+}
+
+/* Tone down background gradients */
+body::before, body::after {
+  opacity: 0.5 !important;
+}
+
+/* Selection */
+::selection {
+  background: var(--n-accent-glow) !important;
+  color: var(--n-text) !important;
+}

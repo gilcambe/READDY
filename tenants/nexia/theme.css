@@ -1,0 +1,18 @@
+/* NEXIA Tenant Theme v18 — proper dark/light support */
+:root {
+  --tenant-accent: #2563EB;
+  --nx-accent: #2563EB;
+  --nx-base: #F8FAFC;
+  --nx-surface: #FFFFFF;
+  --nx-text: #0F172A;
+  --nx-border: #E2E8F0;
+}
+[data-theme="dark"] {
+  --tenant-accent: #00E5FF;
+  --nx-accent: #00E5FF;
+  --nx-base: #07090F;
+  --nx-surface: #0D1117;
+  --nx-text: #CDD5E0;
+  --nx-border: rgba(255,255,255,0.08);
+}
+html, body { max-width:100%; overflow-x:hidden; }

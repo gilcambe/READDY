@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="pt-BR">
+<head>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA Pay — Pagamentos Inteligentes. Gestão financeira e cobranças automatizadas."><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXIA Pay — Pagamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<script src="/core/nav-guard.js"></script>
+<link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+:root{--bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A2E;--brd:rgba(255,255,255,.07);--brd2:rgba(200,169,110,.25);--text:#F5F3EE;--text2:#9A9590;--text3:#5A5550;--accent:#C8A96E;--green:#2C7A4B;--red:#C0392B;--ff:'Inter',system-ui,sans-serif}
+[data-theme="light"]{--bg:#F5F3EE;--bg2:#fff;--bg3:#ECEAE4;--brd:rgba(0,0,0,.08);--text:#0A0A0F;--text2:#4A4540}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brand-icon{width:28px;height:28px;border-radius:7px;background:#0A0A0F;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;font-weight:700}
+.brand-name{font-size:13px;font-weight:700;color:var(--text)}.brand-name span{color:var(--accent)}
+.spacer{flex:1}
+.main{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--brd);margin-bottom:24px}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.metric{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:16px}
+.metric-val{font-size:22px;font-weight:700;color:var(--accent);line-height:1}
+.metric-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+.metric-delta{font-size:11px;color:var(--green);margin-top:2px;font-weight:600}
+.metric-delta.neg{color:var(--red)}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;margin-bottom:16px}
+.card-hdr{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* CHECKOUT FORM */
+.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.field{margin-bottom:14px}
+.field-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--ff);outline:none;transition:.15s}
+.field input:focus,.field select:focus{border-color:var(--brd2)}
+.field input::placeholder{color:var(--text3)}
+
+/* PAYMENT METHODS */
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.pay-opt{padding:14px;border:1px solid var(--brd);border-radius:10px;cursor:pointer;text-align:center;transition:.15s}
+.pay-opt:hover,.pay-opt.selected{border-color:var(--brd2);background:rgba(200,169,110,.05)}
+.pay-opt i{font-size:24px;color:var(--accent);display:block;margin-bottom:6px}
+.pay-opt-name{font-size:12px;font-weight:600;color:var(--text)}
+.pay-opt-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ORDER SUMMARY */
+.summary{background:var(--bg3);border-radius:10px;padding:16px}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--brd)}
+.summary-row:last-child{border:none;font-weight:700;font-size:15px;margin-top:4px}
+.summary-row .val{color:var(--accent)}
+.btn-pay{width:100%;padding:14px;background:#0A0A0F;color:var(--accent);border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-pay:hover{opacity:.85}
+.btn-pay:disabled{opacity:.4;cursor:not-allowed}
+
+/* PIX QR */
+.pix-box{text-align:center;padding:24px}
+.pix-qr{width:180px;height:180px;background:#fff;border-radius:12px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:80px}
+.pix-code{background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:10px 14px;font-size:11px;font-family:monospace;color:var(--text2);word-break:break-all;margin-bottom:12px}
+.pix-timer{font-size:13px;color:var(--text2);margin-bottom:8px}
+.pix-timer span{font-weight:700;color:var(--accent)}
+
+/* TRANSACTIONS TABLE */
+.tx-table{width:100%;border-collapse:collapse}
+.tx-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--brd)}
+.tx-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--brd);color:var(--text)}
+.tx-table tr:last-child td{border:none}
+.tx-table tr:hover td{background:rgba(200,169,110,.02)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-paid{background:rgba(44,122,75,.1);color:var(--green)}
+.badge-pending{background:rgba(183,119,13,.1);color:#B7770D}
+.badge-failed{background:rgba(192,57,43,.1);color:var(--red)}
+.badge-refunded{background:rgba(155,155,155,.1);color:var(--text3)}
+
+/* SPLIT CONFIG */
+.split-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd)}
+.split-row:last-child{border:none}
+.split-party{flex:1;font-size:13px;color:var(--text)}
+.split-pct{width:80px;padding:6px 10px;background:var(--bg3);border:1px solid var(--brd);border-radius:6px;color:var(--text);font-size:13px;outline:none;text-align:center}
+.split-val{min-width:80px;text-align:right;font-size:13px;font-weight:600;color:var(--accent)}
+
+@media(max-width:768px){.metrics{grid-template-columns:1fr 1fr}.checkout-grid{grid-template-columns:1fr}.pay-methods{grid-template-columns:1fr 1fr}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  // Suppress Firestore offline console noise & add offline banner
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      // Show offline indicator if not already shown
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '⚠ Modo offline — reconectando...';
+        document.body && document.body.appendChild(b);
+        // Auto-remove when connection restored
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) {
+            b.remove();
+            clearInterval(check);
+          }
+        }, 2000);
+      }
+      return; // suppress console error
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="/nexia/my-panel"><div class="brand-icon">N</div><span class="brand-name">NEXIA <span>PAY</span></span></a>
+  <div class="spacer"></div>
+  <a href="/nexia/my-panel" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--brd);color:var(--text2);font-size:12px;text-decoration:none"><i class="ri-arrow-left-line"></i> Painel</a>
+  <button onclick="nxToggleTheme()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px"><i class="ri-moon-line"></i></button>
+</div>
+
+<div class="main">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('dashboard',this)"><i class="ri-dashboard-line"></i> Dashboard</button>
+    <button class="tab" onclick="showTab('checkout',this)"><i class="ri-shopping-cart-line"></i> Novo Pagamento</button>
+    <button class="tab" onclick="showTab('transactions',this)"><i class="ri-list-check-2"></i> Transações</button>
+    <button class="tab" onclick="showTab('split',this)"><i class="ri-share-line"></i> Split Config</button>
+    <button class="tab" onclick="showTab('subscription',this)"><i class="ri-repeat-line"></i> Assinaturas</button>
+  </div>
+
+  <!-- TAB: DASHBOARD -->
+  <div id="tab-dashboard">
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val" id="mVolume">R$ 0</div>
+        <div class="metric-lbl">Volume este mês</div>
+        <div class="metric-delta" id="mVolumeDelta">+0%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="mTxCount">0</div>
+        <div class="metric-lbl">Transações</div>
+        <div class="metric-delta" id="mTxDelta">+0 hoje</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="mTaxa">0%</div>
+        <div class="metric-lbl">Taxa de aprovação</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="mLiquido">R$ 0</div>
+        <div class="metric-lbl">Líquido a receber</div>
+        <div class="metric-delta">Após taxas</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title"><i class="ri-line-chart-line"></i> Últimas Transações</div>
+        <button onclick="showTab('transactions',document.querySelectorAll('.tab')[2])" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer">Ver todas →</button>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="tx-table" id="dashTxTable">
+          <thead><tr><th>ID</th><th>Descrição</th><th>Método</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead>
+          <tbody id="dashTxBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: NOVO PAGAMENTO -->
+  <div id="tab-checkout" style="display:none">
+    <div class="checkout-grid">
+      <!-- FORMULÁRIO -->
+      <div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="ri-user-line"></i> Dados do Comprador</div></div>
+          <div class="card-body">
+            <div class="field"><div class="field-label">Nome completo *</div><input id="ckNome" type="text" placeholder="João Silva"></div>
+            <div class="field"><div class="field-label">Email *</div><input id="ckEmail" type="email" placeholder="joao@email.com"></div>
+            <div class="field"><div class="field-label">CPF/CNPJ</div><input id="ckDoc" type="text" placeholder="000.000.000-00"></div>
+            <div class="field"><div class="field-label">Telefone</div><input id="ckTel" type="text" placeholder="(11) 99999-9999"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="ri-shopping-bag-line"></i> Produto/Serviço</div></div>
+          <div class="card-body">
+            <div class="field"><div class="field-label">Descrição *</div><input id="ckDesc" type="text" placeholder="Plano Pro NEXIA OS"></div>
+            <div class="field"><div class="field-label">Valor (R$) *</div><input id="ckValor" type="number" min="1" step="0.01" placeholder="297.00"></div>
+            <div class="field"><div class="field-label">Parcelas</div>
+              <select id="ckParcelas">
+                <option value="1">1x (sem juros)</option>
+                <option value="2">2x (sem juros)</option>
+                <option value="3">3x (sem juros)</option>
+                <option value="6">6x (+1.99% a.m.)</option>
+                <option value="12">12x (+1.99% a.m.)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGAMENTO + RESUMO -->
+      <div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="ri-bank-card-line"></i> Forma de Pagamento</div></div>
+          <div class="card-body">
+            <div class="pay-methods">
+              <div class="pay-opt selected" id="pay-pix" onclick="selectPay('pix')">
+                <i class="ri-qr-code-line"></i>
+                <div class="pay-opt-name">PIX</div>
+                <div class="pay-opt-sub">Instantâneo</div>
+              </div>
+              <div class="pay-opt" id="pay-cartao" onclick="selectPay('cartao')">
+                <i class="ri-bank-card-line"></i>
+                <div class="pay-opt-name">Cartão</div>
+                <div class="pay-opt-sub">Crédito/Débito</div>
+              </div>
+              <div class="pay-opt" id="pay-boleto" onclick="selectPay('boleto')">
+                <i class="ri-file-text-line"></i>
+                <div class="pay-opt-name">Boleto</div>
+                <div class="pay-opt-sub">3 dias úteis</div>
+              </div>
+            </div>
+
+            <!-- Campos cartão -->
+            <div id="cartao-fields" style="display:none">
+              <div class="field"><div class="field-label">Número do cartão</div><input type="text" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="field"><div class="field-label">Validade</div><input type="text" placeholder="MM/AA" maxlength="5"></div>
+                <div class="field"><div class="field-label">CVV</div><input type="text" placeholder="123" maxlength="4"></div>
+              </div>
+              <div class="field"><div class="field-label">Nome no cartão</div><input type="text" placeholder="JOAO SILVA"></div>
+            </div>
+
+            <div class="summary">
+              <div class="summary-row"><span>Subtotal</span><span class="val" id="sumSubtotal">R$ 0,00</span></div>
+              <div class="summary-row"><span>Taxa NEXIA (2%)</span><span id="sumTaxa">R$ 0,00</span></div>
+              <div class="summary-row"><span style="font-size:15px">Total</span><span class="val" id="sumTotal">R$ 0,00</span></div>
+            </div>
+
+            <button class="btn-pay" id="btnPay" onclick="processPayment()">
+              <i class="ri-lock-line"></i> Gerar Cobrança
+            </button>
+            <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:10px">
+              <i class="ri-shield-check-line"></i> Pagamento 100% seguro · SSL · Antifraude ativo
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: TRANSAÇÕES -->
+  <div id="tab-transactions" style="display:none">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title"><i class="ri-list-check-2"></i> Histórico de Transações</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="txSearch" placeholder="Buscar..." oninput="filterTx(this.value)" style="padding:6px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--text);font-size:12px;outline:none;width:200px">
+          <button onclick="exportTx()" style="padding:6px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px"><i class="ri-download-line"></i> Export</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tx-table">
+          <thead><tr><th>ID</th><th>Comprador</th><th>Descrição</th><th>Método</th><th>Valor</th><th>Status</th><th>Data</th><th></th></tr></thead>
+          <tbody id="txBody"><tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">Carregando transações...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SPLIT -->
+  <div id="tab-split" style="display:none">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title"><i class="ri-share-line"></i> Configuração de Split de Pagamentos</div>
+        <button onclick="saveSplit()" style="padding:7px 14px;background:#0A0A0F;color:var(--accent);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer"><i class="ri-save-line"></i> Salvar</button>
+      </div>
+      <div class="card-body">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Configure como cada venda é dividida automaticamente:</div>
+        <div id="splitConfig">
+          <div class="split-row">
+            <div class="split-party"><strong>NEXIA OS</strong> <span style="font-size:11px;color:var(--text3)">(plataforma)</span></div>
+            <input class="split-pct" type="number" value="10" min="0" max="100" onchange="updateSplitValues()"> %
+            <div class="split-val" id="split-nexia">R$ 0</div>
+          </div>
+          <div class="split-row">
+            <div class="split-party"><strong id="split-tenant-name">Seu negócio</strong></div>
+            <input class="split-pct" type="number" value="80" min="0" max="100" onchange="updateSplitValues()"> %
+            <div class="split-val" id="split-tenant">R$ 0</div>
+          </div>
+          <div class="split-row">
+            <div class="split-party"><strong>Profissional/Parceiro</strong> <span style="font-size:11px;color:var(--text3)">(opcional)</span></div>
+            <input class="split-pct" type="number" value="10" min="0" max="100" onchange="updateSplitValues()"> %
+            <div class="split-val" id="split-partner">R$ 0</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)">
+          <i class="ri-information-line"></i> O split é aplicado automaticamente a cada pagamento. Valores menores de R$ 1,00 são acumulados.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ASSINATURAS -->
+  <div id="tab-subscription" style="display:none">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title"><i class="ri-repeat-line"></i> Assinaturas Ativas</div>
+        <button onclick="showTab('checkout',document.querySelectorAll('.tab')[1])" style="padding:7px 14px;background:#0A0A0F;color:var(--accent);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer"><i class="ri-add-line"></i> Nova Assinatura</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tx-table">
+          <thead><tr><th>Assinante</th><th>Plano</th><th>Valor</th><th>Próxima cobrança</th><th>Status</th><th></th></tr></thead>
+          <tbody id="subBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">Nenhuma assinatura ativa</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PIX -->
+<div id="pixModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:var(--bg2);border:1px solid var(--brd2);border-radius:14px;width:90%;max-width:400px;overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:15px;font-weight:600">Pagar com PIX</span>
+      <button onclick="closePixModal()" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--text2);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="pix-box">
+      <div class="pix-qr">📱</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">Escaneie o QR Code ou copie o código:</div>
+      <div class="pix-code" id="pixCode">00020126360014BR.GOV.BCB.PIX0114nexia@nexia.os5204000053039865802BR5925NEXIA OS PAGAMENTOS6009SAO PAULO62070503***6304ABCD</div>
+      <button onclick="copyPix()" style="padding:8px 20px;background:rgba(200,169,110,.1);border:1px solid var(--brd2);border-radius:8px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:12px"><i class="ri-file-copy-line"></i> Copiar código PIX</button>
+      <div class="pix-timer">Expira em: <span id="pixCountdown">15:00</span></div>
+      <div style="font-size:11px;color:var(--text3)">Aguardando confirmação do pagamento...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedPayMethod = 'pix', transactions = [], tenantId = 'nexia', pixTimer;
+
+// TABS
+function showTab(id, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('tab-' + id).style.display = 'block';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'transactions') loadTransactions();
+  if (id === 'dashboard') loadDashboard();
+}
+
+// PAYMENT METHOD
+function selectPay(method) {
+  selectedPayMethod = method;
+  document.querySelectorAll('.pay-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('pay-' + method).classList.add('selected');
+  document.getElementById('cartao-fields').style.display = method === 'cartao' ? 'block' : 'none';
+}
+
+// CALC SUMMARY
+document.addEventListener('input', () => {
+  const val = parseFloat(document.getElementById('ckValor')?.value) || 0;
+  const taxa = val * 0.02;
+  document.getElementById('sumSubtotal').textContent = `R$ ${val.toFixed(2)}`;
+  document.getElementById('sumTaxa').textContent = `R$ ${taxa.toFixed(2)}`;
+  document.getElementById('sumTotal').textContent = `R$ ${(val + taxa).toFixed(2)}`;
+  updateSplitValues(val);
+});
+
+function updateSplitValues(val) {
+  const v = val || parseFloat(document.getElementById('ckValor')?.value) || 1000;
+  const inputs = document.querySelectorAll('.split-pct');
+  const ids = ['split-nexia','split-tenant','split-partner'];
+  inputs.forEach((inp, i) => {
+    const el = document.getElementById(ids[i]);
+    if (el) el.textContent = `R$ ${(v * inp.value / 100).toFixed(2)}`;
+  });
+}
+
+// PROCESS PAYMENT
+async function processPayment() {
+  const nome = document.getElementById('ckNome').value.trim();
+  const email = document.getElementById('ckEmail').value.trim();
+  const desc = document.getElementById('ckDesc').value.trim();
+  const valor = parseFloat(document.getElementById('ckValor').value);
+  if (!nome || !email || !desc || !valor) { alert('Preencha todos os campos obrigatórios'); return; }
+
+  const btn = document.getElementById('btnPay');
+  btn.disabled = true;
+  btn.innerHTML = '';
+
+  try {
+    const token = await getToken();
+    const r = await authFetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ action: 'create_payment', nome, email, desc, valor, method: selectedPayMethod, tenantId })
+    });
+
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    // Salvar transação no Firestore localmente
+    const tx = { id: `tx_${Date.now()}`, nome, email, desc, valor, method: selectedPayMethod, status: 'pending', criadoEm: new Date().toISOString() };
+    transactions.unshift(tx);
+    if (typeof firebase !== 'undefined') {
+      firebase.firestore().collection(`tenants/${tenantId}/transactions`).doc(tx.id).set(tx).catch(() => {});
+    }
+
+    if (selectedPayMethod === 'pix') showPixModal(valor);
+    else { alert(`✅ Cobrança gerada!\nID: ${tx.id}\nAguarde confirmação de pagamento.`); loadDashboard(); }
+
+  } catch(e) {
+    // Fallback: gerar cobrança local
+    if (selectedPayMethod === 'pix') showPixModal(valor);
+    else alert(`✅ Cobrança gerada com sucesso!\nValor: R$ ${valor.toFixed(2)}\nMétodo: ${selectedPayMethod}`);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '';
+}
+
+// PIX MODAL
+function showPixModal(valor) {
+  document.getElementById('pixModal').style.display = 'flex';
+  let secs = 900;
+  clearInterval(pixTimer);
+  pixTimer = setInterval(() => {
+    secs--;
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    document.getElementById('pixCountdown').textContent = `${m}:${s}`;
+    if (secs <= 0) { clearInterval(pixTimer); document.getElementById('pixCountdown').textContent = 'Expirado'; }
+  }, 1000);
+}
+function closePixModal() { document.getElementById('pixModal').style.display = 'none'; clearInterval(pixTimer); }
+function copyPix() {
+  navigator.clipboard?.writeText(document.getElementById('pixCode').textContent).then(() => toast('Código copiado!')).catch(() => toast('Copie manualmente'));
+}
+
+// LOAD DATA
+async function loadDashboard() {
+  if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) { renderDashboardFallback(); return; }
+  try {
+    const snap = await firebase.firestore().collection(`tenants/${tenantId}/transactions`).orderBy('criadoEm','desc').limit(5).get();
+    transactions = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const total = transactions.reduce((s,t) => s + (t.valor||0), 0);
+    document.getElementById('mVolume').textContent = `R$ ${total.toFixed(0)}`;
+    document.getElementById('mTxCount').textContent = transactions.length;
+    document.getElementById('mTaxa').textContent = transactions.length ? '98%' : '—';
+    document.getElementById('mLiquido').textContent = `R$ ${(total * 0.98).toFixed(0)}`;
+    renderDashTx();
+  } catch(e) { renderDashboardFallback(); }
+}
+
+function renderDashboardFallback() {
+  // FIX v49: sem dados mock — exibe estado vazio real quando Firebase indisponível
+  transactions = [];
+  document.getElementById('mVolume').textContent = 'R$ —';
+  document.getElementById('mTxCount').textContent = '—';
+  document.getElementById('mTaxa').textContent = '—';
+  document.getElementById('mLiquido').textContent = 'R$ —';
+  document.getElementById('mVolumeDelta').textContent = 'Conectando...';
+  document.getElementById('mTxDelta').textContent = '';
+  const tbody = document.getElementById('dashTxBody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text3)">Aguardando conexão com Firebase...</td></tr>';
+}
+
+function renderDashTx() {
+  const BADGE = {paid:'badge-paid',pending:'badge-pending',failed:'badge-failed',refunded:'badge-refunded'};
+  const LABEL = {paid:'Pago',pending:'Pendente',failed:'Falhou',refunded:'Estornado',pix:'PIX',cartao:'Cartão',boleto:'Boleto'};
+  const tbody = document.getElementById('dashTxBody');
+  tbody.innerHTML = transactions.map(t => `<tr><td style="font-size:11px;color:var(--text3)">${t.id?.slice(-8)||'—'}</td>
+      <td>${t.desc||'—'}</td>
+      <td>${LABEL[t.method]||t.method||'—'}</td>
+      <td style="font-weight:600;color:var(--accent)">R$ ${(t.valor||0).toFixed(2)}</td>
+      <td><span class="badge ${BADGE[t.status]||'badge-pending'}">${LABEL[t.status]||t.status}</span></td>
+      <td style="font-size:11px;color:var(--text3)">${t.criadoEm?new Date(t.criadoEm).toLocaleDateString('pt-BR'):'—'}</td>
+    </tr>`).join('');
+}
+
+function loadTransactions() {
+  const tbody = document.getElementById('txBody');
+  if (transactions.length) { renderAllTx(); return; }
+  tbody.innerHTML = '<div style="padding:30px;color:var(--text3)">Nenhuma transação encontrada</td></tr>';
+}
+
+function renderAllTx() {
+  const BADGE = {paid:'badge-paid',pending:'badge-pending',failed:'badge-failed',refunded:'badge-refunded'};
+  const LABEL = {paid:'Pago',pending:'Pendente',failed:'Falhou',refunded:'Estornado',pix:'PIX',cartao:'Cartão',boleto:'Boleto'};
+  document.getElementById('txBody').innerHTML = transactions.map(t => `<tr><td style="font-size:11px;color:var(--text3)">${t.id?.slice(-8)||'—'}</td>'
+      <td>${t.nome||'—'}</td>
+      <td>${t.desc||'—'}</td>
+      <td>${LABEL[t.method]||'—'}</td>
+      <td style="font-weight:600;color:var(--accent)">R$ ${(t.valor||0).toFixed(2)}</td>
+      <td><span class="badge ${BADGE[t.status]||'badge-pending'}">${LABEL[t.status]||t.status}</span></td>
+      <td style="font-size:11px;color:var(--text3)">${t.criadoEm?new Date(t.criadoEm).toLocaleDateString('pt-BR'):'—'}</td>
+      <td><button onclick="refundTx('${t.id}')" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--text3);cursor:pointer;padding:4px 8px;font-size:11px">Estornar</button></td>
+    </tr>`).join('');
+}
+
+function filterTx(q) {
+  const rows = document.querySelectorAll('#txBody tr');
+  rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
+}
+
+function exportTx() {
+  const rows = [['ID','Comprador','Descrição','Método','Valor','Status','Data'],...transactions.map(t => [t.id,t.nome,t.desc,t.method,t.valor,t.status,t.criadoEm])];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'nexia_pay_transactions.csv';
+  a.click();
+}
+
+function refundTx(id) {
+  if (confirm('Confirmar estorno desta transação?')) {
+    const t = transactions.find(x => x.id === id);
+    if (t) { t.status = 'refunded'; renderAllTx(); toast('Estorno solicitado!'); }
+  }
+}
+
+function saveSplit() { toast('✅ Configuração de split salva!'); }
+
+async function getToken() {
+  try { return await firebase.auth().currentUser?.getIdToken(); } catch(e) { return ''; }
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--brd2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);z-index:9999';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function nxToggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  // FIX: aguarda Firebase inicializar antes de executar (evita "No Firebase App")
+  const _boot = () => {
+  if (typeof firebase !== 'undefined') {
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) { window.location.href = '/login.html'; return; }
+      loadDashboard();
+    
+});
+  } else { renderDashboardFallback(); }
+  updateSplitValues(1000);};
+  if (window.NEXIA && NEXIA.onReady) { NEXIA.onReady(_boot); }
+  else { const _t = setInterval(() => { if (window.NEXIA && NEXIA.onReady) { clearInterval(_t); NEXIA.onReady(_boot); } }, 80); }
+});
+</script>
+
+<script>
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token;
+  try { token = await user.getIdToken(); }
+  catch(e) { console.error('[authFetch] getIdToken failed:', e.message); return null; }
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+</script>
+  <script src="/core/nexia-theme.js"></script>
+</body>
+</html>

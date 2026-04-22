@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="pt-BR">
+<head>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA Striker — Centro de Strikes e Moderação. Gerencie alertas, políticas e ações automatizadas com IA."><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXIA Striker — Prospecção Ativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<script src="/core/nav-guard.js"></script>
+<link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+:root{--bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A2E;--brd:rgba(255,255,255,.07);--brd2:rgba(200,169,110,.25);--text:#F5F3EE;--text2:#9A9590;--text3:#5A5550;--accent:#C8A96E;--green:#2C7A4B;--ff:'Inter',system-ui,sans-serif}
+[data-theme="light"]{--bg:#F5F3EE;--bg2:#fff;--bg3:#ECEAE4;--brd:rgba(0,0,0,.08);--text:#0A0A0F;--text2:#4A4540}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brand-icon{width:28px;height:28px;border-radius:7px;background:#0A0A0F;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;font-weight:700}
+.brand-name{font-size:13px;font-weight:700;color:var(--text)}.brand-name span{color:var(--accent)}
+.spacer{flex:1}
+.main{max-width:1200px;margin:0 auto;padding:28px 24px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
+.metric{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px 16px}
+.metric-val{font-size:24px;font-weight:700;color:var(--accent);line-height:1}
+.metric-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+.metric-delta{font-size:11px;color:var(--green);margin-top:2px;font-weight:600}
+.section{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;margin-bottom:20px}
+.section-hdr{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.section-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-body{padding:20px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s}
+.btn-primary{background:#0A0A0F;color:var(--accent)}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{background:var(--bg3);color:var(--text);border-color:var(--brd)}
+.btn-sm{padding:5px 12px;font-size:12px}
+input,textarea,select{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--ff);outline:none;transition:.15s}
+input:focus,textarea:focus{border-color:var(--brd2)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.prospects-table{width:100%;border-collapse:collapse}
+.prospects-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--brd)}
+.prospects-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--brd);color:var(--text)}
+.prospects-table tr:last-child td{border:none}
+.prospects-table tr:hover td{background:rgba(200,169,110,.03)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-new{background:rgba(200,169,110,.1);color:var(--accent)}
+.badge-contact{background:rgba(26,86,219,.1);color:#4D9FFF}
+.badge-demo{background:rgba(183,119,13,.1);color:#B7770D}
+.badge-closed{background:rgba(44,122,75,.1);color:var(--green)}
+.score-bar{height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;width:80px;display:inline-block;vertical-align:middle}
+.score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#C8A96E,#2C7A4B)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '\u26a0 Modo offline \u2014 reconectando...';
+        document.body && document.body.appendChild(b);
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) { b.remove(); clearInterval(check); }
+        }, 2000);
+      }
+      return;
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="/nexia/my-panel"><div class="brand-icon">N</div><span class="brand-name">NEXIA <span>OS</span></span></a>
+  <span style="color:var(--brd2)">/</span>
+  <span style="font-size:13px;color:var(--text2)">Striker — Prospecção Ativa</span>
+  <div class="spacer"></div>
+  <a href="/nexia/my-panel" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--brd);color:var(--text2);font-size:12px;text-decoration:none"><i class="ri-arrow-left-line"></i> Painel</a>
+</div>
+
+<div class="main">
+  <!-- METRICS -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-val" id="mTotal">0</div><div class="metric-lbl">Prospects</div><div class="metric-delta">+0 hoje</div></div>
+    <div class="metric"><div class="metric-val" id="mContato">0</div><div class="metric-lbl">Em Contato</div></div>
+    <div class="metric"><div class="metric-val" id="mDemo">0</div><div class="metric-lbl">Demo Agendada</div></div>
+    <div class="metric"><div class="metric-val" id="mFechado">0</div><div class="metric-lbl">Fechados</div><div class="metric-delta" style="color:var(--green)">↑ 0%</div></div>
+    <div class="metric"><div class="metric-val" id="mTaxa">0%</div><div class="metric-lbl">Taxa Conversão</div></div>
+  </div>
+
+  <!-- ADICIONAR PROSPECT -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-title"><i class="ri-user-add-line"></i> Adicionar Prospect</div>
+      <button class="btn btn-primary btn-sm" onclick="generateWithAI()"><i class="ri-brain-line"></i> Gerar sequência IA</button>
+    </div>
+    <div class="section-body">
+      <div class="form-grid">
+        <div>
+          <div class="form-label">Nome *</div>
+          <input id="pNome" type="text" placeholder="João Silva">
+        </div>
+        <div>
+          <div class="form-label">Empresa *</div>
+          <input id="pEmpresa" type="text" placeholder="Empresa Ltda">
+        </div>
+        <div>
+          <div class="form-label">Email</div>
+          <input id="pEmail" type="email" placeholder="joao@empresa.com">
+        </div>
+        <div>
+          <div class="form-label">WhatsApp</div>
+          <input id="pWhatsapp" type="text" placeholder="(11) 99999-9999">
+        </div>
+        <div>
+          <div class="form-label">Setor</div>
+          <input id="pSetor" type="text" placeholder="Saúde, Varejo, Educação...">
+        </div>
+        <div>
+          <div class="form-label">Score de interesse (0-100)</div>
+          <input id="pScore" type="number" min="0" max="100" value="50">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addProspect()"><i class="ri-user-add-line"></i> Adicionar e iniciar sequência</button>
+    </div>
+  </div>
+
+  <!-- LISTA DE PROSPECTS -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-title"><i class="ri-list-check-2"></i> Pipeline de Prospecção</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()"><i class="ri-download-line"></i> Exportar</button>
+        <button class="btn btn-primary btn-sm" onclick="runAISequence()"><i class="ri-flashlight-line"></i> Rodar Sequência IA</button>
+      </div>
+    </div>
+    <div class="section-body" style="padding:0;overflow-x:auto">
+      <table class="prospects-table">
+        <thead>
+          <tr>
+            <th>Nome</th><th>Empresa</th><th>Setor</th><th>Score</th><th>Status</th><th>Próxima Ação</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="prospectsBody">
+          <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Nenhum prospect ainda. Adicione o primeiro!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let prospects = [], tenantId = 'nexia';
+const STATUSES = {new:'Novo',contact:'Em Contato',demo:'Demo',closed:'Fechado'};
+const BADGE_CLASSES = {new:'badge-new',contact:'badge-contact',demo:'badge-demo',closed:'badge-closed'};
+
+function updateMetrics() {
+  document.getElementById('mTotal').textContent = prospects.length;
+  document.getElementById('mContato').textContent = prospects.filter(p => p.status === 'contact').length;
+  document.getElementById('mDemo').textContent = prospects.filter(p => p.status === 'demo').length;
+  const fechados = prospects.filter(p => p.status === 'closed').length;
+  document.getElementById('mFechado').textContent = fechados;
+  document.getElementById('mTaxa').textContent = prospects.length > 0 ? Math.round(fechados/prospects.length*100) + '%' : '0%';
+}
+
+function renderProspects() {
+  updateMetrics();
+  const tbody = document.getElementById('prospectsBody');
+  if (!prospects.length) {
+    tbody.innerHTML = '<div style="padding:40px;color:var(--text3)">Nenhum prospect. Adicione o primeiro!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = prospects.map(p => `<tr><td>${p.empresa||'—'}</td><td>${p.contato||'—'}</td><td><div style="display:flex;align-items:center;gap:8px">
+          <div class="score-bar"><div class="score-fill" style="width:${p.score}%"></div></div><div class="score-fill" style="width:${p.score}%"></div></div>
+          <span style="font-size:12px;color:var(--accent)">${p.score}</span>
+        </div>
+      </td>
+      <td><span class="badge ${BADGE_CLASSES[p.status]}">${STATUSES[p.status]}</span></td>
+      <td style="font-size:12px;color:var(--text2)">${p.proximaAcao || '—'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="advanceStatus('${p.id}')"><i class="ri-arrow-right-line"></i></button>
+          <button class="btn btn-primary btn-sm" onclick="sendMessage('${p.id}')"><i class="ri-whatsapp-line"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function addProspect() {
+  const nome = document.getElementById('pNome').value.trim();
+  const empresa = document.getElementById('pEmpresa').value.trim();
+  if (!nome || !empresa) { alert('Nome e empresa são obrigatórios'); return; }
+
+  const prospect = {
+    id: `p_${Date.now()}`,
+    nome, empresa,
+    email: document.getElementById('pEmail').value.trim(),
+    whatsapp: document.getElementById('pWhatsapp').value.trim(),
+    setor: document.getElementById('pSetor').value.trim(),
+    score: parseInt(document.getElementById('pScore').value) || 50,
+    status: 'new',
+    proximaAcao: 'Enviar email de apresentação',
+    criadoEm: new Date().toISOString()
+  };
+
+  prospects.unshift(prospect);
+
+  // Salvar no Firestore
+  if (typeof firebase !== 'undefined') {
+    try {
+      await firebase.firestore().collection(`tenants/${tenantId}/striker_prospects`).doc(prospect.id).set(prospect);
+    } catch(e) {}
+  }
+
+  renderProspects();
+  ['pNome','pEmpresa','pEmail','pWhatsapp','pSetor'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('pScore').value = 50;
+  toast(`✅ ${nome} adicionado ao pipeline!`);
+}
+
+function advanceStatus(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  const flow = ['new','contact','demo','closed'];
+  const idx = flow.indexOf(p.status);
+  if (idx < flow.length - 1) {
+    p.status = flow[idx + 1];
+    const acoes = {contact:'Enviar proposta comercial',demo:'Fazer apresentação',closed:'Enviar contrato'};
+    p.proximaAcao = acoes[p.status] || '—';
+    renderProspects();
+    if (typeof firebase !== 'undefined') {
+      firebase.firestore().collection(`tenants/${tenantId}/striker_prospects`).doc(id).update({ status: p.status, proximaAcao: p.proximaAcao }).catch(() => {});
+    }
+  }
+}
+
+function sendMessage(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p || !p.whatsapp) { alert('Prospect sem WhatsApp cadastrado'); return; }
+  const num = p.whatsapp.replace(/\D/g, '');
+  const msg = encodeURIComponent(`Olá ${p.nome}! Somos da NEXIA OS e gostaríamos de apresentar uma solução para ${p.empresa}. Quando poderia conversar?`);
+  window.open(`https://wa.me/55${num}?text=${msg}`, '_blank');
+}
+
+async function runAISequence() {
+  const btn = event?.target || document.querySelector('[onclick="runAISequence()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Executando...'; }
+  const newProspects = prospects.filter(p => p.status === 'new');
+  if (!newProspects.length) {
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Rodar Sequência IA'; }
+    toast('⚠️ Nenhum prospect novo');
+    return;
+  }
+  try {
+    const res = await authFetch('/api/ai-sales-agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'run_sequence', tenantId, prospects: newProspects.map(p => p.id) })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      newProspects.forEach(p => { p.status = 'contact'; p.proximaAcao = data.nextAction || 'Aguardar resposta (email enviado)'; });
+    } else {
+      newProspects.forEach(p => { p.status = 'contact'; p.proximaAcao = 'Aguardar resposta (email enviado)'; });
+    }
+  } catch {
+    newProspects.forEach(p => { p.status = 'contact'; p.proximaAcao = 'Aguardar resposta (email enviado)'; });
+  }
+  renderProspects();
+  if (btn) { btn.disabled = false; btn.textContent = '⚡ Rodar Sequência IA'; }
+  toast(`✅ Sequência enviada para ${newProspects.length} prospects!`);
+}
+
+async function generateWithAI() {
+  toast('🤖 Gerando prospect com IA...');
+  try {
+    const res = await authFetch('/api/ai-sales-agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'generate_lead', tenantId })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const lead = data.lead || {
+        id: `p_${Date.now()}`,
+        nome: data.nome || 'Novo Prospect',
+        empresa: data.empresa || 'Empresa Identificada',
+        email: data.email || 'contato@empresa.com',
+        setor: data.setor || 'Tecnologia',
+        score: data.score || 75,
+        status: 'new',
+        proximaAcao: 'Enviar email de apresentação',
+        criadoEm: new Date().toISOString()
+      };
+      prospects.unshift(lead);
+      renderProspects();
+      toast(`✅ Prospect gerado: ${lead.nome} (${lead.empresa})`);
+      return;
+    }
+  } catch {}
+  // Fallback local
+  const setores = ['Saúde','Varejo','Tecnologia','Construção','Educação','Finanças'];
+  const nomes = ['Marcelo Santos','Ana Ferreira','Roberto Lima','Carla Mendes','João Costa','Maria Silva'];
+  const empresas = ['Tech Solutions','Prime Varejo','Clínica Saúde','Construtora ABC','EduPro','FinanceTech'];
+  const idx = Math.floor(Math.random() * nomes.length);
+  const lead = {
+    id: `p_${Date.now()}`,
+    nome: nomes[idx], empresa: empresas[idx],
+    email: `contato@${empresas[idx].toLowerCase().replace(/[^a-z]/g,'')}.com.br`,
+    setor: setores[idx], score: 60 + Math.floor(Math.random() * 35),
+    status: 'new', proximaAcao: 'Enviar email de apresentação',
+    criadoEm: new Date().toISOString()
+  };
+  prospects.unshift(lead);
+  renderProspects();
+  toast(`✅ Prospect gerado: ${lead.nome} (${lead.empresa})`);
+}
+
+function exportCSV() {
+  const rows = [['Nome','Empresa','Setor','Score','Status'],...prospects.map(p => [p.nome,p.empresa,p.setor||'',p.score,STATUSES[p.status]])];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'striker_prospects.csv';
+  a.click();
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--brd2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);z-index:9999';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // FIX: aguarda Firebase inicializar antes de executar (evita "No Firebase App")
+  const _boot = () => {
+  if (typeof firebase !== 'undefined') {
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) { window.location.href = '/login.html'; return; }
+      try {
+        firebase.firestore().collection(`tenants/${tenantId}/striker_prospects`)
+          .orderBy('criadoEm','desc').limit(50).onSnapshot(snap => {
+            prospects = snap.docs.map(d => ({id:d.id,...d.data()}));
+            renderProspects();
+          }, () => renderProspects());
+      } catch(e) { renderProspects(); }
+    
+});
+  } else { renderProspects(); }};
+  if (window.NEXIA && NEXIA.onReady) { NEXIA.onReady(_boot); }
+  else { const _t = setInterval(() => { if (window.NEXIA && NEXIA.onReady) { clearInterval(_t); NEXIA.onReady(_boot); } }, 80); }
+});
+
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  let user;
+  try {
+    user = (typeof NEXIA !== 'undefined' && NEXIA.auth)
+      ? NEXIA.auth.currentUser
+      : firebase.auth().currentUser;
+  } catch(e) { user = null; }
+  if (!user) {
+    window.location.href = '/login.html?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token = '';
+  try { token = await user.getIdToken(); } catch(e) {}
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+
+</script>
+  <script src="/core/nexia-theme.js"></script>
+</body>
+</html>

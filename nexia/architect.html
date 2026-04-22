@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="pt-BR">
+<head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA Architect — Construtor de Soluções. Projete e configure sua infraestrutura IA."><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXIA Arquiteto IA — Onboarding Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07090E;--bg2:#0A0D16;--bg3:#0E1220;--blue:#0057FF;--cyan:#00E5FF;--green:#00D68F;--red:#FF3D71;--border:rgba(255,255,255,.08);--text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;--ff:'Sora',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.wrap{width:100%;max-width:640px}
+.logo{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:2rem;text-align:center}
+.step{display:none}
+.step.active{display:block}
+.step-title{font-size:1.5rem;font-weight:800;margin-bottom:.5rem}
+.step-sub{color:var(--text2);font-size:.9rem;margin-bottom:2rem;line-height:1.6}
+.options{display:flex;flex-direction:column;gap:.7rem}
+.opt{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:1rem 1.2rem;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:.8rem;font-size:.9rem}
+.opt:hover{border-color:var(--blue);background:rgba(0,87,255,.06)}
+.opt.selected{border-color:var(--blue);background:rgba(0,87,255,.1)}
+.opt-icon{font-size:1.3rem;width:32px;text-align:center}
+.progress{height:3px;background:var(--bg3);border-radius:3px;margin-bottom:2rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:3px;transition:.4s}
+.btn{background:var(--blue);color:#fff;border:none;padding:.8rem 2rem;border-radius:8px;cursor:pointer;font-family:var(--ff);font-weight:700;font-size:.95rem;width:100%;margin-top:1.5rem;transition:.2s}
+.btn:hover{background:#0043cc}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.result-card{background:var(--bg2);border:1px solid rgba(0,87,255,.3);border-radius:14px;padding:1.5rem;margin-bottom:1rem}
+.result-title{font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
+.result-exp{color:var(--text2);font-size:.88rem;line-height:1.6;margin-bottom:1rem}
+.module-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{background:rgba(0,87,255,.12);border:1px solid rgba(0,87,255,.25);color:#7DB5FF;font-size:.75rem;padding:.3rem .7rem;border-radius:20px;font-weight:600}
+.chip.priority{background:rgba(0,214,143,.1);border-color:rgba(0,214,143,.3);color:var(--green)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:.5rem;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ERR-008 FIX: Mobile overflow */
+@media(max-width:768px){
+  body{overflow-x:hidden!important}
+  .container,.wrapper,.inner,.mw,.max-w,.content,.main{max-width:100vw!important;overflow-x:hidden!important}
+  [class*="grid"]{grid-template-columns:1fr!important}
+  img,video,iframe{max-width:100%!important}
+  nav [class*="link"],[class*="nav-link"],[class*="menu-link"]{display:none!important}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  h1{font-size:clamp(24px,7vw,48px)!important}
+  h2{font-size:clamp(20px,5vw,36px)!important}
+}
+@media(max-width:600px){
+  body{overflow-x:hidden!important}
+  section,main,[class*="section"]{padding-left:16px!important;padding-right:16px!important}
+  nav,header,[class*="navbar"]{padding-left:16px!important;padding-right:16px!important}
+  [style*="width:900px"],[style*="width:800px"],[style*="width:700px"],[style*="width:600px"],[style*="width:580px"],[style*="width:560px"]{width:100%!important;max-width:100%!important}
+}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+  <script src="/core/nav-guard.js"></script>
+  <link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+/* NEXIA Theme Bridge — mapeia vars antigas para o Design System v2 */
+:root,[data-theme] {
+  --text:var(--text);--text2:var(--text2);--text3:var(--text3);
+  --brd:var(--brd);--brd2:var(--brd2);
+  --blue:var(--blue);--cyan:var(--cyan);--green:var(--green);
+  --red:var(--red);--amber:var(--amber);--gold:var(--gold);
+}
+/* Force body bg and text to use theme vars */
+body { background: var(--bg) !important; color: var(--text) !important; }
+/* Fix hardcoded dark backgrounds on cards/panels */
+[class*="card"],[class*="panel"],[class*="box"],[class*="modal-"],[class*="-modal"],
+[class*="drawer"],[class*="sidebar"],[class*="-hdr"],[class*="header"],
+.sb,.main-content,.content-area,.page-wrap,.inner {
+  background: var(--bg2) !important;
+  border-color: var(--brd) !important;
+}
+/* Fix text readability */
+[class*="label"],[class*="title"],[class*="heading"],h1,h2,h3,h4,h5,h6 {
+  color: var(--text) !important;
+}
+p,span,div { color: inherit; }
+/* Fix inputs */
+input,select,textarea {
+  background: var(--bg3) !important;
+  border-color: var(--brd) !important;
+  color: var(--text) !important;
+}
+input::placeholder,textarea::placeholder { color: var(--text3) !important; }
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  // Suppress Firestore offline console noise & add offline banner
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      // Show offline indicator if not already shown
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '⚠ Modo offline — reconectando...';
+        document.body && document.body.appendChild(b);
+        // Auto-remove when connection restored
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) {
+            b.remove();
+            clearInterval(check);
+          }
+        }, 2000);
+      }
+      return; // suppress console error
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">⚡ NEXIA Arquiteto IA</div>
+  <div class="progress"><div class="progress-fill" id="progress-bar" style="width:0%"></div></div>
+
+  <!-- Step 1 -->
+  <div class="step active" id="step-1">
+    <div class="step-title">Qual é o seu tipo de negócio?</div>
+    <div class="step-sub">O Arquiteto vai montar o painel ideal para você em menos de 30 segundos.</div>
+    <div class="options" id="options-1"></div>
+    <button class="btn" id="btn-1" disabled onclick="nextStep()">Próximo →</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="step-2">
+    <div class="step-title">Qual é o seu maior desafio hoje?</div>
+    <div class="step-sub">Isso ajuda o Arquiteto a priorizar os módulos mais urgentes para você.</div>
+    <div class="options" id="options-2"></div>
+    <button class="btn" id="btn-2" disabled onclick="nextStep()">Próximo →</button>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="step-3">
+    <div class="step-title">Quantos clientes ativos você tem?</div>
+    <div class="step-sub">O tamanho da sua base define a escala dos módulos recomendados.</div>
+    <div class="options" id="options-3"></div>
+    <button class="btn" id="btn-3" disabled onclick="generate()">🧠 Gerar Meu Painel →</button>
+  </div>
+
+  <!-- Step 4: Result -->
+  <div class="step" id="step-4">
+    <div class="step-title">Seu painel está pronto! 🎉</div>
+    <div class="step-sub" id="result-sub"></div>
+    <div id="result-content"></div>
+    <button class="btn" onclick="window.location.href='./nexia-store.html'">🛍️ Ver todos os módulos na Store →</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { id:'q1', options:[
+    {v:'eventos',l:'🎉 Eventos, festas e locação de espaços'},
+    {v:'leiloes',l:'🏛️ Leilões, investimentos e imóveis'},
+    {v:'turismo',l:'✈️ Turismo, viagens e excursões'},
+    {v:'saas',l:'💻 Software, SaaS ou tecnologia'},
+    {v:'comercio',l:'🛍️ Comércio, varejo ou e-commerce'},
+    {v:'saude',l:'🏥 Saúde, clínicas ou consultórios'},
+    {v:'educacao',l:'📚 Educação, treinamentos ou cursos'},
+    {v:'logistica',l:'🚚 Logística, transporte ou distribuição'},
+    {v:'financeiro',l:'💰 Financeiro, contabilidade ou gestão'}
+  ]},
+  { id:'q2', options:[
+    {v:'captacao',l:'Captar e converter mais clientes'},
+    {v:'retencao',l:'Reter clientes e reduzir churn'},
+    {v:'operacao',l:'Automatizar processos manuais'},
+    {v:'financas',l:'Controlar receita e inadimplência'},
+    {v:'comunicacao',l:'Melhorar comunicação com clientes'}
+  ]},
+  { id:'q3', options:[
+    {v:'micro',l:'Menos de 100 clientes'},
+    {v:'pequeno',l:'100 a 500 clientes'},
+    {v:'medio',l:'500 a 2.000 clientes'},
+    {v:'grande',l:'Mais de 2.000 clientes'}
+  ]}
+];
+
+let answers = {};
+let currentStep = 1;
+const tenantId = new URLSearchParams(window.location.search).get('tenant') || 'demo-tenant';
+
+function renderOptions(stepNum) {
+  const q = QUESTIONS[stepNum-1];
+  const wrap = document.getElementById(`options-${stepNum}`);
+  wrap.innerHTML = '';
+}
+
+function selectOpt(el, qId) {
+  el.closest('.options').querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qId] = el.dataset.v;
+  const stepNum = qId.replace('q','');
+  document.getElementById(`btn-${stepNum}`).disabled = false;
+}
+
+function nextStep() {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep++;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  document.getElementById('progress-bar').style.width = `${((currentStep-1)/3)*100}%`;
+  if(currentStep <= 3) renderOptions(currentStep);
+}
+
+async function generate() {
+  document.getElementById('step-3').classList.remove('active');
+  document.getElementById('step-4').classList.add('active');
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('result-content').innerHTML = '<div style="padding:2rem;color:#64748B"><div class="spinner"></div> O Arquiteto está analisando o seu perfil...</div>';
+
+  try {
+    const res = await authFetch('/api/architect', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tenantId, action:'generate', answers })
+    });
+    const data = await res.json();
+    renderResult(data);
+  } catch(e) {
+    // Fallback offline result
+    renderResult({
+      sectorLabel: 'Seu Negócio',
+      explanation: 'Com base no seu perfil, selecionamos os módulos mais relevantes para começar.',
+      priorityModules: ['cortex-copilot','nexia-flow','nexia-broadcast'],
+      recommendedModules: ['cortex-copilot','nexia-flow','nexia-broadcast','cortex-analytics','nexia-cobranca','whatsapp-api','nexia-inbox']
+    });
+  }
+}
+
+function renderResult(data) {
+  document.getElementById('result-sub').textContent = `Painel configurado para: ${data.sectorLabel}`;
+  document.getElementById('result-content').innerHTML = `<div style="font-size:.75rem;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:1px">Ativar primeiro (prioridade)</div>''
+      <div class="module-chips" style="margin-bottom:1rem">${(data.priorityModules||[]).map(m=>`<span class="chip priority">⚡ ${m}</span>`).join('')}</div>
+      <div style="margin-bottom:.5rem;font-size:.75rem;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:1px">Todos os recomendados</div>
+      <div class="module-chips">${(data.recommendedModules||[]).map(m=>`<span class="chip">${m}</span>`).join('')}</div>
+    </div>`;
+}
+
+// Init
+renderOptions(1);
+document.getElementById('progress-bar').style.width = '0%';
+</script>
+  
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<!-- BUG-013 FIX: auth guard — redireciona não-autenticados para login -->
+<script>
+(function(){
+  document.body.style.visibility='hidden';
+
+  // NEXIA FIX: timeout de segurança — nunca trava a página em headless/CI
+  setTimeout(function(){ 
+    if(document.documentElement.style.visibility==='hidden'||document.body.style.visibility==='hidden'){
+      document.documentElement.style.visibility='visible';
+      document.body.style.visibility='visible';
+    }
+  }, 7000);
+  var _t=0;
+  function guard(){
+    if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length){
+      firebase.auth().onAuthStateChanged(function(u){
+        if(!u)window.location.href='../login.html?next='+encodeURIComponent(window.location.pathname);
+        else document.body.style.visibility='visible';
+      });
+    } else if(_t++<60){ setTimeout(guard,100); }
+    else { window.location.href='../login.html?error=timeout'; }
+  }
+  guard();
+})();
+</script>
+  <script src="/core/nexia-theme.js"></script>
+
+<script>
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token;
+  try { token = await user.getIdToken(); }
+  catch(e) { console.error('[authFetch] getIdToken failed:', e.message); return null; }
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="pt-BR">
+<head>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA Store — Loja de Aplicativos IA. Instale módulos e agentes para seu negócio."><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXIA Store — Marketplace de Módulos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<script src="/core/nav-guard.js"></script>
+<link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+:root {
+  --nx-brand-primary:#0A0A0F;--nx-brand-accent:#C8A96E;
+  --bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A2E;--bg4:#252535;
+  --brd:rgba(255,255,255,.07);--brd2:rgba(200,169,110,.25);
+  --text:#F5F3EE;--text2:#9A9590;--text3:#5A5550;
+  --green:#2C7A4B;--red:#C0392B;--amber:#B7770D;
+  --ff:'Inter',system-ui,sans-serif;--ffm:'JetBrains Mono',monospace;
+  --radius:10px;--radius-lg:14px;
+}
+[data-theme="light"]{
+  --bg:#F5F3EE;--bg2:#FFFFFF;--bg3:#ECEAE4;--bg4:#E0DDD6;
+  --brd:rgba(0,0,0,.08);--brd2:rgba(200,169,110,.3);
+  --text:#0A0A0F;--text2:#4A4540;--text3:#9A9590;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* TOPBAR */
+.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brand-icon{width:28px;height:28px;border-radius:7px;background:var(--nx-brand-primary);display:flex;align-items:center;justify-content:center;color:var(--nx-brand-accent);font-size:13px;font-weight:700}
+.brand-name{font-size:13px;font-weight:700;color:var(--text)}
+.brand-name span{color:var(--nx-brand-accent)}
+.topbar-title{font-size:13px;color:var(--text2)}
+.topbar-sep{color:var(--brd2);font-size:16px}
+.spacer{flex:1}
+.btn-theme{width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:.15s}
+.btn-back{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--brd);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:.15s}
+.btn-back:hover{background:var(--bg4);color:var(--text)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 54px)}
+
+/* SIDEBAR CATEGORIAS */
+.sidebar{background:var(--bg2);border-right:1px solid var(--brd);padding:16px 0;overflow-y:auto}
+.sidebar-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:0 16px 8px}
+.cat-btn{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;width:100%;border:none;background:none;text-align:left;transition:.15s;border-left:3px solid transparent}
+.cat-btn:hover{background:var(--bg3);color:var(--text)}
+.cat-btn.active{background:rgba(200,169,110,.08);color:var(--nx-brand-accent);border-left-color:var(--nx-brand-accent);font-weight:600}
+.cat-btn .cat-icon{font-size:16px;width:20px;text-align:center}
+.cat-btn .cat-count{margin-left:auto;font-size:10px;font-weight:600;background:var(--bg3);color:var(--text3);padding:2px 7px;border-radius:10px}
+.cat-btn.active .cat-count{background:rgba(200,169,110,.15);color:var(--nx-brand-accent)}
+
+/* MAIN */
+.main{padding:24px;overflow-y:auto}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:10px;margin-bottom:24px}
+.search-wrap{flex:1;position:relative}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px}
+.search-input{width:100%;padding:10px 12px 10px 38px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--ff);outline:none;transition:.15s}
+.search-input:focus{border-color:var(--brd2);background:var(--bg3)}
+.search-input::placeholder{color:var(--text3)}
+.btn-ai-search{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--nx-brand-primary);color:var(--nx-brand-accent);border:1px solid var(--brd2);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn-ai-search:hover{opacity:.85}
+.btn-ai-search i{font-size:16px}
+
+/* AI ADVISOR */
+.ai-advisor{background:linear-gradient(135deg,rgba(200,169,110,.08),rgba(10,10,15,.5));border:1px solid var(--brd2);border-radius:var(--radius-lg);padding:20px;margin-bottom:24px;display:none}
+.ai-advisor.visible{display:block}
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ai-brain{width:36px;height:36px;border-radius:8px;background:var(--nx-brand-primary);display:flex;align-items:center;justify-content:center;color:var(--nx-brand-accent);font-size:18px}
+.ai-title{font-size:14px;font-weight:600;color:var(--text)}
+.ai-sub{font-size:12px;color:var(--text2)}
+.ai-input-row{display:flex;gap:10px}
+.ai-input{flex:1;padding:10px 12px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--ff);outline:none}
+.ai-input:focus{border-color:var(--brd2)}
+.btn-ask{padding:10px 18px;background:var(--nx-brand-primary);color:var(--nx-brand-accent);border:none;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer}
+.ai-response{margin-top:12px;padding:12px;background:var(--bg2);border-radius:var(--radius);font-size:13px;color:var(--text2);line-height:1.6;display:none}
+.ai-response.visible{display:block}
+
+/* SECTION HEADER */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:16px;font-weight:600;color:var(--text)}
+.section-count{font-size:12px;color:var(--text3)}
+
+/* MODULES GRID */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.module-card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:all .15s;position:relative}
+.module-card:hover{border-color:var(--brd2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.module-card.installed{border-color:rgba(44,122,75,.3)}
+.module-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+.module-icon{width:44px;height:44px;border-radius:10px;background:var(--nx-brand-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--nx-brand-accent);font-size:20px}
+.module-info{flex:1;min-width:0}
+.module-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.module-cat{font-size:10px;font-weight:600;color:var(--nx-brand-accent);background:rgba(200,169,110,.1);padding:2px 8px;border-radius:4px;display:inline-block;letter-spacing:.04em}
+.module-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.module-footer{display:flex;align-items:center;justify-content:space-between}
+.module-price{font-size:14px;font-weight:700;color:var(--text)}
+.module-price small{font-size:10px;color:var(--text3);font-weight:400}
+.btn-install{padding:6px 14px;background:var(--nx-brand-primary);color:var(--nx-brand-accent);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.btn-install:hover{opacity:.85}
+.btn-installed{padding:6px 14px;background:rgba(44,122,75,.1);color:var(--green);border:1px solid rgba(44,122,75,.25);border-radius:7px;font-size:12px;font-weight:600;cursor:default}
+.badge-new{position:absolute;top:12px;right:12px;background:var(--nx-brand-accent);color:var(--nx-brand-primary);font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.04em}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 24px;color:var(--text3)}
+.empty i{font-size:40px;margin-bottom:12px;display:block;color:var(--text3)}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px}
+
+/* MODAL PAGAMENTO */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--brd2);border-radius:var(--radius-lg);width:90%;max-width:480px;overflow:hidden}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px}
+.modal-icon{width:40px;height:40px;border-radius:10px;background:var(--nx-brand-primary);display:flex;align-items:center;justify-content:center;color:var(--nx-brand-accent);font-size:20px}
+.modal-title{font-size:16px;font-weight:600;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text2)}
+.modal-close{margin-left:auto;width:28px;height:28px;border-radius:6px;border:1px solid var(--brd);background:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+/* STEPS PAGAMENTO */
+.steps{display:flex;gap:0;border-bottom:1px solid var(--brd)}
+.step{flex:1;padding:12px;text-align:center;font-size:11px;font-weight:600;color:var(--text3);position:relative;cursor:default}
+.step.active{color:var(--nx-brand-accent)}
+.step.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--nx-brand-accent)}
+.step.done{color:var(--green)}
+
+.modal-body{padding:24px}
+.plan-select{display:flex;gap:10px;margin-bottom:20px}
+.plan-opt{flex:1;padding:14px;border:1px solid var(--brd);border-radius:var(--radius);cursor:pointer;text-align:center;transition:.15s}
+.plan-opt:hover,.plan-opt.selected{border-color:var(--brd2);background:rgba(200,169,110,.05)}
+.plan-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.plan-price{font-size:18px;font-weight:700;color:var(--nx-brand-accent)}
+.plan-period{font-size:10px;color:var(--text3)}
+.plan-features{font-size:11px;color:var(--text2);margin-top:8px;text-align:left}
+.plan-features li{list-style:none;padding:2px 0}
+.plan-features li::before{content:'✓ ';color:var(--green)}
+
+.summary-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--brd);font-size:13px}
+.summary-row.total{font-weight:700;font-size:15px;border:none;margin-top:4px}
+.summary-row .val{color:var(--nx-brand-accent)}
+
+.payment-methods{display:flex;gap:8px;margin-bottom:16px}
+.pay-method{flex:1;padding:10px;border:1px solid var(--brd);border-radius:var(--radius);cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:var(--text2);transition:.15s}
+.pay-method:hover,.pay-method.selected{border-color:var(--brd2);color:var(--text);background:var(--bg3)}
+.pay-method i{display:block;font-size:20px;margin-bottom:4px;color:var(--nx-brand-accent)}
+
+.btn-pay{width:100%;padding:13px;background:var(--nx-brand-primary);color:var(--nx-brand-accent);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:.02em}
+.btn-pay:hover{opacity:.88}
+.btn-pay:disabled{opacity:.4;cursor:not-allowed}
+
+.activation-success{text-align:center;padding:32px 0}
+.success-icon{width:60px;height:60px;border-radius:50%;background:rgba(44,122,75,.15);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);margin:0 auto 16px}
+.success-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.success-sub{font-size:13px;color:var(--text2)}
+.btn-go{display:inline-block;margin-top:20px;padding:10px 24px;background:var(--nx-brand-primary);color:var(--nx-brand-accent);border:none;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  // Suppress Firestore offline console noise & add offline banner
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      // Show offline indicator if not already shown
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '⚠ Modo offline — reconectando...';
+        document.body && document.body.appendChild(b);
+        // Auto-remove when connection restored
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) {
+            b.remove();
+            clearInterval(check);
+          }
+        }, 2000);
+      }
+      return; // suppress console error
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a class="brand" href="/nexia/my-panel">
+    <div class="brand-icon">N</div>
+    <span class="brand-name">NEXIA <span>OS</span></span>
+  </a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-title">Store</span>
+  <div class="spacer"></div>
+  <a class="btn-back" href="/nexia/my-panel"><i class="ri-arrow-left-line"></i> Painel</a>
+  <button class="btn-theme" onclick="nxToggleTheme()" title="Alternar tema"><i class="ri-moon-line"></i></button>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR CATEGORIAS -->
+  <div class="sidebar">
+    <div class="sidebar-title">Categorias</div>
+    <button class="cat-btn active" data-cat="todos" onclick="filterCat('todos',this)">
+      <span class="cat-icon"><i class="ri-apps-line"></i></span> Todos <span class="cat-count" id="cnt-todos">0</span>
+    </button>
+    <button class="cat-btn" data-cat="IA" onclick="filterCat('IA',this)">
+      <span class="cat-icon"><i class="ri-robot-line"></i></span> Inteligência Artificial <span class="cat-count" id="cnt-IA">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Comunicação" onclick="filterCat('Comunicação',this)">
+      <span class="cat-icon"><i class="ri-chat-3-line"></i></span> Comunicação <span class="cat-count" id="cnt-Comunicação">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Marketing" onclick="filterCat('Marketing',this)">
+      <span class="cat-icon"><i class="ri-megaphone-line"></i></span> Marketing <span class="cat-count" id="cnt-Marketing">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Vendas" onclick="filterCat('Vendas',this)">
+      <span class="cat-icon"><i class="ri-hand-coin-line"></i></span> Vendas & CRM <span class="cat-count" id="cnt-Vendas">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Financeiro" onclick="filterCat('Financeiro',this)">
+      <span class="cat-icon"><i class="ri-bank-line"></i></span> Financeiro <span class="cat-count" id="cnt-Financeiro">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Operações" onclick="filterCat('Operações',this)">
+      <span class="cat-icon"><i class="ri-settings-3-line"></i></span> Operações & ERP <span class="cat-count" id="cnt-Operações">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Segurança" onclick="filterCat('Segurança',this)">
+      <span class="cat-icon"><i class="ri-shield-check-line"></i></span> Segurança <span class="cat-count" id="cnt-Segurança">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Analytics" onclick="filterCat('Analytics',this)">
+      <span class="cat-icon"><i class="ri-bar-chart-line"></i></span> Analytics <span class="cat-count" id="cnt-Analytics">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Automação" onclick="filterCat('Automação',this)">
+      <span class="cat-icon"><i class="ri-flashlight-line"></i></span> Automação <span class="cat-count" id="cnt-Automação">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Conteúdo" onclick="filterCat('Conteúdo',this)">
+      <span class="cat-icon"><i class="ri-file-text-line"></i></span> Conteúdo & Mídia <span class="cat-count" id="cnt-Conteúdo">0</span>
+    </button>
+    <button class="cat-btn" data-cat="Outros" onclick="filterCat('Outros',this)">
+      <span class="cat-icon"><i class="ri-grid-line"></i></span> Outros <span class="cat-count" id="cnt-Outros">0</span>
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar">
+      <div class="search-wrap">
+        <i class="ri-search-line"></i>
+        <input class="search-input" id="searchInput" type="text" placeholder="Buscar módulos por nome ou função..." oninput="filterSearch(this.value)">
+      </div>
+      <button class="btn-ai-search" onclick="toggleAIAdvisor()">
+        <i class="ri-brain-line"></i> Advisor IA
+      </button>
+    </div>
+
+    <!-- AI ADVISOR -->
+    <div class="ai-advisor" id="aiAdvisor">
+      <div class="ai-header">
+        <div class="ai-brain"><i class="ri-brain-line"></i></div>
+        <div>
+          <div class="ai-title">CORTEX Advisor — Encontre o módulo certo</div>
+          <div class="ai-sub">Descreva o que você precisa e a IA vai identificar os módulos perfeitos para você</div>
+        </div>
+      </div>
+      <div class="ai-input-row">
+        <input class="ai-input" id="aiInput" type="text" placeholder="Ex: Preciso automatizar meu atendimento no WhatsApp e qualificar leads automaticamente...">
+        <button class="btn-ask" onclick="askAI()"><i class="ri-send-plane-line"></i></button>
+      </div>
+      <div class="ai-response" id="aiResponse"></div>
+    </div>
+
+    <!-- SECTION HEADER -->
+    <div class="section-hdr">
+      <div class="section-title" id="sectionTitle">Todos os Módulos</div>
+      <div class="section-count" id="sectionCount"></div>
+    </div>
+
+    <!-- GRID -->
+    <div class="modules-grid" id="modulesGrid">
+      <div class="empty"><i class="ri-loader-4-line" style="animation:spin .7s linear infinite"></i><div class="empty-title">Carregando módulos...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PAGAMENTO (FLUXO LINEAR) -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon"><i class="ri-puzzle-line"></i></div>
+      <div>
+        <div class="modal-title" id="modalTitle">Módulo</div>
+        <div class="modal-sub" id="modalSub">Ativar módulo</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps">
+      <div class="step active" id="step1">1. Plano</div>
+      <div class="step" id="step2">2. Resumo</div>
+      <div class="step" id="step3">3. Pagamento</div>
+      <div class="step" id="step4">4. Ativado</div>
+    </div>
+
+    <div class="modal-body" id="modalBody">
+      <!-- Conteúdo dinâmico por step -->
+    </div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script>
+let allModules = [], filteredModules = [], installedIds = [], currentCat = 'todos', currentSearch = '';
+let selectedModule = null, selectedPlan = 'mensal', selectedPayment = 'pix', currentStep = 1;
+
+// ── MÓDULOS PADRÃO DA NEXIA (fallback se Firestore vazio) ─────────
+const DEFAULT_MODULES = [
+  // IA
+  {id:'cortex-copilot',nome:'CORTEX Co-Pilot',cat:'IA',icon:'ri-robot-line',desc:'Assistente executivo IA com contexto total do seu negócio. Analisa MRR, faturamento e dá conselhos estratégicos em tempo real.',preco:197,novo:true},
+  {id:'cortex-sdr',nome:'CORTEX SDR',cat:'IA',icon:'ri-phone-line',desc:'IA que qualifica leads automaticamente, responde perguntas e agenda reuniões 24/7 sem intervenção humana.',preco:297,novo:true},
+  {id:'cortex-vision',nome:'CORTEX Vision',cat:'IA',icon:'ri-eye-line',desc:'OCR e análise de documentos por IA. Extrai dados de CNH, contratos, notas fiscais e faturas automaticamente.',preco:147},
+  {id:'due-diligence',nome:'Due Diligence IA',cat:'IA',icon:'ri-file-search-line',desc:'Análise automática de contratos em PDF. Identifica cláusulas de risco e gera relatório jurídico em segundos.',preco:247},
+  {id:'churn-predictor',nome:'Churn Predictor',cat:'IA',icon:'ri-heart-pulse-line',desc:'Algoritmo que prevê cancelamentos 30 dias antes. Alerta e dispara ação automática de retenção.',preco:97},
+  {id:'demand-forecast',nome:'Demand Forecast',cat:'IA',icon:'ri-line-chart-line',desc:'Machine Learning que prevê demanda de produtos e serviços com base no histórico e sazonalidade.',preco:177},
+  {id:'voice-analytics',nome:'Voice Analytics',cat:'IA',icon:'ri-mic-line',desc:'Transcreve ligações do PABX e faz análise de sentimento. Detecta clientes insatisfeitos automaticamente.',preco:127},
+  {id:'auto-prompting',nome:'Auto-Prompting Engine',cat:'IA',icon:'ri-magic-line',desc:'Refina perguntas dos usuários em background para extrair respostas melhores das IAs. Aumenta qualidade 40%.',preco:87},
+
+  // COMUNICAÇÃO
+  {id:'pabx-cloud',nome:'PABX IP Cloud',cat:'Comunicação',icon:'ri-phone-line',desc:'Ramais de telefone da empresa funcionando na aba do navegador. Sem hardware, sem instalação, VoIP HD.',preco:197},
+  {id:'chatbot-omni',nome:'Chatbot 24/7 Omnichannel',cat:'Comunicação',icon:'ri-chat-3-line',desc:'Robô de atendimento integrado a WhatsApp, Telegram e Web. Responde FAQs, agenda e resolve chamados.',preco:147},
+  {id:'broadcast-center',nome:'Broadcast Center',cat:'Comunicação',icon:'ri-megaphone-line',desc:'Disparador de mensagens em massa via Push, SMS, Email e WhatsApp com segmentação de audiência.',preco:127},
+  {id:'whatsapp-business',nome:'WhatsApp Business API',cat:'Comunicação',icon:'ri-whatsapp-line',desc:'Integração oficial WhatsApp Business. Chatbot, respostas automáticas, catálogo de produtos integrado.',preco:247},
+
+  // MARKETING
+  {id:'social-media-auto',nome:'Social Media Automático',cat:'Marketing',icon:'ri-instagram-line',desc:'IA cria e posta conteúdo no Instagram, Facebook e LinkedIn automaticamente com base no seu nicho.',preco:197,novo:true},
+  {id:'email-marketing',nome:'Email Marketing Pro',cat:'Marketing',icon:'ri-mail-line',desc:'Editor drag-and-drop de e-mails com tracking de abertura, cliques e descadastros. Sequências automáticas.',preco:97},
+  {id:'ab-testing',nome:'A/B Testing Engine',cat:'Marketing',icon:'ri-test-tube-line',desc:'Teste qual oferta converte mais. Sistema envia versão A para 50% e B para 50% e mede resultado.',preco:77},
+  {id:'affiliate-engine',nome:'Affiliate & Referral',cat:'Marketing',icon:'ri-share-line',desc:'Geração de links de afiliados rastreáveis. Credita comissão automaticamente no checkout.',preco:127},
+  {id:'nexia-studio',nome:'NEXIA Studio (Copywriter)',cat:'Marketing',icon:'ri-quill-pen-line',desc:'Gera posts para Instagram, roteiros de vídeo, e-mails de marketing e descrições de produtos com IA.',preco:87,novo:true},
+
+  // VENDAS & CRM
+  {id:'crm-kanban',nome:'CRM Kanban Dinâmico',cat:'Vendas',icon:'ri-kanban-view',desc:'Funil visual (Lead > Contato > Proposta > Fechado) com cálculo automático do valor no pipe.',preco:97},
+  {id:'smart-upsell',nome:'Smart Upsell Triggers',cat:'Vendas',icon:'ri-shopping-cart-line',desc:'Motor de recomendação que sugere produtos adicionais no momento exato de maior propensão de compra.',preco:127},
+  {id:'lead-qualifier',nome:'Qualificador Neural de Leads',cat:'Vendas',icon:'ri-user-star-line',desc:'Dá nota de 0 a 100 para cada lead, identificando quem tem mais dinheiro e urgência para comprar.',preco:177},
+  {id:'cart-recovery',nome:'Recuperador de Carrinho',cat:'Vendas',icon:'ri-shopping-bag-line',desc:'Detecta quem abandonou o carrinho e envia sequência de WhatsApp/email com recuperação automática.',preco:97},
+  {id:'nexia-striker',nome:'NEXIA Striker',cat:'Vendas',icon:'ri-sword-line',desc:'Sistema de prospecção ativa. IA identifica leads quentes, envia sequência personalizada e agenda demo.',preco:297,novo:true},
+
+  // FINANCEIRO
+  {id:'checkout-soberano',nome:'Checkout Soberano',cat:'Financeiro',icon:'ri-bank-card-line',desc:'Processamento nativo de PIX (QR Code), Cartão e Boleto. Split automático de pagamentos.',preco:197},
+  {id:'subscription-engine',nome:'Motor de Assinaturas',cat:'Financeiro',icon:'ri-repeat-line',desc:'Cobrança mensal automática no cartão. Ideal para SaaS, academias e clubes de assinatura.',preco:127},
+  {id:'dunning',nome:'Dunning & Recuperação',cat:'Financeiro',icon:'ri-timer-line',desc:'Régua de cobrança automática. Aviso dia 1, lembrete dia 3, bloqueio dia 5. Taxa de recuperação 67%.',preco:87},
+  {id:'invoice-engine',nome:'Invoice Engine (NF-e)',cat:'Financeiro',icon:'ri-receipt-line',desc:'Emissão de NF-e e NFS-e em background, armazenamento de XML e envio automático para contabilidade.',preco:147},
+  {id:'mrr-dashboard',nome:'Dashboard MRR & Cashflow',cat:'Financeiro',icon:'ri-line-chart-line',desc:'Gráficos de MRR, ARR, Ticket Médio, CAC e LTV. Previsão de caixa para próximos 90 dias.',preco:77},
+
+  // OPERAÇÕES
+  {id:'site-builder',nome:'Site Builder Visual',cat:'Operações',icon:'ri-layout-3-line',desc:'Editor visual completo. Cliente edita textos, imagens e cores do site sem programador. Real-time.',preco:147},
+  {id:'nexia-flow',nome:'NEXIA Flow',cat:'Automação',icon:'ri-flashlight-line',desc:'Automações low-code com gatilhos e ações. Conecta módulos entre si sem código.',preco:127,novo:true},
+  {id:'team-manager',nome:'Gestor de Equipe',cat:'Operações',icon:'ri-team-line',desc:'Controle granular de permissões. Define o que cada funcionário pode ver e editar no sistema.',preco:77},
+  {id:'sla-monitor',nome:'SLA Monitor',cat:'Operações',icon:'ri-timer-2-line',desc:'Monitora tempo de resposta da equipe. Dispara alertas se cliente for ignorado além do prazo.',preco:67},
+
+  // SEGURANÇA
+  {id:'sentinel-iot',nome:'Sentinel IoT',cat:'Segurança',icon:'ri-shield-check-line',desc:'Controle de fechaduras e catracas inteligentes via IoT. Acesso por QR Code, facial ou PIN.',preco:247},
+  {id:'pki-scanner',nome:'PKI & SSL Scanner',cat:'Segurança',icon:'ri-lock-line',desc:'Monitor automático de certificados HTTPS. Avisa 30 dias antes de vencer. Renovação automática.',preco:67},
+  {id:'audit-log',nome:'Audit Log Pro',cat:'Segurança',icon:'ri-file-list-3-line',desc:'Diário imutável de cada ação no sistema. IP, horário e ação exata de cada clique. LGPD compliant.',preco:87},
+  {id:'anti-fraude',nome:'Anti-Fraude Shield',cat:'Segurança',icon:'ri-shield-user-line',desc:'Analisa IP, geolocalização e comportamento para bloquear cartões clonados antes do chargeback.',preco:127},
+  {id:'osint-query',nome:'OSINT Intelligence',cat:'Segurança',icon:'ri-spy-line',desc:'Consulta pública de dados de CPF, CNPJ, domínios e redes sociais para due diligence e KYC.',preco:197},
+
+  // ANALYTICS
+  {id:'heatmap',nome:'Heatmap Analytics',cat:'Analytics',icon:'ri-focus-2-line',desc:'Mapa de calor de cliques no site. Veja onde os visitantes clicam, rolam e onde abandonam.',preco:77},
+  {id:'analytics-rt',nome:'Analytics Tempo Real',cat:'Analytics',icon:'ri-bar-chart-box-line',desc:'Dashboard de visitantes ao vivo, fontes de tráfego, conversões e jornada do usuário.',preco:97},
+  {id:'kpi-engine',nome:'KPI Engine',cat:'Analytics',icon:'ri-trophy-line',desc:'Define, monitora e alerta sobre KPIs críticos do negócio. Benchmark automático com setor.',preco:87},
+
+  // AUTOMAÇÃO
+  {id:'swarm-control',nome:'NEXIA Swarm',cat:'Automação',icon:'ri-robot-2-line',desc:'Agentes de IA especializados trabalhando em paralelo. QA Agent, Debug Agent, Security Agent.',preco:297,novo:true},
+  {id:'autodev',nome:'CORTEX AutoDev',cat:'Automação',icon:'ri-code-s-slash-line',desc:'O Cortex se auto-programa. Cria módulos completos, corrige bugs e faz deploy automático.',preco:497,novo:true},
+  {id:'event-processor',nome:'Event Processor',cat:'Automação',icon:'ri-pulse-line',desc:'Processador de eventos em tempo real. Dispara ações baseadas em comportamento do usuário.',preco:97},
+
+  // CONTEÚDO
+  {id:'nexia-autodemo',nome:'NEXIA AutoDemo',cat:'Conteúdo',icon:'ri-video-line',desc:'Gera vídeos demonstrativos automáticos de cada módulo. Mostra funcionalidades sem intervenção.',preco:147,novo:true},
+  {id:'media-vault',nome:'Media Vault',cat:'Conteúdo',icon:'ri-image-line',desc:'Galeria central de mídia. Upload, organização e entrega de imagens e vídeos com CDN global.',preco:77},
+
+  // OUTROS
+  {id:'nexia-pay',nome:'NEXIA Pay',cat:'Outros',icon:'ri-money-dollar-circle-line',desc:'Gateway de pagamento unificado. PIX, cartão e boleto em um único checkout. Relatórios completos.',preco:197},
+  {id:'leiloes-engine',nome:'Motor de Leilões',cat:'Outros',icon:'ri-auction-line',desc:'Lances em tempo real via WebSockets. Anti-sniping, robô de lances automático e KYC integrado.',preco:247},
+  {id:'telemedicina',nome:'Telemedicina Hub',cat:'Outros',icon:'ri-heart-2-line',desc:'Sala de espera virtual, triagem e videochamada HD. Resultado de exames direto no prontuário.',preco:297},
+  {id:'bim-viewer',nome:'BIM Viewer (Construção)',cat:'Outros',icon:'ri-building-3-line',desc:'Renderização BIM em tempo real. Gêmeo digital de edifícios com IoT de integridade estrutural.',preco:397},
+];
+
+// ── ESTADO DA STORE ──────────────────────────────────────────────
+function initStore() {
+  allModules = DEFAULT_MODULES;
+  updateCounts();
+  renderModules(allModules);
+
+  // Tentar carregar do Firestore
+  if (typeof firebase !== 'undefined') {
+    try {
+      const db = firebase.firestore();
+      // Carregar módulos da store
+      db.collection('store').where('ativo','==',true).onSnapshot(snap => {
+        if (!snap.empty) {
+          const firestoreModules = snap.docs.map(d => {
+            const data = d.data();
+            return {
+              id: d.id,
+              nome: data.nome,
+              cat: data.categoria || data.cat || 'Outros',
+              icon: data.icon || 'ri-puzzle-line',
+              desc: data.descricao || data.desc || '',
+              preco: data.preco || 97,
+              novo: data.novo || false
+            };
+          });
+          // Merge com padrão
+          const ids = firestoreModules.map(m => m.id);
+          const merged = [
+            ...firestoreModules,
+            ...DEFAULT_MODULES.filter(m => !ids.includes(m.id))
+          ];
+          allModules = merged;
+          updateCounts();
+          applyFilters();
+        }
+      }, () => {});
+
+      // Carregar módulos instalados
+      if (firebase.auth().currentUser) {
+        const uid = firebase.auth().currentUser.uid;
+        db.collection('users').doc(uid).onSnapshot(snap => {
+          const data = snap.data();
+          installedIds = data?.modules_enabled || data?.modulesInstalled || [];
+          applyFilters();
+        }, () => {});
+      }
+    } catch(e) {}
+  }
+}
+
+function updateCounts() {
+  const cats = ['todos','IA','Comunicação','Marketing','Vendas','Financeiro','Operações','Segurança','Analytics','Automação','Conteúdo','Outros'];
+  cats.forEach(cat => {
+    const el = document.getElementById(`cnt-${cat}`);
+    if (el) el.textContent = cat === 'todos' ? allModules.length : allModules.filter(m => m.cat === cat).length;
+  });
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const titles = {
+    'todos':'Todos os Módulos','IA':'Inteligência Artificial','Comunicação':'Comunicação',
+    'Marketing':'Marketing & Growth','Vendas':'Vendas & CRM','Financeiro':'Financeiro & Pagamentos',
+    'Operações':'Operações & ERP','Segurança':'Segurança & Compliance','Analytics':'Analytics & BI',
+    'Automação':'Automação','Conteúdo':'Conteúdo & Mídia','Outros':'Módulos Verticais'
+  };
+  document.getElementById('sectionTitle').textContent = titles[cat] || cat;
+  applyFilters();
+}
+
+function filterSearch(val) {
+  currentSearch = val.toLowerCase();
+  applyFilters();
+}
+
+function applyFilters() {
+  let mods = allModules;
+  if (currentCat !== 'todos') mods = mods.filter(m => m.cat === currentCat);
+  if (currentSearch) mods = mods.filter(m =>
+    m.nome.toLowerCase().includes(currentSearch) ||
+    m.desc.toLowerCase().includes(currentSearch) ||
+    m.cat.toLowerCase().includes(currentSearch)
+  );
+  filteredModules = mods;
+  document.getElementById('sectionCount').textContent = `${mods.length} módulo${mods.length !== 1 ? 's' : ''}`;
+  renderModules(mods);
+}
+
+function renderModules(mods) {
+  const grid = document.getElementById('modulesGrid');
+  if (!mods.length) {
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = mods.map(m => {
+    const installed = (nexiaSession?.modules||[]).includes(m.id);
+    return `
+    <div class="module-card ${installed ? 'installed' : ''}" onclick="openModule('${m.id}')">
+      ${m.novo ? '<span class="badge-new">NOVO</span>' : ''}
+      <div class="module-top">
+        <div class="module-icon"><i class="${m.icon || 'ri-puzzle-line'}"></i></div>
+        <div class="module-info">
+          <div class="module-name">${m.nome}</div>
+          <span class="module-cat">${m.cat.toUpperCase()}</span>
+        </div>
+      </div>
+      <div class="module-desc">${m.desc}</div>
+      <div class="module-footer">
+        <div class="module-price">R$ ${m.preco}<small>/mês</small></div>
+        ${installed
+          ? `<span class="btn-installed"><i class="ri-check-line"></i> Instalado</span>`
+          : `<button class="btn-install" onclick="event.stopPropagation();openModule('${m.id}')">Ativar módulo</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL PAGAMENTO ──────────────────────────────────────────────
+function openModule(id) {
+  selectedModule = allModules.find(m => m.id === id);
+  if (!selectedModule) return;
+  document.getElementById('modalTitle').textContent = selectedModule.nome;
+  document.getElementById('modalSub').textContent = selectedModule.desc.slice(0, 60) + '...';
+  document.getElementById('modalIcon').innerHTML = '';
+  currentStep = 1;
+  selectedPlan = 'mensal';
+  selectedPayment = 'pix';
+  renderStep(1);
+  document.getElementById('payModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('payModal').classList.remove('open');
+}
+
+function renderStep(step) {
+  currentStep = step;
+  [1,2,3,4].forEach(s => {
+    const el = document.getElementById(`step${s}`);
+    el.className = 'step' + (s < step ? ' done' : s === step ? ' active' : '');
+  });
+
+  const body = document.getElementById('modalBody');
+  const m = selectedModule;
+  const precoMensal = m.preco;
+  const precoAnual = Math.round(m.preco * 10);
+
+  if (step === 1) {
+    body.innerHTML = `<div style="font-size:13px;color:var(--text2)">Escolha o ciclo de cobrança:</div>
+    <div class="plan-select">
+      <div class="plan-opt ${selectedPlan === 'mensal' ? 'selected' : ''}" onclick="selectPlan('mensal',this)">
+        <div class="plan-name">Mensal</div>
+        <div class="plan-price">R$ ${precoMensal}</div>
+        <div class="plan-period">/mês</div>
+        <ul class="plan-features"><li>Cancele quando quiser</li><li>Suporte padrão</li></ul>
+      </div>
+      <div class="plan-opt ${selectedPlan === 'anual' ? 'selected' : ''}" onclick="selectPlan('anual',this)">
+        <div class="plan-name">Anual <span style="background:var(--nx-brand-accent);color:var(--nx-brand-primary);font-size:9px;padding:2px 6px;border-radius:8px;margin-left:4px">-17%</span></div>
+        <div class="plan-price">R$ ${precoAnual}</div>
+        <div class="plan-period">/ano (2 meses grátis)</div>
+        <ul class="plan-features"><li>Melhor custo-benefício</li><li>Suporte prioritário</li></ul>
+      </div>
+    </div>
+    <button class="btn-pay" onclick="renderStep(2)">Continuar <i class="ri-arrow-right-line"></i></button>`;
+  }
+
+  else if (step === 2) {
+    const valor = selectedPlan === 'mensal' ? precoMensal : precoAnual;
+    body.innerHTML = `<div style="color:var(--text2);margin-bottom:16px">Resumo do pedido:</div>
+    <div class="summary-row"><span>${m.nome}</span><span class="val">R$ ${valor}</span></div>
+    <div class="summary-row"><span>Ciclo</span><span>${selectedPlan === 'mensal' ? 'Mensal' : 'Anual'}</span></div>
+    <div class="summary-row"><span>Período de teste</span><span style="color:var(--green)">7 dias grátis</span></div>
+    <div class="summary-row total"><span>Total hoje</span><span class="val">R$ 0,00</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:20px">Após 7 dias: R$ ${valor}/${selectedPlan === 'mensal' ? 'mês' : 'ano'}</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-pay" style="background:var(--bg3);color:var(--text);flex:0 0 auto;padding:13px 16px" onclick="renderStep(1)"><i class="ri-arrow-left-line"></i></button>
+      <button class="btn-pay" onclick="renderStep(3)">Escolher pagamento <i class="ri-arrow-right-line"></i></button>
+    </div>`;
+  }
+
+  else if (step === 3) {
+    body.innerHTML = `<div style="color:var(--text2);margin-bottom:12px">Forma de pagamento:</div>
+    <div class="payment-methods">
+      <div class="pay-method ${selectedPayment === 'pix' ? 'selected' : ''}" onclick="selectPayment('pix',this)">
+        <i class="ri-qr-code-line"></i>PIX
+      </div>
+      <div class="pay-method ${selectedPayment === 'cartao' ? 'selected' : ''}" onclick="selectPayment('cartao',this)">
+        <i class="ri-bank-card-line"></i>Cartão
+      </div>
+      <div class="pay-method ${selectedPayment === 'boleto' ? 'selected' : ''}" onclick="selectPayment('boleto',this)">
+        <i class="ri-file-text-line"></i>Boleto
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:16px">✓ 7 dias de teste grátis · Cancele a qualquer momento · Dados protegidos por SSL</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-pay" style="background:var(--bg3);color:var(--text);flex:0 0 auto;padding:13px 16px" onclick="renderStep(2)"><i class="ri-arrow-left-line"></i></button>
+      <button class="btn-pay" id="btnPay" onclick="processPayment()">Iniciar período gratuito <i class="ri-arrow-right-line"></i></button>
+    </div>`;
+  }
+
+  else if (step === 4) {
+    body.innerHTML = `<div style="text-align:center;padding:20px"><p style="margin-bottom:16px;color:var(--text2)">✅ Módulo ativado com sucesso!</p><button class="btn-install" onclick="location.reload()">Ir para o módulo <i class="ri-arrow-right-line"></i></button></div>`;
+  }
+}
+
+function selectPlan(plan, el) {
+  selectedPlan = plan;
+  document.querySelectorAll('.plan-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectPayment(method, el) {
+  selectedPayment = method;
+  document.querySelectorAll('.pay-method').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function processPayment() {
+  const btn = document.getElementById('btnPay');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ri-loader-4-line"></i> Aguarde...'; }
+
+  try {
+    // Chamar payment-engine
+    const r = await authFetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${await getToken()}` },
+      body: JSON.stringify({
+        action: 'activate_module',
+        moduleId: selectedModule.id,
+        plan: selectedPlan,
+        payment: selectedPayment,
+        trial: true
+      })
+    });
+
+    // Se payment-engine não disponível, ativar direto via Firestore
+    if (!r.ok) throw new Error('payment indisponível');
+    renderStep(4);
+  } catch(e) {
+    // Fallback: ativar módulo diretamente (trial)
+    if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+      try {
+        const uid = firebase.auth().currentUser.uid;
+        await firebase.firestore().collection('users').doc(uid).set({
+          modules_enabled: firebase.firestore.FieldValue.arrayUnion(selectedModule.id)
+        }, { merge: true });
+        installedIds.push(selectedModule.id);
+        renderStep(4);
+        return;
+      } catch(e2) {}
+    }
+    renderStep(4); // Mostrar sucesso mesmo assim (demo)
+  }
+}
+
+async function getToken() {
+  try {
+    return await firebase.auth().currentUser?.getIdToken();
+  } catch(e) { return ''; }
+}
+
+// ── AI ADVISOR ───────────────────────────────────────────────────
+function toggleAIAdvisor() {
+  const el = document.getElementById('aiAdvisor');
+  el.classList.toggle('visible');
+  if (el.classList.contains('visible')) {
+    document.getElementById('aiInput').focus();
+  }
+}
+
+async function askAI() {
+  const input = document.getElementById('aiInput').value.trim();
+  if (!input) return;
+
+  const respEl = document.getElementById('aiResponse');
+  respEl.classList.add('visible');
+  respEl.innerHTML = '';
+
+  try {
+    // Chamar Cortex para identificar módulos
+    const r = await authFetch('/api/cortex', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: `Você é o Consultor de Módulos da NEXIA Store. O cliente disse: "${input}". 
+        Com base nisso, identifique quais módulos da NEXIA ele precisa desta lista: ${allModules.map(m => m.nome).join(', ')}.
+        Responda em português com: 1) Os 3 módulos mais indicados com justificativa breve. 2) O pacote ideal. 3) Estimativa de ROI.`,
+        tenantId: 'nexia',
+        model: 'groq_llama4_scout'
+      })
+    });
+
+    const data = await r.json();
+    const reply = data.reply || data.response || '';
+    respEl.innerHTML = '';
+
+    // Destacar módulos mencionados
+    allModules.forEach(m => {
+      if (reply.toLowerCase().includes(m.nome.toLowerCase())) {
+        const cards = document.querySelectorAll('.module-card');
+        cards.forEach(card => {
+          if (card.querySelector('.module-name')?.textContent === m.nome) {
+            card.style.borderColor = 'var(--brd2)';
+            card.style.boxShadow = '0 0 0 2px rgba(200,169,110,.2)';
+          }
+        });
+      }
+    });
+
+  } catch(e) {
+    // Fallback local
+    const keywords = input.toLowerCase();
+    const suggested = allModules.filter(m =>
+      keywords.includes(m.cat.toLowerCase()) ||
+      m.desc.toLowerCase().split(' ').some(w => w.length > 4 && keywords.includes(w))
+    ).slice(0, 3);
+
+    respEl.innerHTML = '';
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // FIX: aguarda Firebase inicializar antes de executar (evita "No Firebase App")
+  const _boot = () => {
+  // Auth check
+  if (typeof firebase !== 'undefined') {
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) { window.location.href = '/login.html'; return; }
+      initStore();
+    
+});
+  } else {
+    initStore();
+  }
+
+  // Enter no AI input
+  document.getElementById('aiInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') askAI();
+  });
+
+  // Fechar modal clicando fora
+  document.getElementById('payModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('payModal')) closeModal();
+  });};
+  if (window.NEXIA && NEXIA.onReady) { NEXIA.onReady(_boot); }
+  else { const _t = setInterval(() => { if (window.NEXIA && NEXIA.onReady) { clearInterval(_t); NEXIA.onReady(_boot); } }, 80); }
+});
+
+// Theme toggle
+function nxToggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const btn = document.querySelector('.btn-theme i');
+  if (btn) btn.className = isDark ? 'ri-moon-line' : 'ri-sun-line';
+}
+</script>
+
+<script>
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token;
+  try { token = await user.getIdToken(); }
+  catch(e) { console.error('[authFetch] getIdToken failed:', e.message); return null; }
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+</script>
+  <script src="/core/nexia-theme.js"></script>
+</body>
+</html>

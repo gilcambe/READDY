@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="pt-BR">
+<head>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="dns-prefetch" href="https://firestore.googleapis.com">
+<meta charset="UTF-8">
+<meta name="description" content="NEXIA Social Media Auto — Automação inteligente de redes sociais com IA. Crie, publique e monitore conteúdo automaticamente."><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Media Automático — NEXIA OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/core/config.js"></script>
+<script src="/core/auth.js"></script>
+<script src="/core/nav-guard.js"></script>
+<link rel="stylesheet" href="/core/nexia-theme.css">
+<style>
+:root{--bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A2E;--brd:rgba(255,255,255,.07);--brd2:rgba(200,169,110,.25);--text:#F5F3EE;--text2:#9A9590;--text3:#5A5550;--accent:#C8A96E;--ff:'Inter',system-ui,sans-serif}
+[data-theme="light"]{--bg:#F5F3EE;--bg2:#fff;--bg3:#ECEAE4;--brd:rgba(0,0,0,.08);--text:#0A0A0F;--text2:#4A4540}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.brand-icon{width:28px;height:28px;border-radius:7px;background:#0A0A0F;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;font-weight:700}
+.brand-name{font-size:13px;font-weight:700;color:var(--text)}.brand-name span{color:var(--accent)}
+.spacer{flex:1}
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 54px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--brd);padding:20px;display:flex;flex-direction:column;gap:16px}
+.sidebar-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.config-group{display:flex;flex-direction:column;gap:8px}
+.label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--ff);outline:none;transition:.15s}
+.input:focus{border-color:var(--brd2)}
+.textarea{resize:vertical;min-height:80px}
+.select{appearance:none;cursor:pointer}
+.network-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.network-btn{padding:8px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.network-btn.active{border-color:var(--brd2);background:rgba(200,169,110,.08);color:var(--accent)}
+.btn-generate{width:100%;padding:12px;background:#0A0A0F;color:var(--accent);border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-generate:hover{opacity:.85}
+.btn-generate:disabled{opacity:.4;cursor:not-allowed}
+.main{padding:24px;overflow-y:auto}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:14px}
+.stat-val{font-size:22px;font-weight:700;color:var(--accent);line-height:1}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.post-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;overflow:hidden;transition:.15s}
+.post-card:hover{border-color:var(--brd2)}
+.post-header{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--brd)}
+.post-network{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.post-network.ig{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)}
+.post-network.fb{background:#1877f2}
+.post-network.li{background:#0077b5}
+.post-network.tw{background:#000}
+.post-title{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.post-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.post-status.draft{background:rgba(183,119,13,.1);color:#B7770D}
+.post-status.scheduled{background:rgba(44,122,75,.1);color:#2C7A4B}
+.post-status.published{background:rgba(200,169,110,.1);color:var(--accent)}
+.post-body{padding:14px}
+.post-text{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;min-height:60px}
+.post-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.tag{font-size:10px;color:var(--accent);opacity:.7}
+.post-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--brd);background:var(--bg3);color:var(--text2);transition:.15s;display:flex;align-items:center;gap:4px}
+.btn-sm:hover{background:var(--bg4);color:var(--text)}
+.btn-sm.primary{background:#0A0A0F;color:var(--accent);border-color:transparent}
+.empty{text-align:center;padding:60px;color:var(--text3);grid-column:1/-1}
+.empty i{font-size:40px;margin-bottom:12px;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite}
+
+/* === MOBILE OVERFLOW FIX v12 === */
+@media(max-width:768px){
+  html,body{overflow-x:hidden!important;max-width:100vw!important}
+  *{max-width:100%}
+  img,video,iframe{max-width:100%!important;height:auto}
+  pre,code{overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  [class*="container"],[class*="wrap"],[class*="inner"]{max-width:100vw!important;padding-left:16px!important;padding-right:16px!important}
+  nav,header{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important}
+  section,.sec{padding-left:16px!important;padding-right:16px!important;max-width:100vw!important;overflow:hidden!important}
+}
+
+</style>
+
+<script>
+/* === NEXIA Firebase Resilience v12 === */
+(function(){
+  var _origError = console.error.bind(console);
+  console.error = function() {
+    var msg = Array.prototype.join.call(arguments, ' ');
+    if (msg.indexOf('Could not reach Cloud Firestore') !== -1 ||
+        msg.indexOf('offline mode') !== -1 ||
+        msg.indexOf('ERR_SOCKET_NOT_CONNECTED') !== -1) {
+      if (!document.getElementById('nx-offline-banner')) {
+        var b = document.createElement('div');
+        b.id = 'nx-offline-banner';
+        b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#FF8C00;color:#000;font-size:11px;font-weight:700;text-align:center;padding:6px 16px;z-index:99999;letter-spacing:.05em';
+        b.textContent = '\u26a0 Modo offline \u2014 reconectando...';
+        document.body && document.body.appendChild(b);
+        var retries = 0;
+        var check = setInterval(function(){
+          retries++;
+          if (navigator.onLine || retries > 30) { b.remove(); clearInterval(check); }
+        }, 2000);
+      }
+      return;
+    }
+    return _origError.apply(this, arguments);
+  };
+})();
+</script>
+<link rel="stylesheet" href="/tenants/nexia/theme.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../nexia-design-system.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="/nexia/my-panel"><div class="brand-icon">N</div><span class="brand-name">NEXIA <span>OS</span></span></a>
+  <span style="color:var(--brd2)">/</span>
+  <span style="font-size:13px;color:var(--text2)">Social Media Automático</span>
+  <div class="spacer"></div>
+  <a href="/nexia/my-panel" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--brd);color:var(--text2);font-size:12px;text-decoration:none"><i class="ri-arrow-left-line"></i> Painel</a>
+  <button onclick="nxToggleTheme()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px"><i class="ri-moon-line"></i></button>
+</div>
+
+<div class="shell">
+  <!-- SIDEBAR CONFIG -->
+  <div class="sidebar">
+    <div class="sidebar-title">Configuração</div>
+
+    <div class="config-group">
+      <div class="label">Nicho / Setor</div>
+      <input class="input" id="nicho" type="text" placeholder="Ex: Clínica estética, Imobiliária...">
+    </div>
+
+    <div class="config-group">
+      <div class="label">Tom de voz</div>
+      <select class="input select" id="tom">
+        <option value="profissional">Profissional</option>
+        <option value="descontraido">Descontraído</option>
+        <option value="inspirador">Inspirador</option>
+        <option value="urgente">Urgente / Promoção</option>
+        <option value="educativo">Educativo</option>
+      </select>
+    </div>
+
+    <div class="config-group">
+      <div class="label">Produto / Serviço principal</div>
+      <textarea class="input textarea" id="produto" placeholder="Descreva brevemente o que você vende..."></textarea>
+    </div>
+
+    <div class="config-group">
+      <div class="label">Redes sociais</div>
+      <div class="network-grid">
+        <button class="network-btn active" id="net-ig" onclick="toggleNet('ig',this)"><i class="ri-instagram-line"></i> Instagram</button>
+        <button class="network-btn" id="net-fb" onclick="toggleNet('fb',this)"><i class="ri-facebook-line"></i> Facebook</button>
+        <button class="network-btn" id="net-li" onclick="toggleNet('li',this)"><i class="ri-linkedin-line"></i> LinkedIn</button>
+        <button class="network-btn" id="net-tw" onclick="toggleNet('tw',this)"><i class="ri-twitter-x-line"></i> X/Twitter</button>
+      </div>
+    </div>
+
+    <div class="config-group">
+      <div class="label">Quantidade de posts</div>
+      <select class="input select" id="qtd">
+        <option value="5">5 posts</option>
+        <option value="10" selected>10 posts</option>
+        <option value="20">20 posts</option>
+        <option value="30">30 posts (1 mês)</option>
+      </select>
+    </div>
+
+    <button class="btn-generate" id="btnGenerate" onclick="generatePosts()">
+      <i class="ri-ai-generate"></i> Gerar com IA
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="page-hdr">
+      <div class="page-title">Posts Gerados</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm" onclick="scheduleAll()"><i class="ri-calendar-line"></i> Agendar Todos</button>
+        <button class="btn-sm primary" onclick="publishAll()"><i class="ri-send-plane-line"></i> Publicar Todos</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Posts gerados</div></div>
+      <div class="stat"><div class="stat-val" id="statScheduled">0</div><div class="stat-lbl">Agendados</div></div>
+      <div class="stat"><div class="stat-val" id="statPublished">0</div><div class="stat-lbl">Publicados</div></div>
+      <div class="stat"><div class="stat-val" id="statDraft">0</div><div class="stat-lbl">Rascunhos</div></div>
+    </div>
+
+    <div class="posts-grid" id="postsGrid">
+      <div class="empty">
+        <i class="ri-instagram-line"></i>
+        <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:8px">Nenhum post ainda</div>
+        <div>Configure o nicho e clique em "Gerar com IA"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let posts = [], selectedNets = ['ig'];
+let tenantId = 'nexia', userId = '';
+
+const NET_LABELS = {ig:'Instagram',fb:'Facebook',li:'LinkedIn',tw:'X/Twitter'};
+const NET_CLASSES = {ig:'ig',fb:'fb',li:'li',tw:'tw'};
+const NET_ICONS = {ig:'ri-instagram-line',fb:'ri-facebook-line',li:'ri-linkedin-line',tw:'ri-twitter-x-line'};
+
+function toggleNet(net, btn) {
+  const idx = selectedNets.indexOf(net);
+  if (idx >= 0) { if (selectedNets.length > 1) { selectedNets.splice(idx,1); btn.classList.remove('active'); } }
+  else { selectedNets.push(net); btn.classList.add('active'); }
+}
+
+async function generatePosts() {
+  const nicho = document.getElementById('nicho').value.trim();
+  const tom = document.getElementById('tom').value;
+  const produto = document.getElementById('produto').value.trim();
+  const qtd = parseInt(document.getElementById('qtd').value);
+
+  if (!nicho) { alert('Informe o nicho/setor'); return; }
+
+  const btn = document.getElementById('btnGenerate');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line spin"></i> Gerando...';
+
+  try {
+    const prompt = `Gere ${qtd} posts para redes sociais para um negócio do setor: ${nicho}.
+Produto/Serviço: ${produto || 'não especificado'}. Tom: ${tom}.
+Redes: ${selectedNets.map(n => NET_LABELS[n]).join(', ')}.
+Retorne JSON array: [{"rede":"ig|fb|li|tw","texto":"texto do post completo com emojis","hashtags":["#tag1","#tag2"],"tipo":"educativo|promocional|engajamento|depoimento"}]
+APENAS JSON, sem texto fora.`;
+
+    const r = await authFetch('/api/cortex', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt, tenantId, model: 'groq_llama4_scout' })
+    });
+    const data = await r.json();
+    const raw = (data.reply || data.response || '[]').replace(/```json|```/g, '').trim();
+
+    try {
+      const generated = JSON.parse(raw);
+      posts = generated.map((p, i) => ({
+        id: `post_${Date.now()}_${i}`,
+        rede: p.rede || selectedNets[i % selectedNets.length],
+        texto: p.texto || '',
+        hashtags: p.hashtags || [],
+        tipo: p.tipo || 'geral',
+        status: 'draft',
+        criadoEm: new Date().toISOString()
+      }));
+
+      // Salvar no Firestore
+      if (typeof firebase !== 'undefined') {
+        const db = firebase.firestore();
+        const batch = db.batch();
+        posts.forEach(p => {
+          const ref = db.collection(`tenants/${tenantId}/social_posts`).doc(p.id);
+          batch.set(ref, p);
+        });
+        await batch.commit();
+      }
+
+      renderPosts();
+    } catch(e) {
+      // Gerar posts de fallback localmente
+      posts = generateFallbackPosts(nicho, tom, qtd);
+      renderPosts();
+    }
+
+  } catch(e) {
+    posts = generateFallbackPosts(nicho, tom, qtd);
+    renderPosts();
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ri-ai-generate"></i> Gerar com IA';
+}
+
+function generateFallbackPosts(nicho, tom, qtd) {
+  const templates = [
+    {texto:`🚀 Transforme seu negócio com ${nicho}! Nossa solução foi desenvolvida para empresas que buscam resultados reais.\n\nEntre em contato e descubra como podemos ajudar você a alcançar seus objetivos.`,hashtags:['#negócios','#resultados','#crescimento']},
+    {texto:`💡 Você sabia que empresas do setor de ${nicho} que investem em tecnologia crescem 3x mais rápido?\n\nEstamos aqui para fazer parte dessa transformação. Fale com nosso time!`,hashtags:['#inovação','#tecnologia','#crescimento']},
+    {texto:`✅ Qualidade, eficiência e resultados. É isso que entregamos no dia a dia.\n\nDescubra nossos serviços e veja como podemos fazer a diferença para o seu negócio de ${nicho}.`,hashtags:['#qualidade','#eficiência','#parceria']},
+  ];
+  return Array.from({length: Math.min(qtd, 10)}, (_, i) => ({
+    id: `post_${Date.now()}_${i}`,
+    rede: selectedNets[i % selectedNets.length],
+    ...templates[i % templates.length],
+    status: 'draft',
+    criadoEm: new Date().toISOString()
+  }));
+}
+
+function renderPosts() {
+  const grid = document.getElementById('postsGrid');
+  document.getElementById('statTotal').textContent = posts.length;
+  document.getElementById('statDraft').textContent = posts.filter(p => p.status === 'draft').length;
+  document.getElementById('statScheduled').textContent = posts.filter(p => p.status === 'scheduled').length;
+  document.getElementById('statPublished').textContent = posts.filter(p => p.status === 'published').length;
+
+  if (!posts.length) { grid.innerHTML = '<div class="empty"><i class="ri-instagram-line"></i><div>Nenhum post gerado</div></div>'; return; }
+
+  grid.innerHTML = posts.map(p => `
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-network ${NET_CLASSES[p.rede] || 'ig'}"><i class="${NET_ICONS[p.rede] || 'ri-instagram-line'}" style="color:#fff;font-size:13px"></i></div>
+        <div class="post-title">${NET_LABELS[p.rede] || p.rede}</div>
+        <span class="post-status ${p.status}">${{draft:'Rascunho',scheduled:'Agendado',published:'Publicado'}[p.status]}</span>
+      </div>
+      <div class="post-body">
+        <div class="post-text">${p.texto?.slice(0, 150)}${p.texto?.length > 150 ? '...' : ''}</div>
+        <div class="post-tags">${(p.hashtags || []).map(h => `<span class="tag">${h}</span>`).join(' ')}</div>
+        <div class="post-actions">
+          <button class="btn-sm" onclick="editPost('${p.id}')"><i class="ri-edit-line"></i> Editar</button>
+          <button class="btn-sm" onclick="schedulePost('${p.id}')"><i class="ri-calendar-line"></i> Agendar</button>
+          <button class="btn-sm primary" onclick="publishPost('${p.id}')"><i class="ri-send-plane-line"></i> Publicar</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function schedulePost(id) {
+  const p = posts.find(x => x.id === id);
+  if (p) { p.status = 'scheduled'; renderPosts(); toast('Post agendado!'); }
+}
+function publishPost(id) {
+  const p = posts.find(x => x.id === id);
+  if (p) { p.status = 'published'; renderPosts(); toast('Post publicado!'); }
+}
+function scheduleAll() { posts.forEach(p => { if (p.status === 'draft') p.status = 'scheduled'; }); renderPosts(); toast(`${posts.length} posts agendados!`); }
+function publishAll() { posts.forEach(p => p.status = 'published'); renderPosts(); toast(`${posts.length} posts publicados!`); }
+function editPost(id) { alert('Editor de post em breve!'); }
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--brd2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);z-index:9999;animation:fadeIn .2s';
+  t.textContent = '✅ ' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function nxToggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+// Auth
+document.addEventListener('DOMContentLoaded', () => {
+  // FIX: aguarda Firebase inicializar antes de executar (evita "No Firebase App")
+  const _boot = () => {
+  if (typeof firebase !== 'undefined') {
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) { window.location.href = '/login.html'; return; }
+      userId = user.uid;
+      // Carregar posts existentes
+      try {
+        firebase.firestore().collection(`tenants/${tenantId}/social_posts`)
+          .orderBy('criadoEm','desc').limit(30).get()
+          .then(snap => { if (!snap.empty) { posts = snap.docs.map(d => ({id:d.id,...d.data()})); renderPosts(); }})
+          .catch(() => {
+});
+      } catch(e) {}
+    });
+  }};
+  if (window.NEXIA && NEXIA.onReady) { NEXIA.onReady(_boot); }
+  else { const _t = setInterval(() => { if (window.NEXIA && NEXIA.onReady) { clearInterval(_t); NEXIA.onReady(_boot); } }, 80); }
+});
+</script>
+
+<script>
+/* ═══ authFetch — envia token Firebase em TODOS os requests /api ═══ */
+async function authFetch(url, options = {}) {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+    return null;
+  }
+  let token;
+  try { token = await user.getIdToken(); }
+  catch(e) { console.error('[authFetch] getIdToken failed:', e.message); return null; }
+  const headers = Object.assign({}, options.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+  });
+  return fetch(url, Object.assign({}, options, { headers }));
+}
+</script>
+  <script src="/core/nexia-theme.js"></script>
+</body>
+</html>

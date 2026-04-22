@@ -1,0 +1,90 @@
+/* ── NEXIA GLOBAL THEME TOKENS ── */
+:root {
+  --bg: #F8FAFC;
+  --bg2: #FFFFFF;
+  --bg3: #F1F5F9;
+  --bg4: #E2E8F0;
+  --text: #0F172A;
+  --text2: #475569;
+  --text3: #94A3B8;
+  --brd: #E2E8F0;
+  --brd2: #CBD5E1;
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #DC2626;
+  --cyan: #2563EB;
+  --cyan2: #1D4ED8;
+  --cyanlt: rgba(37,99,235,0.06);
+  --cyanbrd: rgba(37,99,235,0.2);
+  --purple: #7C3AED;
+  --purplt: rgba(124,58,237,0.06);
+  --purpbrd: rgba(124,58,237,0.2);
+  --green: #16A34A;
+  --greenlt: rgba(22,163,74,0.08);
+  --greenbrd: rgba(22,163,74,0.2);
+  --amber: #F59E0B;
+  --amberlt: rgba(245,158,11,0.08);
+  --red: #DC2626;
+  --redlt: rgba(220,38,38,0.08);
+  --gold: #B45309;
+  --sb: 240px;
+}
+
+[data-theme="dark"] {
+  --bg: #07090F;
+  --bg2: #0D1117;
+  --bg3: #161B22;
+  --bg4: #0a0d14;
+  --text: #CDD5E0;
+  --text2: rgba(205,213,224,0.6);
+  --text3: rgba(205,213,224,0.3);
+  --brd: rgba(255,255,255,0.05);
+  --brd2: rgba(255,255,255,0.09);
+  --primary: #00E5FF;
+  --primary-hover: #00B8CC;
+  --cyan: #00E5FF;
+  --cyan2: #00B8CC;
+  --cyanlt: rgba(0,229,255,0.07);
+  --cyanbrd: rgba(0,229,255,0.15);
+  --purple: #A855F7;
+  --purplt: rgba(168,85,247,0.07);
+  --purpbrd: rgba(168,85,247,0.18);
+  --green: #10B981;
+  --greenlt: rgba(16,185,129,0.08);
+  --greenbrd: rgba(16,185,129,0.2);
+  --amber: #F59E0B;
+  --amberlt: rgba(245,158,11,0.08);
+  --red: #EF4444;
+  --redlt: rgba(239,68,68,0.08);
+  --gold: #FFD700;
+}
+
+/* Force light mode override — needed when page inline :root has dark defaults */
+[data-theme="light"] {
+  --bg: #F8FAFC !important;
+  --bg2: #FFFFFF !important;
+  --bg3: #F1F5F9 !important;
+  --bg4: #E2E8F0 !important;
+  --text: #0F172A !important;
+  --text2: #475569 !important;
+  --text3: #94A3B8 !important;
+  --brd: #E2E8F0 !important;
+  --brd2: #CBD5E1 !important;
+  --primary: #2563EB !important;
+  --primary-hover: #1D4ED8 !important;
+  --cyan: #2563EB !important;
+  --cyan2: #1D4ED8 !important;
+  --cyanlt: rgba(37,99,235,0.06) !important;
+  --cyanbrd: rgba(37,99,235,0.2) !important;
+  --purple: #7C3AED !important;
+  --purplt: rgba(124,58,237,0.06) !important;
+  --purpbrd: rgba(124,58,237,0.2) !important;
+  --green: #16A34A !important;
+  --greenlt: rgba(22,163,74,0.08) !important;
+  --greenbrd: rgba(22,163,74,0.2) !important;
+  --red: #DC2626 !important;
+  --redlt: rgba(220,38,38,0.08) !important;
+  --gold: #B45309 !important;
+}
